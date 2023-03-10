@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-confirm@3.3.4/dist/jquery-confirm.min.css">
+    <link href="https://cdn.bootcdn.net/ajax/libs/jquery-treegrid/0.2.0/css/jquery.treegrid.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-select/1.13.17/css/bootstrap-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css" />
+    <link href="/assets/bootstrap/css/style.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">配置分类栏</div>
+                </div>
+                <div class="card-body">
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">上级分类</span>
+                        </div>
+                        <select class="form-control select-picker col-lg-3" data-width="auto"
+                                data-live-search="true" id="level">
+                        </select>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">分类名称</span>
+                        </div>
+                        <input type="text" class="form-control" id="name" placeholder="请输入分类名称">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">分类图标</span>
+                        </div>
+                        <input type="text" class="form-control" id="icon" placeholder="请输入分类图标">
+                    </div>
+
+                    <input type="hidden" id="id">
+
+                    <button type="button" id="btnOk" class="btn btn-primary">提交</button>
+                    <button type="button" id="btnLoading" class="btn btn-primary" disabled style="display: none">
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        提交中...
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card">
+                <header class="card-header">
+                    <div class="card-title">分类栏列表</div>
+                </header>
+                <div class="card-body">
+                    <table class="tree-table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/bootstrap/js/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-confirm@3.3.4/dist/jquery-confirm.min.js"></script>
+<script type="text/javascript" src="/assets/bootstrap/js/httpclient/httpclient.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.16.0/src/locale/bootstrap-table-zh-CN.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery-treegrid/0.2.0/js/jquery.treegrid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.16.0/src/extensions/treegrid/bootstrap-table-treegrid.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-select/1.13.17/js/i18n/defaults-zh_CN.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.select-picker').selectpicker();
+        let menuData = "";
+
+        AjaxFormNoAsync(
+            "GET",
+            "/api/category",
+            "",
+            function () {
+            },
+            function (data) {
+                $("#level").append("<option value='-1'>一级目录</option>");
+                $.each(data.list, function (index, value) {
+                    $("#level").append("<option value='" + value.id + "'>" + value.name + "</option>");
+                });
+
+                $("#level option:eq(0)").attr('selected', 'selected'); //选中第一个
+                $("#level").selectpicker('refresh');
+
+                menuData = data.list;
+            },
+            function (response) {
+                AjaxError(response);
+            }
+        );
+
+        const $treeTable = $('.tree-table');
+        $treeTable.bootstrapTable({
+            data: menuData,
+            idField: 'id',
+            uniqueId: 'id',
+            dataType: 'jsonp',
+            //toolbar: '#toolbar2',
+            columns: [
+                {
+                    field: 'name',
+                    title: '名称',
+                    formatter: function (value, row, index) {
+                        return row.name;
+                    }
+                },
+                {
+                    field: 'sort',
+                    title: '排序',
+                    formatter: function (value, row, index) {
+                        return '<input type="text" value="'+ row.sort +'" data-id="' + row.id + '" data-name="' + row.name + '" class="form-control sort" style="width:60px;">';
+                    }
+                },
+                {
+                    field: 'link',
+                    title: '分类图标',
+                    formatter: function (value, row, index) {
+                        return '<i class="lni lni-'+ row.icon+ '"></i>'
+                    }
+                },
+                {
+                    field: 'is_used',
+                    title: '是否启用',
+                    //sortable: true,
+                    formatter: function (value, row, index) {
+                        let is_checked;
+                        if (value === -1) {
+                            is_checked = '';
+                        } else if (value === 1) {
+                            is_checked = 'checked="checked"';
+                        }
+                        return '<div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input" id="'+ row.id + '"' + is_checked + '><label class="custom-control-label customSwitch" state="' + value + '"id="' + row.id + '" for="customSwitch' + row.id + ')"></label></div>';
+                    },
+                },
+                {
+                    field: 'operate',
+                    title: '操作',
+                    align: 'center',
+                    events: {
+                        'click .role-add': function (e, value, row, index) {
+                            add(row.id);
+                        },
+                        'click .role-delete': function (e, value, row, index) {
+                            del(row.id);
+                        },
+                        'click .role-edit': function (e, value, row, index) {
+                            update(row.id);
+                        }
+                    },
+                    formatter: operateFormatter
+                }
+            ],
+
+            treeShowField: 'name',
+            parentIdField: 'pid',
+
+            onResetView: function (menuData) {
+                $treeTable.treegrid({
+                    initialState: 'collapsed', // 所有节点都折叠
+                    treeColumn: 0,
+                    //expanderExpandedClass: 'mdi mdi-folder-open',  // 可自定义图标样式
+                    //expanderCollapsedClass: 'mdi mdi-folder',
+                });
+
+                // 只展开树形的第一集节点
+                $treeTable.treegrid('getRootNodes').treegrid('expand');
+            },
+
+        });
+
+        // 操作按钮
+        function operateFormatter(value, row, index) {
+            return [
+                '<a type="button" class="role-add btn btn-xs btn-default m-r-5" title="编辑" data-toggle="tooltip"><i class="lni lni-plus"></i></a>',
+                '<a type="button" class="role-edit btn btn-xs btn-default m-r-5" title="修改" data-toggle="tooltip"><i class="lni lni-pencil"></i></a>',
+                '<a type="button" class="role-delete btn btn-xs btn-default" title="删除" data-toggle="tooltip"><i class="lni lni-trash-can"></i></a>'
+            ].join('');
+        }
+
+        function add(id) {
+            $("#id").val('');
+            $("#name").val('');
+            $("#icon").val('');
+            getMenuDetail(id, 'add');
+        }
+
+        function del(id) {
+            $.confirm({
+                title: '谨慎操作',
+                content: '确认要 <strong style="color: red">删除</strong> 吗？',
+                icon: 'mdi mdi-alert',
+                animation: 'scale',
+                closeAnimation: 'zoom',
+                buttons: {
+                    okay: {
+                        text: '确认',
+                        keys: ['enter'],
+                        btnClass: 'btn-orange',
+                        action: function () {
+                            AjaxForm(
+                                "DELETE",
+                                "/api/category/" + id,
+                                "",
+                                function () {
+                                },
+                                function () {
+                                    $.alert({
+                                        title: '操作成功',
+                                        icon: 'mdi mdi-check-decagram',
+                                        type: 'green',
+                                        content: '已删除成功。',
+                                        buttons: {
+                                            okay: {
+                                                text: '关闭',
+                                                action: function () {
+                                                    location.reload();
+                                                }
+                                            }
+                                        }
+                                    });
+                                },
+                                function (response) {
+                                    AjaxError(response);
+                                }
+                            );
+                        }
+                    },
+                    cancel: {
+                        text: '取消',
+                        keys: ['ctrl', 'shift'],
+                    }
+                }
+            });
+        }
+
+        function update(id) {
+            getMenuDetail(id, 'update');
+        }
+
+        function getMenuDetail(id, op) {
+            AjaxForm(
+                "GET",
+                "/api/category/" + id,
+                "",
+                function () {
+                },
+                function (data) {
+                    if (op === 'add') {
+                        $('#level').selectpicker('val', data.id);
+                        $("#level").selectpicker('refresh');
+                        $("#level").attr("disabled", "");
+                    }
+
+                    if (op === 'update') {
+                        if (data.pid === 0) {
+                            data.pid = -1
+                        }
+                        $('#level').selectpicker('val', data.pid);
+                        $("#level").selectpicker('refresh');
+                        $("#level").attr("disabled", "");
+
+                        $("#id").val(id);
+                        $("#name").val(data.name);
+                        $("#icon").val(data.icon);
+                        $("#link").val(data.link);
+                    }
+                },
+                function (response) {
+                    AjaxError(response);
+                }
+            );
+        }
+
+        $(document).on('blur', '.sort', function () {
+            const id = $(this).attr("data-id");
+            const name = $(this).attr("data-name");
+            const val = $(this).val();
+
+            $.confirm({
+                title: '谨慎操作',
+                content: '确认要将 ' + name + ' 的排序设置为 <strong style="color: red">' + val + '</strong> 吗？',
+                icon: 'mdi mdi-alert',
+                animation: 'scale',
+                closeAnimation: 'zoom',
+                buttons: {
+                    okay: {
+                        text: '确认',
+                        keys: ['enter'],
+                        btnClass: 'btn-orange',
+                        action: function () {
+                            AjaxForm(
+                                "PATCH",
+                                "/api/category/sort",
+                                {id: id, sort: val},
+                                function () {
+                                },
+                                function () {
+                                    $.alert({
+                                        title: '操作成功',
+                                        icon: 'mdi mdi-check-decagram',
+                                        type: 'green',
+                                        content: '分类：' + name + '排序成功。',
+                                        buttons: {
+                                            okay: {
+                                                text: '关闭',
+                                                action: function () {
+                                                    location.reload();
+                                                }
+                                            }
+                                        }
+                                    });
+                                },
+                                function (response) {
+                                    AjaxError(response);
+                                }
+                            );
+                        }
+                    },
+                    cancel: {
+                        text: '取消',
+                        keys: ['ctrl', 'shift'],
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '.customSwitch', function () {
+            let state = $(this).attr("state");
+            const id = $(this).attr("id");
+
+            const is_used = (state === '1') ? -1 : 1;
+            const is_used_msg = (state === '1') ? "禁用" : "启用";
+
+            $.confirm({
+                title: '谨慎操作',
+                content: '确认要 <strong style="color: red">' + is_used_msg + '</strong> 吗？',
+                icon: 'mdi mdi-alert',
+                animation: 'scale',
+                closeAnimation: 'zoom',
+                buttons: {
+                    okay: {
+                        text: '确认',
+                        keys: ['enter'],
+                        btnClass: 'btn-orange',
+                        action: function () {
+                            AjaxForm(
+                                "PATCH",
+                                "/api/category/used",
+                                {id: id, used: is_used},
+                                function () {
+                                },
+                                function () {
+                                    $.alert({
+                                        title: '操作成功',
+                                        icon: 'mdi mdi-check-decagram',
+                                        type: 'green',
+                                        content: '已' + is_used_msg + '成功。',
+                                        buttons: {
+                                            okay: {
+                                                text: '关闭',
+                                                action: function () {
+                                                    location.reload();
+                                                }
+                                            }
+                                        }
+                                    });
+                                },
+                                function (response) {
+                                    AjaxError(response);
+                                }
+                            );
+                        }
+                    },
+                    cancel: {
+                        text: '取消',
+                        keys: ['ctrl', 'shift'],
+                    }
+                }
+            });
+        });
+
+        $('#btnOk').on('click', function () {
+            const level = $("#level").val();
+            const name = $("#name").val();
+            const icon = $("#icon").val();
+            const id = $("#id").val();
+
+            if (level === "") {
+                $.alert({
+                    title: '温馨提示',
+                    icon: 'mdi mdi-alert',
+                    type: 'orange',
+                    content: '请选择上级目录。',
+                });
+                return false;
+            }
+
+            if (name === "") {
+                $.alert({
+                    title: '温馨提示',
+                    icon: 'mdi mdi-alert',
+                    type: 'orange',
+                    content: '请输入分类名称。',
+                });
+                return false;
+            }
+
+            const postData = {
+                level: level,
+                name: name,
+                icon: icon,
+                id: id,
+            };
+
+            AjaxForm(
+                "POST",
+                "/api/category",
+                postData,
+                function () {
+                    $(this).hide();
+                    $("#btnLoading").show();
+                },
+                function () {
+                    $("#btnLoading").hide();
+                    $("#btnOk").show();
+
+                    $.alert({
+                        title: '操作成功',
+                        icon: 'mdi mdi-check-decagram',
+                        type: 'green',
+                        content: '分类：' + name + ' 创建完成。',
+                        buttons: {
+                            okay: {
+                                text: '关闭',
+                                action: function () {
+                                    location.reload();
+                                }
+                            }
+                        }
+                    });
+                },
+                function (response) {
+                    $("#btnLoading").hide();
+                    $("#btnOk").show();
+
+                    AjaxError(response);
+                }
+            );
+        });
+    })
+</script>
+</body>
+</html>

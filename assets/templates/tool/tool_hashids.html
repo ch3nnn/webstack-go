@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-confirm@3.3.4/dist/jquery-confirm.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css" />
+
+    <link href="/assets/bootstrap/css/style.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">hashids 加密</div>
+                </div>
+                <div class="card-body">
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">数字</span>
+                        </div>
+                        <input type="text" class="form-control" id="number" maxlength="10" placeholder="需加密的数字">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" >密文</span>
+                        </div>
+                        <input type="text" class="form-control" disabled id="NumberToEncodeValue">
+                    </div>
+
+                    <button type="button" id="btnEncode" class="btn btn-primary">执行</button>
+                    <button type="button" id="btnEncodeLoading" class="btn btn-primary" disabled style="display: none">
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        执行中...
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <header class="card-header">
+                    <div class="card-title">hashids 解密</div>
+                </header>
+                <div class="card-body">
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">密文</span>
+                        </div>
+                        <input type="text" class="form-control" id="encodeValue" placeholder="需解密的密文">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" >数字</span>
+                        </div>
+                        <input type="text" class="form-control" disabled id="DecodeValueToNumber">
+                    </div>
+
+                    <button type="button" id="btnDecode" class="btn btn-primary">执行</button>
+                    <button type="button" id="btnDecodeLoading" class="btn btn-primary" disabled style="display: none">
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        执行中...
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/bootstrap/js/popper.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-maxlength/1.9.0/bootstrap-maxlength.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-confirm@3.3.4/dist/jquery-confirm.min.js"></script>
+<script type="text/javascript" src="/assets/bootstrap/js/httpclient/httpclient.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("input#number").maxlength({
+            warningClass: "badge badge-info",
+            limitReachedClass: "badge badge-warning"
+        });
+
+        $('#btnEncode').on('click', function () {
+            const number = $("#number").val();
+            if (number === "") {
+                $.alert({
+                    title: '温馨提示',
+                    icon: 'mdi mdi-alert',
+                    type: 'orange',
+                    content: '请输入需加密的数字。',
+                });
+                return false;
+            }
+
+            AjaxForm(
+                "GET",
+                "/api/tool/hashids/encode/" + number,
+                "",
+                function () {
+                    $(this).hide();
+                    $("#btnEncodeLoading").show();
+                },
+                function (data) {
+                    $("#btnEncodeLoading").hide();
+                    $("#btnEncode").show();
+                    $("#NumberToEncodeValue").val(data.val)
+                },
+                function (response) {
+                    $("#btnEncodeLoading").hide();
+                    $("#btnEncode").show();
+                    AjaxError(response);
+                }
+            );
+        });
+
+        $('#btnDecode').on('click', function () {
+            const encodeValue = $("#encodeValue").val();
+            if (encodeValue === "") {
+                $.alert({
+                    title: '温馨提示',
+                    icon: 'mdi mdi-alert',
+                    type: 'orange',
+                    content: '请输入需解密的密文。',
+                });
+                return false;
+            }
+
+            AjaxForm(
+                "GET",
+                "/api/tool/hashids/decode/" + encodeValue,
+                "",
+                function () {
+                    $(this).hide();
+                    $("#btnDecodeLoading").show();
+                },
+                function (data) {
+                    $("#btnDecodeLoading").hide();
+                    $("#btnDecode").show();
+                    $("#DecodeValueToNumber").val(data.val)
+                },
+                function (response) {
+                    $("#btnDecodeLoading").hide();
+                    $("#btnDecode").show();
+                    AjaxError(response);
+                }
+            );
+        });
+
+    })
+</script>
+</body>
+</html>

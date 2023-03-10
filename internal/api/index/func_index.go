@@ -1,0 +1,46 @@
+package index
+
+import (
+	"github.com/xinliangnote/go-gin-api/internal/code"
+	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
+	"github.com/xinliangnote/go-gin-api/internal/services/category"
+	"github.com/xinliangnote/go-gin-api/internal/services/site"
+	"net/http"
+)
+
+type indexResponse struct {
+	CategoryTree  []*category.TreeNode
+	CategorySites []*site.CategorySite
+}
+
+func (h *handler) Index() core.HandlerFunc {
+	return func(c core.Context) {
+
+		categoryTree, err := h.categoryService.Tree(c)
+		if err != nil {
+			c.AbortWithError(core.Error(
+				http.StatusBadRequest,
+				code.MenuListError,
+				code.Text(code.MenuListError)).WithError(err),
+			)
+			return
+		}
+
+		categorySites, err := h.siteService.CategorySite(c)
+		if err != nil {
+			c.AbortWithError(core.Error(
+				http.StatusBadRequest,
+				code.MenuListError,
+				code.Text(code.MenuListError)).WithError(err),
+			)
+			return
+		}
+
+		response := indexResponse{
+			CategoryTree:  categoryTree,
+			CategorySites: categorySites,
+		}
+
+		c.HTML("index", response)
+	}
+}
