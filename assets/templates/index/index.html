@@ -15,13 +15,23 @@
           content="WebStack - 收集国内外优秀设计网站、UI设计资源网站、灵感创意网站、素材资源网站，定时更新分享优质产品设计书签。www.webstack.cc">
     <link rel="shortcut icon" href="/assets/bootstrap/static/index/images/favicon.png">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Arimo:400,700,400italic">
-    <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css" />
+    <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.2.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ch3nnn/picgo/static/css/xenon/xenon-core.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ch3nnn/picgo/static/css/xenon/xenon-components.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ch3nnn/picgo/static/css/xenon/nav.css">
+    <link rel="stylesheet" href="https://webstack.hclonely.com/css/hclonely.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@1.11.1/dist/jquery.min.js"></script>
+    <script>var userDefinedSearchData = {
+        "custom": false,
+        "thisSearch": "https://www.baidu.com/s?wd=",
+        "thisSearchIcon": "url(https://www.baidu.com/favicon.ico)",
+        "hotStatus": true,
+        "data": [{"name": "百度", "img": "url(https://www.baidu.com/favicon.ico)", "url": "https://www.baidu.com/s?wd="}]
+    };</script>
+    <script src="/assets/bootstrap/js/index/header.js"></script>
+
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -71,7 +81,7 @@
                 </div>
             </header>
             <ul id="main-menu" class="main-menu">
-                {{ range  .CategoryTree }}
+                {{ range .CategoryTree }}
                 {{ if .Child }}
                 <li>
                     <a>
@@ -79,7 +89,7 @@
                         <span class="title">{{ .Name }}</span>
                     </a>
                     <ul>
-                        {{ range  .Child }}
+                        {{ range .Child }}
                         <li>
                             <a href="#{{ .Name }}" class="smooth"><span class="title">{{ .Name }}</span></a>
                         </li>
@@ -109,6 +119,17 @@
                         <i class="fa-bars"></i>
                     </a>
                 </li>
+                <!-- 暗黑模式 -->
+                <li class="switch-mode hover-line" onclick="switchNightMode()">
+                    <a href="#">
+                        <svg t="1593061068148" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                             p-id="1681" width="16" height="16">
+                            <path d="M582.4 326.4c-140.8 0-256 115.2-256 256s115.2 256 256 256 256-115.2 256-256-115.2-256-256-256z m0 448c-70.4 0-131.2-36.8-164.8-92.8 12.8 3.2 27.2 4.8 40 4.8 121.6 0 219.2-99.2 219.2-219.2 0-17.6-1.6-35.2-6.4-52.8 60.8 32 102.4 96 102.4 169.6 1.6 104-84.8 190.4-190.4 190.4zM582.4 262.4c17.6 0 32-14.4 32-32v-128c0-17.6-14.4-32-32-32s-32 14.4-32 32v128c0 17.6 14.4 32 32 32zM262.4 582.4c0-17.6-14.4-32-32-32h-128c-17.6 0-32 14.4-32 32s14.4 32 32 32h128c17.6 0 32-14.4 32-32zM310.4 356.8c6.4 6.4 14.4 9.6 22.4 9.6 8 0 16-3.2 22.4-9.6 12.8-12.8 12.8-32 0-44.8l-91.2-91.2c-12.8-12.8-32-12.8-44.8 0-12.8 12.8-12.8 32 0 44.8l91.2 91.2zM944 220.8c-12.8-12.8-32-12.8-44.8 0l-91.2 91.2c-12.8 12.8-12.8 32 0 44.8 6.4 6.4 14.4 9.6 22.4 9.6 8 0 16-3.2 22.4-9.6l91.2-91.2c12.8-12.8 12.8-33.6 0-44.8zM310.4 808l-91.2 91.2c-12.8 12.8-12.8 32 0 44.8 6.4 6.4 14.4 9.6 22.4 9.6 8 0 16-3.2 22.4-9.6l91.2-91.2c12.8-12.8 12.8-32 0-44.8-11.2-11.2-32-11.2-44.8 0z"
+                                  p-id="1682" fill="#707070"></path>
+                        </svg>
+                    </a>
+                </li>
+
             </ul>
             <ul class="user-info-menu right-links list-inline list-unstyled">
                 <li class="hidden-sm hidden-xs">
@@ -120,6 +141,33 @@
             <!-- <a href="https://github.com/WebStackPage/WebStackPage.github.io" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a> -->
 
         </nav>
+        <!-- 搜索 -->
+        <section class="sousuo">
+            <div class="search">
+                <div class="search-box">
+                    <span class="search-icon"
+                          style="background: url(/assets/bootstrap/images/index/search_icon.png) 0px 0px; opacity: 1;"></span>
+                    <input type="text" id="txt" class="search-input" autocomplete="off" placeholder="请输入关键字，按回车 / Enter 搜索">
+                    <button class="search-btn" id="search-btn"><i class="fa fa-search"></i></button>
+                </div>
+                <!-- 搜索热词 -->
+                <div class="box search-hot-text" id="box" style="display: none;">
+                    <ul></ul>
+                </div>
+                <!-- 搜索引擎 -->
+                <div class="search-engine" style="display: none;">
+                    <div class="search-engine-head">
+                        <strong class="search-engine-tit">选择您的默认搜索引擎：</strong>
+                        <div class="search-engine-tool">
+                            搜索热词： <span id="hot-btn" style="background-image: url(/assets/bootstrap/images/index/off_on.png);"></span>
+                        </div>
+                    </div>
+                    <ul class="search-engine-list search-engine-list_zmki_ul">
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <script>search('/assets/bootstrap/images/index/search_icon.png')</script>
         <!-- 常用推荐 -->
         {{ range .CategorySites }}
         {{ if .SiteList }}
@@ -230,7 +278,7 @@
 </script>
 <!-- Bottom Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.1/dist/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.13.1/TweenMax.min.js"> </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.13.1/TweenMax.min.js"></script>
 <script src="/assets/bootstrap/static/index/js/resizeable.js"></script>
 <script src="/assets/bootstrap/static/index/js/xenon-toggles.js"></script>
 <!-- JavaScripts initializations and stuff -->
