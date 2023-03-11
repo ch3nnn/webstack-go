@@ -4,6 +4,12 @@
 - 前端模板: [WebStackPage](https://github.com/WebStackPage/WebStackPage.github.io)
 - 后端框架: [go-gin-api](https://github.com/xinliangnote/go-gin-api)
 
+原有后端框架基础上新增功能：
+1. webstack - 导航首页
+2. 系统管理员 - 网站分类 
+3. 系统管理员 - 网站列表
+4. 支持网址自动获取 logo url
+
 ## 快速开始
 
 **运行环境**
