@@ -32,7 +32,7 @@
                         <div class="form-group">
                             <label for="business_key">LOGO</label>
                             <input type="text" class="form-control" maxlength="200" id="thumb"
-                                   placeholder="请输入LOGO图片地址">
+                                   placeholder="默认自动获取网站 LOGO">
                         </div>
                         <div class="form-group">
                             <label for="business_developer">名称</label>
@@ -113,15 +113,15 @@
 
         $('#btnOk').on('click', function () {
             const thumb = $("#thumb").val();
-            if (thumb === "") {
-                $.alert({
-                    title: '温馨提示',
-                    icon: 'mdi mdi-alert',
-                    type: 'orange',
-                    content: '请输入网站LOGO。',
-                });
-                return false;
-            }
+            // if (thumb === "") {
+            //     $.alert({
+            //         title: '温馨提示',
+            //         icon: 'mdi mdi-alert',
+            //         type: 'orange',
+            //         content: '请输入网站LOGO。',
+            //     });
+            //     return false;
+            // }
 
             const title = $("#title").val();
             if (title === "") {
