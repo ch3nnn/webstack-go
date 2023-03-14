@@ -1,9 +1,9 @@
 package menu
 
 import (
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql/menu"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/menu"
 )
 
 type SearchData struct {

@@ -3,10 +3,10 @@ package cron
 import (
 	"net/http"
 
-	"github.com/xinliangnote/go-gin-api/internal/code"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/validation"
-	"github.com/xinliangnote/go-gin-api/internal/services/cron"
+	"github.com/ch3nnn/webstack-go/internal/code"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/pkg/validation"
+	"github.com/ch3nnn/webstack-go/internal/services/cron"
 )
 
 type createRequest struct {

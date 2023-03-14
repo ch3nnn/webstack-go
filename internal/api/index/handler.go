@@ -1,13 +1,13 @@
 package index
 
 import (
-	"github.com/xinliangnote/go-gin-api/configs"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
-	"github.com/xinliangnote/go-gin-api/internal/repository/redis"
-	"github.com/xinliangnote/go-gin-api/internal/services/category"
-	"github.com/xinliangnote/go-gin-api/internal/services/index"
-	"github.com/xinliangnote/go-gin-api/internal/services/site"
+	"github.com/ch3nnn/webstack-go/configs"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/redis"
+	"github.com/ch3nnn/webstack-go/internal/services/category"
+	"github.com/ch3nnn/webstack-go/internal/services/index"
+	"github.com/ch3nnn/webstack-go/internal/services/site"
 	"github.com/xinliangnote/go-gin-api/pkg/hash"
 
 	"go.uber.org/zap"

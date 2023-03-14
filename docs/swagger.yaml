@@ -335,7 +335,7 @@ definitions:
         description: 链接地址
         type: string
       name:
-        description: 菜单名称
+        description: 分类名称
         type: string
       pid:
         description: 父类ID
@@ -2364,6 +2364,32 @@ paths:
           schema:
             $ref: '#/definitions/code.Failure'
       summary: 删除网站信息
+      tags:
+      - API.site
+  /api/site/category:
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 网站列列表-新增列表分类下拉框数据
+      parameters:
+      - description: 请求信息
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/site.listRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/site.listResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/code.Failure'
+      summary: 网站列列表-新增列表分类下拉框数据
       tags:
       - API.site
   /api/site/used:

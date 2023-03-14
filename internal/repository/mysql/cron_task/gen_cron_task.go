@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
 
 	"github.com/pkg/errors"
 	"gorm.io/gorm"

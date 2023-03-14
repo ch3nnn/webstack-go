@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/xinliangnote/go-gin-api/configs"
+	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/xinliangnote/go-gin-api/pkg/errors"
 
 	"gorm.io/driver/mysql"

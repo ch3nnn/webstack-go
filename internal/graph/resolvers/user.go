@@ -3,7 +3,7 @@ package resolvers
 import (
 	"context"
 
-	"github.com/xinliangnote/go-gin-api/internal/graph/model"
+	"github.com/ch3nnn/webstack-go/internal/graph/model"
 	"github.com/xinliangnote/go-gin-api/pkg/errors"
 )
 

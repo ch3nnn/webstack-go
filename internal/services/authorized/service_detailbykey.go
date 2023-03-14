@@ -3,12 +3,12 @@ package authorized
 import (
 	"encoding/json"
 
-	"github.com/xinliangnote/go-gin-api/configs"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql/authorized"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql/authorized_api"
-	"github.com/xinliangnote/go-gin-api/internal/repository/redis"
+	"github.com/ch3nnn/webstack-go/configs"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized_api"
+	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 )
 
 // CacheAuthorizedData 缓存结构

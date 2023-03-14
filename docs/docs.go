@@ -2299,6 +2299,46 @@ var doc = `{
                 }
             }
         },
+        "/api/site/category": {
+            "get": {
+                "description": "网站列列表-新增列表分类下拉框数据",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API.site"
+                ],
+                "summary": "网站列列表-新增列表分类下拉框数据",
+                "parameters": [
+                    {
+                        "description": "请求信息",
+                        "name": "Request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/site.listRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/site.listResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/code.Failure"
+                        }
+                    }
+                }
+            }
+        },
         "/api/site/used": {
             "patch": {
                 "description": "更新网站为启用/禁用",
@@ -3309,7 +3349,7 @@ var doc = `{
                     "type": "string"
                 },
                 "name": {
-                    "description": "菜单名称",
+                    "description": "分类名称",
                     "type": "string"
                 },
                 "pid": {

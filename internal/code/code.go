@@ -3,7 +3,7 @@ package code
 import (
 	_ "embed"
 
-	"github.com/xinliangnote/go-gin-api/configs"
+	"github.com/ch3nnn/webstack-go/configs"
 )
 
 //go:embed code.go
@@ -82,10 +82,11 @@ const (
 	CategoryDeleteError = 20504
 	CategoryDetailError = 20505
 
-	SiteCreateError = 20601
-	SiteUpdateError = 20602
-	SiteListError   = 20603
-	SiteDeleteError = 20604
+	SiteCreateError   = 20601
+	SiteUpdateError   = 20602
+	SiteListError     = 20603
+	SiteDeleteError   = 20604
+	SiteCategoryError = 20605
 )
 
 func Text(code int) string {

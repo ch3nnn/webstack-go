@@ -1,7 +1,7 @@
 package site
 
 import (
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql/category"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/category"
 	"time"
 )
 

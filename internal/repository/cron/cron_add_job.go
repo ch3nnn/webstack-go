@@ -3,7 +3,7 @@ package cron
 import (
 	"fmt"
 
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql/cron_task"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/cron_task"
 
 	"github.com/jakecoffman/cron"
 )
