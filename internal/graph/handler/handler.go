@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/xinliangnote/go-gin-api/internal/graph/generated"
-	"github.com/xinliangnote/go-gin-api/internal/graph/resolvers"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
-	"github.com/xinliangnote/go-gin-api/internal/repository/redis"
+	"github.com/ch3nnn/webstack-go/internal/graph/generated"
+	"github.com/ch3nnn/webstack-go/internal/graph/resolvers"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"

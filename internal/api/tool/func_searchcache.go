@@ -3,9 +3,9 @@ package tool
 import (
 	"net/http"
 
-	"github.com/xinliangnote/go-gin-api/internal/code"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/repository/redis"
+	"github.com/ch3nnn/webstack-go/internal/code"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 )
 
 type searchCacheRequest struct {

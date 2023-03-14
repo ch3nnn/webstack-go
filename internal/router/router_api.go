@@ -1,16 +1,16 @@
 package router
 
 import (
-	"github.com/xinliangnote/go-gin-api/internal/api/admin"
-	"github.com/xinliangnote/go-gin-api/internal/api/authorized"
-	"github.com/xinliangnote/go-gin-api/internal/api/category"
-	"github.com/xinliangnote/go-gin-api/internal/api/config"
-	"github.com/xinliangnote/go-gin-api/internal/api/cron"
-	"github.com/xinliangnote/go-gin-api/internal/api/helper"
-	"github.com/xinliangnote/go-gin-api/internal/api/menu"
-	"github.com/xinliangnote/go-gin-api/internal/api/site"
-	"github.com/xinliangnote/go-gin-api/internal/api/tool"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/api/admin"
+	"github.com/ch3nnn/webstack-go/internal/api/authorized"
+	"github.com/ch3nnn/webstack-go/internal/api/category"
+	"github.com/ch3nnn/webstack-go/internal/api/config"
+	"github.com/ch3nnn/webstack-go/internal/api/cron"
+	"github.com/ch3nnn/webstack-go/internal/api/helper"
+	"github.com/ch3nnn/webstack-go/internal/api/menu"
+	"github.com/ch3nnn/webstack-go/internal/api/site"
+	"github.com/ch3nnn/webstack-go/internal/api/tool"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 )
 
 func setApiRouter(r *resource) {
@@ -93,6 +93,7 @@ func setApiRouter(r *resource) {
 		api.PATCH("/site/used", siteHandler.UpdateUsed())
 		api.DELETE("/site/:id", siteHandler.Delete())
 		api.POST("/site", siteHandler.Create())
+		api.GET("/site/category", siteHandler.CategoryList())
 
 		// tool
 		toolHandler := tool.New(r.logger, r.db, r.cache)

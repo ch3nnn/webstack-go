@@ -1,18 +1,18 @@
 package router
 
 import (
-	"github.com/xinliangnote/go-gin-api/internal/api/index"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/render/admin"
-	"github.com/xinliangnote/go-gin-api/internal/render/authorized"
-	"github.com/xinliangnote/go-gin-api/internal/render/config"
-	"github.com/xinliangnote/go-gin-api/internal/render/cron"
-	"github.com/xinliangnote/go-gin-api/internal/render/dashboard"
-	"github.com/xinliangnote/go-gin-api/internal/render/generator"
-	adminIdex "github.com/xinliangnote/go-gin-api/internal/render/index"
-	"github.com/xinliangnote/go-gin-api/internal/render/install"
-	"github.com/xinliangnote/go-gin-api/internal/render/tool"
-	"github.com/xinliangnote/go-gin-api/internal/render/upgrade"
+	"github.com/ch3nnn/webstack-go/internal/api/index"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/render/admin"
+	"github.com/ch3nnn/webstack-go/internal/render/authorized"
+	"github.com/ch3nnn/webstack-go/internal/render/config"
+	"github.com/ch3nnn/webstack-go/internal/render/cron"
+	"github.com/ch3nnn/webstack-go/internal/render/dashboard"
+	"github.com/ch3nnn/webstack-go/internal/render/generator"
+	adminIdex "github.com/ch3nnn/webstack-go/internal/render/index"
+	"github.com/ch3nnn/webstack-go/internal/render/install"
+	"github.com/ch3nnn/webstack-go/internal/render/tool"
+	"github.com/ch3nnn/webstack-go/internal/render/upgrade"
 )
 
 func setRenderRouter(r *resource) {

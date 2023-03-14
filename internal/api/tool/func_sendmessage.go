@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/xinliangnote/go-gin-api/internal/code"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/validation"
-	"github.com/xinliangnote/go-gin-api/internal/websocket/sysmessage"
+	"github.com/ch3nnn/webstack-go/internal/code"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/pkg/validation"
+	"github.com/ch3nnn/webstack-go/internal/websocket/sysmessage"
 	"github.com/xinliangnote/go-gin-api/pkg/timeutil"
 )
 

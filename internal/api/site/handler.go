@@ -1,11 +1,11 @@
 package site
 
 import (
-	"github.com/xinliangnote/go-gin-api/configs"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
-	"github.com/xinliangnote/go-gin-api/internal/repository/redis"
-	"github.com/xinliangnote/go-gin-api/internal/services/site"
+	"github.com/ch3nnn/webstack-go/configs"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/redis"
+	"github.com/ch3nnn/webstack-go/internal/services/site"
 	"github.com/xinliangnote/go-gin-api/pkg/hash"
 
 	"go.uber.org/zap"
@@ -35,6 +35,11 @@ type Handler interface {
 	// @Tags API.site
 	// @Router /api/site [get]
 	List() core.HandlerFunc
+
+	// CategoryList 新增网站-分类目录列表
+	// @Tags API.site
+	// @Router /api/site/category_list [get]
+	CategoryList() core.HandlerFunc
 }
 
 type handler struct {

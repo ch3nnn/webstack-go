@@ -67,8 +67,9 @@ var zhCNText = map[int]string{
 	CategoryListError:   "获取网站分类列表失败",
 	CategoryUpdateError: "更新网站分类失败",
 
-	SiteCreateError: "创建网站信息失败",
-	SiteDeleteError: "删除网站信息失败",
-	SiteListError:   "获取网站信息列表失败",
-	SiteUpdateError: "更新网站信息失败",
+	SiteCreateError:   "创建网站信息失败",
+	SiteDeleteError:   "删除网站信息失败",
+	SiteListError:     "获取网站信息列表失败",
+	SiteUpdateError:   "更新网站信息失败",
+	SiteCategoryError: "获取网站信息-分类失败",
 }

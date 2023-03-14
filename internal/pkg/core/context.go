@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/xinliangnote/go-gin-api/internal/proposal"
+	"github.com/ch3nnn/webstack-go/internal/proposal"
 	"github.com/xinliangnote/go-gin-api/pkg/trace"
 
 	"github.com/gin-gonic/gin"

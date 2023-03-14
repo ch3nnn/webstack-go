@@ -1,54 +1,51 @@
-package menu
+package site
 
 import (
-	"net/http"
-
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/services/menu"
-
 	"github.com/spf13/cast"
+	"net/http"
 )
 
-type listData struct {
+type categoryListData struct {
 	Id     int32  `json:"id"`      // ID
 	HashID string `json:"hashid"`  // hashid
 	Pid    int32  `json:"pid"`     // 父类ID
-	Name   string `json:"name"`    // 菜单名称
+	Name   string `json:"name"`    // 分类名称
 	Link   string `json:"link"`    // 链接地址
 	Icon   string `json:"icon"`    // 图标
 	IsUsed int32  `json:"is_used"` // 是否启用 1=启用 -1=禁用
 	Sort   int32  `json:"sort"`    // 排序
 }
 
-type listResponse struct {
-	List []listData `json:"list"`
+type categoryListResponse struct {
+	List []categoryListData `json:"list"`
 }
 
-// List 菜单列表
-// @Summary 菜单列表
-// @Description 菜单列表
-// @Tags API.menu
+// CategoryList 网站列列表-新增列表分类下拉框数据
+// @Summary  网站列列表-新增列表分类下拉框数据
+// @Description  网站列列表-新增列表分类下拉框数据
+// @Tags API.site
 // @Accept application/x-www-form-urlencoded
 // @Produce json
+// @Param Request body listRequest true "请求信息"
 // @Success 200 {object} listResponse
 // @Failure 400 {object} code.Failure
-// @Router /api/menu [get]
-// @Security LoginToken
-func (h *handler) List() core.HandlerFunc {
+// @Router /api/site/category [get]
+func (h *handler) CategoryList() core.HandlerFunc {
 	return func(c core.Context) {
-		res := new(listResponse)
-		resListData, err := h.menuService.List(c, new(menu.SearchData))
+		res := new(categoryListResponse)
+		resListData, err := h.siteService.CategoryList(c)
 		if err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
-				code.MenuListError,
-				code.Text(code.MenuListError)).WithError(err),
+				code.SiteCategoryError,
+				code.Text(code.SiteCategoryError)).WithError(err),
 			)
 			return
 		}
 
-		res.List = make([]listData, len(resListData))
+		res.List = make([]categoryListData, len(resListData))
 
 		for k, v := range resListData {
 			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
@@ -61,12 +58,11 @@ func (h *handler) List() core.HandlerFunc {
 				return
 			}
 
-			data := listData{
+			data := categoryListData{
 				Id:     v.Id,
 				HashID: hashId,
-				Pid:    v.Pid,
-				Name:   v.Name,
-				Link:   v.Link,
+				Pid:    v.ParentId,
+				Name:   v.Title,
 				Icon:   v.Icon,
 				IsUsed: v.IsUsed,
 				Sort:   v.Sort,

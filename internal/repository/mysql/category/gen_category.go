@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
 
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -50,6 +50,18 @@ func (qb *categoryQueryBuilder) buildQuery(db *gorm.DB) *gorm.DB {
 	}
 	ret = ret.Limit(qb.limit).Offset(qb.offset)
 	return ret
+}
+
+func (qb *categoryQueryBuilder) GroupByParentId(db *gorm.DB) (parentIds []int32) {
+	rows, _ := db.Model(&Category{}).Select("parent_id").Group("parent_id").Rows()
+	for rows.Next() {
+		var parentId int32
+		rows.Scan(&parentId)
+		parentIds = append(parentIds, parentId)
+	}
+
+	return parentIds
+
 }
 
 func (qb *categoryQueryBuilder) Updates(db *gorm.DB, m map[string]interface{}) (err error) {

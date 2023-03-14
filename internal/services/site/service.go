@@ -1,10 +1,11 @@
 package site
 
 import (
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql/site"
-	"github.com/xinliangnote/go-gin-api/internal/repository/redis"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/category"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/site"
+	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 )
 
 var _ Service = (*service)(nil)
@@ -13,6 +14,7 @@ type Service interface {
 	i()
 
 	List(ctx core.Context) (listData []*site.Site, err error)
+	CategoryList(ctx core.Context) (listData []*category.Category, err error)
 	PageList(ctx core.Context, searchData *SearchData) (listData []*site.Site, err error)
 	PageListCount(ctx core.Context, searchData *SearchData) (total int64, err error)
 	UpdateUsed(ctx core.Context, id int32, used int32) (err error)

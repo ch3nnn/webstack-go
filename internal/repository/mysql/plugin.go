@@ -3,7 +3,7 @@ package mysql
 import (
 	"time"
 
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/xinliangnote/go-gin-api/pkg/timeutil"
 	"github.com/xinliangnote/go-gin-api/pkg/trace"
 

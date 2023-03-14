@@ -3,9 +3,9 @@ package cron
 import (
 	"sync"
 
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql"
-	"github.com/xinliangnote/go-gin-api/internal/repository/mysql/cron_task"
-	"github.com/xinliangnote/go-gin-api/internal/repository/redis"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/cron_task"
+	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 	"github.com/xinliangnote/go-gin-api/pkg/errors"
 
 	"github.com/jakecoffman/cron"

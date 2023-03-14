@@ -3,17 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"time"
-
-	"github.com/xinliangnote/go-gin-api/configs"
-	"github.com/xinliangnote/go-gin-api/internal/router"
+	"github.com/ch3nnn/webstack-go/configs"
+	"github.com/ch3nnn/webstack-go/internal/router"
 	"github.com/xinliangnote/go-gin-api/pkg/env"
 	"github.com/xinliangnote/go-gin-api/pkg/logger"
 	"github.com/xinliangnote/go-gin-api/pkg/shutdown"
 	"github.com/xinliangnote/go-gin-api/pkg/timeutil"
 
 	"go.uber.org/zap"
+	"net/http"
+	"time"
 )
 
 // @title swagger 接口文档

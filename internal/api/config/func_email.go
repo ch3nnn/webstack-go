@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/xinliangnote/go-gin-api/configs"
-	"github.com/xinliangnote/go-gin-api/internal/code"
-	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/configs"
+	"github.com/ch3nnn/webstack-go/internal/code"
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/xinliangnote/go-gin-api/pkg/env"
 	"github.com/xinliangnote/go-gin-api/pkg/mail"
 
