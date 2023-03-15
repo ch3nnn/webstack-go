@@ -12,10 +12,10 @@ import (
 	"github.com/ch3nnn/webstack-go/configs"
 	_ "github.com/ch3nnn/webstack-go/docs"
 	"github.com/ch3nnn/webstack-go/internal/code"
+	"github.com/ch3nnn/webstack-go/internal/pkg/env"
 	"github.com/ch3nnn/webstack-go/internal/proposal"
 	"github.com/xinliangnote/go-gin-api/pkg/browser"
 	"github.com/xinliangnote/go-gin-api/pkg/color"
-	"github.com/xinliangnote/go-gin-api/pkg/env"
 	"github.com/xinliangnote/go-gin-api/pkg/errors"
 	"github.com/xinliangnote/go-gin-api/pkg/trace"
 

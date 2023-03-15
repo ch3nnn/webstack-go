@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/xinliangnote/go-gin-api/pkg/env"
+	"github.com/ch3nnn/webstack-go/internal/pkg/env"
 	"github.com/xinliangnote/go-gin-api/pkg/file"
 
 	"github.com/fsnotify/fsnotify"
@@ -77,6 +77,9 @@ var (
 
 	//go:embed pro_configs.toml
 	proConfigs []byte
+
+	//go:embed docker_configs.toml
+	dockerConfigs []byte
 )
 
 func init() {
@@ -91,6 +94,8 @@ func init() {
 		r = bytes.NewReader(uatConfigs)
 	case "pro":
 		r = bytes.NewReader(proConfigs)
+	case "docker":
+		r = bytes.NewReader(dockerConfigs)
 	default:
 		r = bytes.NewReader(fatConfigs)
 	}
