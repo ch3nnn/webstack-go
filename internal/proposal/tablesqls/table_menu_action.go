@@ -93,7 +93,8 @@ func CreateMenuActionTableDataSql() (sql string) {
 	sql += "(55, 27, 'GET', '/api/site', 'init'),"
 	sql += "(56, 27, 'PATCH', '/api/site/used', 'init'),"
 	sql += "(57, 27, 'DELETE', '/api/site/*', 'init'),"
-	sql += "(58, 27, 'POST', '/api/site', 'init');"
+	sql += "(58, 27, 'POST', '/api/site', 'init'),"
+	sql += "(59, 27, 'GET', '/api/site/*', 'init');"
 
 	return
 }

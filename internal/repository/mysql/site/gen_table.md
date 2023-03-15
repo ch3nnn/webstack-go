@@ -9,6 +9,6 @@
 | 4 | thumb |  | varchar(100) |  | YES |  |  |
 | 5 | description |  | varchar(300) |  | YES |  |  |
 | 6 | url |  | varchar(100) |  | YES |  |  |
-| 7 | create_time |  | timestamp |  | NO |  | CURRENT_TIMESTAMP |
-| 8 | update_time |  | timestamp |  | YES |  |  |
+| 7 | created_at |  | timestamp |  | NO |  | CURRENT_TIMESTAMP |
+| 8 | updated_at |  | timestamp |  | NO |  |  |
 | 9 | is_used | 是否启用 1:是  -1:否 | tinyint(1) |  | NO |  | 1 |

@@ -9,8 +9,8 @@ func CreateSiteTableSql() (sql string) {
 	sql += "`thumb` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '网站logo',"
 	sql += "`description` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '网站描述',"
 	sql += "`url` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '网站地址',"
-	sql += "`create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',"
-	sql += "`update_time` timestamp NULL DEFAULT NULL COMMENT '更新时间',"
+	sql += "`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',"
+	sql += "`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',"
 	sql += "`is_used` int(1) DEFAULT '-1' COMMENT '是否使用',"
 	sql += "PRIMARY KEY (`id`) USING BTREE"
 	sql += ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='网站信息';"
@@ -20,7 +20,7 @@ func CreateSiteTableSql() (sql string) {
 
 func CreateSiteTableDateSql() (sql string) {
 
-	sql = "INSERT INTO `site` (category_id,title,thumb,description,url,create_time,update_time,is_used) VALUES"
+	sql = "INSERT INTO `site` (category_id,title,thumb,description,url,created_at,updated_at,is_used) VALUES"
 	sql += "(1,'Dribbble','http://127.0.0.1:9999/assets/bootstrap/static/index/images/favicon.png','全球UI设计师作品分享平台。','https://dribbble.com/','2019-01-21 15:23:29','2019-03-12 02:13:08',1),"
 	sql += "(1,'Behance','http://127.0.0.1:9999/assets/bootstrap/static/index/images/favicon.png','Adobe旗下的设计师交流平台，来自世界各地的设计师在这里分享自己的作品。','https://behance.net/','2019-01-22 01:11:24','2019-01-22 01:11:24',1),"
 	sql += "(1,'UI中国','http://127.0.0.1:9999/assets/bootstrap/static/index/images/favicon.png','图形交互与界面设计交流、作品展示、学习平台。','http://www.ui.cn/','2019-01-22 01:13:10','2019-01-22 01:13:10',1),"

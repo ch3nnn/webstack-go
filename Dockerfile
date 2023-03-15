@@ -1,16 +1,15 @@
-# FROM 基于 golang:1.16-alpine
-FROM golang:1.16-alpine AS builder
+# FROM 基于 golang:1.18-alpine
+FROM golang:1.18-alpine AS builder
 
 # ENV 设置环境变量
-ENV GOPATH=/opt/repo
 ENV GO111MODULE=on
 ENV GOPROXY=https://goproxy.io,direct
 
 # COPY 源路径 目标路径
-COPY . $GOPATH/src/github.com/xinliangnote/go-gin-api
+COPY . /go/src/github.com/ch3nnn/webstack-go
 
 # RUN 执行 go build .
-RUN cd $GOPATH/src/github.com/xinliangnote/go-gin-api && go build .
+RUN cd /go/src/github.com/ch3nnn/webstack-go && go build  .
 
 # FROM 基于 alpine:latest
 FROM alpine:latest
@@ -24,7 +23,7 @@ RUN apk --no-cache add tzdata  && \
     echo "Asia/Shanghai" > /etc/timezone
 
 # COPY 源路径 目标路径 从镜像中 COPY
-COPY --from=builder /opt/repo/src/github.com/xinliangnote/go-gin-api /opt
+COPY --from=builder /go/src/github.com/ch3nnn/webstack-go/webstack-go /opt/
 
 # EXPOSE 设置端口映射
 EXPOSE 9999/tcp
@@ -33,4 +32,4 @@ EXPOSE 9999/tcp
 WORKDIR /opt
 
 # CMD 设置启动命令
-CMD ["./go-gin-api", "-env", "fat"]
+CMD ["./webstack-go", "-env", "docker"]

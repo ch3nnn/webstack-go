@@ -120,8 +120,8 @@ func (h *handler) List() core.HandlerFunc {
 				Category:    v.Category.Title,
 				Description: v.Description,
 				IsUsed:      int(v.IsUsed),
-				CreatedAt:   v.UpdateTime.Format("2006-01-02 15:04:05"),
-				UpdatedAt:   v.UpdateTime.Format("2006-01-02 15:04:05"),
+				CreatedAt:   v.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:   v.UpdatedAt.Format("2006-01-02 15:04:05"),
 			}
 
 			res.List[k] = data

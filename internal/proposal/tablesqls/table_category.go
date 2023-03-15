@@ -7,8 +7,8 @@ func CreateCategoryTableSql() (sql string) {
 	sql += "`sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序',"
 	sql += "`title` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '名称',"
 	sql += "`icon` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '图标',"
-	sql += "`create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',"
-	sql += "`update_time` timestamp NULL DEFAULT NULL COMMENT '更新时间',"
+	sql += "`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',"
+	sql += "`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',"
 	sql += "`is_used` tinyint(4) DEFAULT '-1' COMMENT '是否启用 1:是 -1:否',"
 	sql += "`level` tinyint(1) DEFAULT NULL COMMENT '分类等级',"
 	sql += "PRIMARY KEY (`id`) USING BTREE"
@@ -17,7 +17,7 @@ func CreateCategoryTableSql() (sql string) {
 }
 
 func CreateCategoryTableDataSql() (sql string) {
-	sql = "INSERT INTO category (parent_id,sort,title,icon,create_time,update_time,is_used,`level`) VALUES"
+	sql = "INSERT INTO category (parent_id,sort,title,icon,created_at,updated_at,is_used,`level`) VALUES"
 	sql += "(0,1,'常用推荐','briefcase-alt','2019-01-21 12:48:58','2023-03-10 17:46:19',1,1),"
 	sql += "(0,2,'社区资讯','envelope','2019-01-21 12:50:17','2023-03-10 17:46:31',1,1),"
 	sql += "(0,5,'灵感采集','radio-button','2019-01-21 13:53:10','2023-03-10 17:47:37',1,1),"

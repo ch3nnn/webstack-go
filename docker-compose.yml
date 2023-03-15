@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  webstack-go-service:
+    container_name: webstack-service
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "9999:9999"
+    volumes:
+      - ./configs:/opt/configs
+    networks:
+      - webstack-go
+
+  webstack-go-mysql:
+    image: mysql/mysql-server:5.7
+    container_name: webstack-go-mysql
+    environment:
+      MYSQL_DATABASE: webstack-go
+      TZ: Asia/Shanghai
+      # 允许来自其他主机的根连接
+      # https://dev.mysql.com/doc/refman/5.7/en/docker-mysql-more-topics.html#docker_var_mysql-root-host
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3305:3306"
+    networks:
+      - webstack-go
+
+  webstack-go-redis:
+    image: redis:6.2.4
+    container_name: webstack-go-redis
+    command: redis-server --requirepass 123456
+    ports:
+      - "6378:6379"
+    networks:
+      - webstack-go
+
+
+
+networks:
+  webstack-go:
+    driver: bridge

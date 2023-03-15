@@ -9,5 +9,5 @@
 | 4 | title |  | varchar(50) |  | NO |  |  |
 | 5 | icon |  | varchar(20) |  | NO |  |  |
 | 6 | levels |  | int(11) |  | YES |  |  |
-| 7 | create_time |  | timestamp |  | YES |  |  |
-| 8 | update_time |  | timestamp |  | YES |  |  |
+| 7 | created_at |  | timestamp |  | YES |  |  |
+| 8 | updated_at |  | timestamp |  | YES |  |  |
