@@ -7,7 +7,7 @@ import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/pkg/env"
+	"github.com/ch3nnn/webstack-go/internal/pkg/env"
 	"github.com/xinliangnote/go-gin-api/pkg/mail"
 
 	"github.com/spf13/cast"
