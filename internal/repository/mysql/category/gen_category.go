@@ -394,7 +394,7 @@ func (qb *categoryQueryBuilder) WhereCreateTime(p mysql.Predicate, value time.Ti
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "create_time", p),
+		fmt.Sprintf("%v %v ?", "created_at", p),
 		value,
 	})
 	return qb
@@ -405,7 +405,7 @@ func (qb *categoryQueryBuilder) WhereCreateTimeIn(value []time.Time) *categoryQu
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "create_time", "IN"),
+		fmt.Sprintf("%v %v ?", "created_at", "IN"),
 		value,
 	})
 	return qb
@@ -416,7 +416,7 @@ func (qb *categoryQueryBuilder) WhereCreateTimeNotIn(value []time.Time) *categor
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "create_time", "NOT IN"),
+		fmt.Sprintf("%v %v ?", "created_at", "NOT IN"),
 		value,
 	})
 	return qb
@@ -437,7 +437,7 @@ func (qb *categoryQueryBuilder) WhereUpdateTime(p mysql.Predicate, value time.Ti
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "update_time", p),
+		fmt.Sprintf("%v %v ?", "updated_at", p),
 		value,
 	})
 	return qb
@@ -448,7 +448,7 @@ func (qb *categoryQueryBuilder) WhereUpdateTimeIn(value []time.Time) *categoryQu
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "update_time", "IN"),
+		fmt.Sprintf("%v %v ?", "updated_at", "IN"),
 		value,
 	})
 	return qb
@@ -459,7 +459,7 @@ func (qb *categoryQueryBuilder) WhereUpdateTimeNotIn(value []time.Time) *categor
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "update_time", "NOT IN"),
+		fmt.Sprintf("%v %v ?", "updated_at", "NOT IN"),
 		value,
 	})
 	return qb
@@ -471,6 +471,6 @@ func (qb *categoryQueryBuilder) OrderByUpdateTime(asc bool) *categoryQueryBuilde
 		order = "ASC"
 	}
 
-	qb.order = append(qb.order, "update_time "+order)
+	qb.order = append(qb.order, "updated_at "+order)
 	return qb
 }

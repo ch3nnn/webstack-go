@@ -393,7 +393,7 @@ func (qb *siteQueryBuilder) WhereCreateTime(p mysql.Predicate, value time.Time) 
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "create_time", p),
+		fmt.Sprintf("%v %v ?", "created_at", p),
 		value,
 	})
 	return qb
@@ -404,7 +404,7 @@ func (qb *siteQueryBuilder) WhereCreateTimeIn(value []time.Time) *siteQueryBuild
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "create_time", "IN"),
+		fmt.Sprintf("%v %v ?", "created_at", "IN"),
 		value,
 	})
 	return qb
@@ -415,7 +415,7 @@ func (qb *siteQueryBuilder) WhereCreateTimeNotIn(value []time.Time) *siteQueryBu
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "create_time", "NOT IN"),
+		fmt.Sprintf("%v %v ?", "created_at", "NOT IN"),
 		value,
 	})
 	return qb
@@ -427,7 +427,8 @@ func (qb *siteQueryBuilder) OrderByCreateTime(asc bool) *siteQueryBuilder {
 		order = "ASC"
 	}
 
-	qb.order = append(qb.order, "create_time "+order)
+	qb.order = append(qb.order, "created"+
+		"_at "+order)
 	return qb
 }
 
@@ -436,7 +437,7 @@ func (qb *siteQueryBuilder) WhereUpdateTime(p mysql.Predicate, value time.Time) 
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "update_time", p),
+		fmt.Sprintf("%v %v ?", "updated_at", p),
 		value,
 	})
 	return qb
@@ -447,7 +448,7 @@ func (qb *siteQueryBuilder) WhereUpdateTimeIn(value []time.Time) *siteQueryBuild
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "update_time", "IN"),
+		fmt.Sprintf("%v %v ?", "updated_at", "IN"),
 		value,
 	})
 	return qb
@@ -458,7 +459,7 @@ func (qb *siteQueryBuilder) WhereUpdateTimeNotIn(value []time.Time) *siteQueryBu
 		prefix string
 		value  interface{}
 	}{
-		fmt.Sprintf("%v %v ?", "update_time", "NOT IN"),
+		fmt.Sprintf("%v %v ?", "updated_at", "NOT IN"),
 		value,
 	})
 	return qb
@@ -470,6 +471,6 @@ func (qb *siteQueryBuilder) OrderByUpdateTime(asc bool) *siteQueryBuilder {
 		order = "ASC"
 	}
 
-	qb.order = append(qb.order, "update_time "+order)
+	qb.order = append(qb.order, "updated_at "+order)
 	return qb
 }
