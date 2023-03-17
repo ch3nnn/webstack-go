@@ -77,7 +77,7 @@ services:
 
 
   webstack-go-grafana:
-    image: grafana/grafana-enterprise
+    image: grafana/grafana-enterprise:9.4.3
     container_name: webstack-go-grafana
     ports:
       - "3000:3000"
@@ -107,6 +107,7 @@ services:
   webstack-go-promtail:
     image: grafana/promtail:2.7.3
     container_name: webstack-go-promtail
+    user: root
     volumes:
       - ./logs/:/data/logs/
       - ./deployments/loki/promtail.yaml:/etc/promtail/promtail.yaml

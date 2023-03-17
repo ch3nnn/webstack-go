@@ -4,7 +4,7 @@ server:
 
 # Positions
 positions:
-  filename: /data/promtail/positions.yaml
+  filename: /tmp/positions.yaml
 
 # Loki服务器的地址
 clients:
