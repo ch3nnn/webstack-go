@@ -16,6 +16,8 @@ type categoryListData struct {
 	Icon   string `json:"icon"`    // 图标
 	IsUsed int32  `json:"is_used"` // 是否启用 1=启用 -1=禁用
 	Sort   int32  `json:"sort"`    // 排序
+	Level  int32  `json:"level"`   // 分类等级 1 一级分类  2 二级分类
+
 }
 
 type categoryListResponse struct {
@@ -66,6 +68,7 @@ func (h *handler) CategoryList() core.HandlerFunc {
 				Icon:   v.Icon,
 				IsUsed: v.IsUsed,
 				Sort:   v.Sort,
+				Level:  v.Level,
 			}
 
 			res.List[k] = data
