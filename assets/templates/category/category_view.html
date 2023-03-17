@@ -94,7 +94,11 @@
             function (data) {
                 $("#level").append("<option value='-1'>一级目录</option>");
                 $.each(data.list, function (index, value) {
-                    $("#level").append("<option value='" + value.id + "'>" + value.name + "</option>");
+                    if (value.level === 1){
+                        $("#level").append("<option value='" + value.id + "'>" + value.name + "</option>");
+                    }else{
+                        $("#level").append("<option value='" + value.id + "'>&nbsp;&nbsp;&nbsp;" + value.name + "</option>");
+                    }
                 });
 
                 $("#level option:eq(0)").attr('selected', 'selected'); //选中第一个

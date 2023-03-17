@@ -1,8 +1,15 @@
 version: "3.8"
 
+x-healthcheck-defaults: &healthcheck_defaults
+  interval: 10s  # 间隔
+  timeout: 5s  # 超时
+  retries: 5  # 连续失败次数
+  start_period: 10s # 初始化时间
+
 services:
+
   webstack-go-service:
-    container_name: webstack-service
+    container_name: webstack-go-service
     build:
       context: ./
       dockerfile: ./Dockerfile
@@ -10,8 +17,18 @@ services:
       - "9999:9999"
     volumes:
       - ./configs:/opt/configs
+      - ./logs/:/opt/logs/
     networks:
       - webstack-go
+    healthcheck:
+      test: "/bin/netstat -anpt|grep 9999"
+      <<: *healthcheck_defaults
+    depends_on:
+      webstack-go-mysql:
+        condition: service_healthy
+      webstack-go-redis:
+        condition: service_healthy
+
 
   webstack-go-mysql:
     image: mysql/mysql-server:5.7
@@ -27,6 +44,10 @@ services:
       - "3305:3306"
     networks:
       - webstack-go
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      <<: *healthcheck_defaults
+
 
   webstack-go-redis:
     image: redis:6.2.4
@@ -36,8 +57,66 @@ services:
       - "6378:6379"
     networks:
       - webstack-go
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      <<: *healthcheck_defaults
 
 
+  webstack-go-prometheus:
+    image: prom/prometheus:latest
+    container_name: webstack-go-prometheus
+    volumes:
+      - ./deployments/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - webstack-go
+    depends_on:
+      webstack-go-service:
+        condition: service_healthy
+
+
+  webstack-go-grafana:
+    image: grafana/grafana-enterprise:9.4.3
+    container_name: webstack-go-grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - webstack-go
+    depends_on:
+      webstack-go-service:
+        condition: service_healthy
+
+
+  webstack-go-loki:
+    image: grafana/loki:2.7.3
+    container_name: webstack-go-loki
+    user: root
+    volumes:
+      - ./deployments/loki/loki.yaml:/etc/loki/loki.yaml
+    command: -config.file=/etc/loki/loki.yaml
+    ports:
+      - "3100:3100"
+    networks:
+      - webstack-go
+    depends_on:
+      webstack-go-service:
+        condition: service_healthy
+
+
+  webstack-go-promtail:
+    image: grafana/promtail:2.7.3
+    container_name: webstack-go-promtail
+    user: root
+    volumes:
+      - ./logs/:/data/logs/
+      - ./deployments/loki/promtail.yaml:/etc/promtail/promtail.yaml
+    command: -config.file=/etc/promtail/promtail.yaml
+    networks:
+      - webstack-go
+    depends_on:
+      webstack-go-service:
+        condition: service_healthy
 
 networks:
   webstack-go:
