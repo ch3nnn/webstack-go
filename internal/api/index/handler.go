@@ -22,6 +22,11 @@ type Handler interface {
 	// @Tags API.admin
 	// @Router / [get]
 	Index() core.HandlerFunc
+
+	// About 导航网站关于页
+	// @Tags API.admin
+	// @Router /about [get]
+	About() core.HandlerFunc
 }
 
 type handler struct {
