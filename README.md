@@ -1,8 +1,8 @@
 # webstack-go 网址导航后台系统
 
 基于 Golang 开源的网址导航网站项目，具备完整的前后台，您可以拿来制作自己平日收藏的网址导航。
-- 前端模板: [WebStackPage](https://github.com/WebStackPage/WebStackPage.github.io)
 - 图标库: [lineicons](https://lineicons.com/icons/)
+- 前端模板: [WebStackPage](https://github.com/WebStackPage/WebStackPage.github.io)
 - 后端框架: [go-gin-api](https://github.com/xinliangnote/go-gin-api)
 
 原有后端框架基础上新增功能：
