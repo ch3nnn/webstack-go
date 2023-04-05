@@ -34,6 +34,7 @@ func setRenderRouter(r *resource) {
 	{
 		// 首页
 		notRBAC.GET("", renderIndex.Index())
+		notRBAC.GET("/about", renderIndex.About())
 
 		// admin 首页
 		notRBAC.GET("/admin", renderAdminIndex.Index())
