@@ -21,6 +21,7 @@ type Service interface {
 	Delete(ctx core.Context, id int32) (err error)
 	Create(ctx core.Context, siteData *CreateSiteData) (id int32, err error)
 	CategorySite(ctx core.Context) (categorySites []*CategorySite, err error)
+	UpdateSite(ctx core.Context, updateSite *UpdateSiteRequest) (err error)
 }
 
 type service struct {
