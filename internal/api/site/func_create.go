@@ -19,9 +19,9 @@ type createResponse struct {
 	Id int32 `json:"id"`
 }
 
-// Create 创建/编辑网站
-// @Summary 创建/编辑网站
-// @Description 创建/编辑网站
+// Create 创建网站
+// @Summary 创建网站
+// @Description 创建网站
 // @Tags API.site
 // @Accept application/x-www-form-urlencoded
 // @Produce json

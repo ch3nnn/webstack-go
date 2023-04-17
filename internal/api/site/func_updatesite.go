@@ -20,16 +20,16 @@ type updateSiteResponse struct {
 	Id int32 `json:"id"` // 主键ID
 }
 
-// UpdateSite 更新网站
-// @Summary 更新网站
-// @Description 更新网站
+// UpdateSite 编辑网站
+// @Summary 编辑网站
+// @Description 编辑网站
 // @Tags API.site
 // @Accept application/x-www-form-urlencoded
 // @Produce json
-// @Param Request body updateSiteRequest true "请求信息"
+// @Param Request formData updateSiteRequest true "请求信息"
 // @Success 200 {object} updateSiteResponse
 // @Failure 400 {object} code.Failure
-// @Router /api/site [patch]
+// @Router /api/site [put]
 func (h *handler) UpdateSite() core.HandlerFunc {
 	return func(c core.Context) {
 		req := new(updateSiteRequest)

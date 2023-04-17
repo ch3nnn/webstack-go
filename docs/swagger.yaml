@@ -331,11 +331,14 @@ definitions:
       is_used:
         description: 是否启用 1=启用 -1=禁用
         type: integer
+      level:
+        description: 分类等级 1 一级分类  2 二级分类
+        type: integer
       link:
         description: 链接地址
         type: string
       name:
-        description: 分类名称
+        description: 菜单名称
         type: string
       pid:
         description: 父类ID
@@ -705,6 +708,9 @@ definitions:
       category:
         description: 分类
         type: string
+      category_id:
+        description: 分类id
+        type: integer
       created_at:
         description: 创建时间
         type: string
@@ -766,6 +772,12 @@ definitions:
           total:
             type: integer
         type: object
+    type: object
+  site.updateSiteResponse:
+    properties:
+      id:
+        description: 主键ID
+        type: integer
     type: object
   site.updateUsedRequest:
     properties:
@@ -2318,7 +2330,7 @@ paths:
     post:
       consumes:
       - application/x-www-form-urlencoded
-      description: 创建/编辑网站
+      description: 创建网站
       parameters:
       - description: 请求信息
         in: body
@@ -2337,7 +2349,49 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/code.Failure'
-      summary: 创建/编辑网站
+      summary: 创建网站
+      tags:
+      - API.site
+    put:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 编辑网站
+      parameters:
+      - description: 网站分类id
+        in: formData
+        name: categoryId
+        type: integer
+      - description: 网站描述
+        in: formData
+        name: description
+        type: string
+      - in: formData
+        name: id
+        type: integer
+      - description: 网站 logo
+        in: formData
+        name: thumb
+        type: string
+      - description: 网站标题
+        in: formData
+        name: title
+        type: string
+      - description: 网站地址
+        in: formData
+        name: url
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/site.updateSiteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/code.Failure'
+      summary: 编辑网站
       tags:
       - API.site
   /api/site/{id}:
