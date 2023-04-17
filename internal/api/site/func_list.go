@@ -22,6 +22,7 @@ type listData struct {
 	Title       string `json:"title"`       // 名称简介
 	Url         string `json:"url"`         // 链接
 	Category    string `json:"category"`    // 分类
+	CategoryId  int32  `json:"category_id"` // 分类id
 	Description string `json:"description"` // 描述
 	IsUsed      int    `json:"is_used"`     // 是否启用
 	CreatedAt   string `json:"created_at"`  // 创建时间
@@ -118,6 +119,7 @@ func (h *handler) List() core.HandlerFunc {
 				Title:       v.Title,
 				Url:         v.Url,
 				Category:    v.Category.Title,
+				CategoryId:  v.Category.Id,
 				Description: v.Description,
 				IsUsed:      int(v.IsUsed),
 				CreatedAt:   v.CreatedAt.Format("2006-01-02 15:04:05"),

@@ -40,6 +40,11 @@ type Handler interface {
 	// @Tags API.site
 	// @Router /api/site/category_list [get]
 	CategoryList() core.HandlerFunc
+
+	// UpdateSite 编辑网站
+	// @Tags API.site
+	// @Router /api/site [put]
+	UpdateSite() core.HandlerFunc
 }
 
 type handler struct {

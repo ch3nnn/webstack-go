@@ -93,6 +93,7 @@ func setApiRouter(r *resource) {
 		api.PATCH("/site/used", siteHandler.UpdateUsed())
 		api.DELETE("/site/:id", siteHandler.Delete())
 		api.POST("/site", siteHandler.Create())
+		api.PUT("/site", siteHandler.UpdateSite())
 		api.GET("/site/category", siteHandler.CategoryList())
 
 		// tool

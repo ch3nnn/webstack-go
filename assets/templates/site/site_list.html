@@ -4,7 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css" />
+    <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css"/>
+    <link href="/assets/bootstrap/js/bootstrap-multitabs/multitabs.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-select/1.13.17/css/bootstrap-select.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-confirm@3.3.4/dist/jquery-confirm.min.css">
     <link href="/assets/bootstrap/css/style.min.css" rel="stylesheet">
@@ -56,7 +58,12 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-maxlength/1.9.0/bootstrap-maxlength.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-confirm@3.3.4/dist/jquery-confirm.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-select/1.13.17/js/i18n/defaults-zh_CN.js"></script>
+<script type="text/javascript" src="/assets/bootstrap/js/bootstrap-multitabs/multitabs.min.js"></script>
+
 <script type="text/javascript" src="/assets/bootstrap/js/httpclient/httpclient.js"></script>
 <script type="text/javascript" src="/assets/bootstrap/js/jquery.pagination.js"></script>
 <script type="text/javascript">
@@ -118,9 +125,9 @@
 
                             const tr = '<tr>\n' +
                                 '<td>' + value.id + '</td>\n' +
-                                '<td><img class="lozad img-circle" width="30" src="'+ value.thumb +'" data-loaded="true"></td>\n' +
+                                '<td><img class="lozad img-circle" width="30" src="' + value.thumb + '" data-loaded="true"></td>\n' +
                                 '<td>' + value.title + '</td>\n' +
-                                '<td><a href="'+ value.url +'" target="_blank">' + value.url + '</a></td>\n' +
+                                '<td><a href="' + value.url + '" target="_blank">' + value.url + '</a></td>\n' +
                                 '<td>' + value.category + '</td>\n' +
                                 '<td>' + value.created_at + '</td>\n' +
                                 '<td>' + value.updated_at + '</td>\n' +
@@ -138,6 +145,15 @@
                                 '    <a class="btn btn-xs btn-default btn-confirm" href="#!" title=""\n' +
                                 '                                           data-id="' + value.id + '"' +
                                 '                                           data-toggle="tooltip" data-original-title="删除">删除</a>\n' +
+                                '    <a class="btn btn-xs btn-default btn-update" href="#!" title=""\n' +
+                                '                                           data-id="' + value.id + '"' +
+                                '                                           data-thumb="' + value.thumb + '"' +
+                                '                                           data-url="' + value.url + '"' +
+                                '                                           data-category="' + value.category + '"' +
+                                '                                           data-title="' + value.title + '"' +
+                                '                                           data-description="' + value.description + '"' +
+                                '                                           data-category_id="' + value.category_id + '"' +
+                                '                                           data-toggle="tooltip" data-original-title="编辑">编辑</a>\n' +
                                 '</div>\n' +
                                 '</td>\n' +
                                 '</tr>';
@@ -153,7 +169,6 @@
                 function (response) {
                     AjaxError(response);
                 }
-
             );
         }
 
@@ -209,7 +224,8 @@
                                 "PATCH",
                                 "/api/site/used",
                                 patchData,
-                                function () {},
+                                function () {
+                                },
                                 function (data) {
                                     $.alert({
                                         title: '操作成功',
@@ -260,7 +276,8 @@
                                 "DELETE",
                                 '/api/site/' + id,
                                 "",
-                                function () {},
+                                function () {
+                                },
                                 function (data) {
                                     $.alert({
                                         title: '操作成功',
@@ -291,6 +308,178 @@
             });
         })
     })
+</script>
+<script>
+
+
+    // 编辑
+    $(document).on('click', '.btn-update', function () {
+
+        const id = $(this).attr('data-id');
+        const thumb = $(this).attr('data-thumb');
+        const title = $(this).attr('data-title');
+        const url = $(this).attr('data-url');
+        const description = $(this).attr('data-description');
+        const category_id = $(this).attr('data-category_id');
+
+        $.confirm({
+            title: '编辑网站',
+            //content: 'url:form.html',  // 也可以采用url形式
+            content: '<div class="form-group p-1 mb-0">' +
+                '<div className="input-group mb-3">' +
+                '<div className="input-group-prepend">' +
+                '<span className="input-group-text">分类</span>' +
+                ' </div>' +
+                '<select class="form-control select-picker col-lg-5" data-width="auto" data-live-search="true" id="category_id"></select>' +
+                '</div>' +
+                '<div>' +
+                '<input  style="display:none"  autofocus="" class="form-control" type="text"  maxLength="200" id="id" value="' + id + '">' +
+                '</div>' +
+                '<div>' +
+                '<label class="control-label">LOGO</label>' +
+                '<input  autofocus="" class="form-control" type="text"  maxLength="200" id="thumb" placeholder="请输入网站 LOGO" value="' + thumb + '">' +
+                '</div>' +
+                '<div>' +
+                '  <label class="control-label">名称</label>' +
+                '  <input autofocus="" type="text"  placeholder="请输入网站名称" class="form-control"  id="title" value="' + title + '">' +
+                '</div>' +
+                '<div>' +
+                '  <label class="control-label">链接</label>' +
+                '  <input autofocus="" type="text"  placeholder="请输入网站地址" class="form-control"  id="url" value="' + url + '">' +
+                '</div>' +
+                '<div>' +
+                '  <label class="control-label">网站描述</label>' +
+                '  <textarea class="form-control" maxlength="225" rows="2" id="description" placeholder="网站描述"  id="title">' + description + '</textarea>' +
+                '</div>',
+            onOpen: function () {
+                AjaxFormNoAsync(
+                    "GET",
+                    "/api/site/category",
+                    "",
+                    function () {
+                    },
+                    function (data) {
+                        $("#category_id").append("<option value='-1'>一级目录</option>");
+                        $.each(data.list, function (index, value) {
+                            if (String(value.id) === category_id) {
+                                $("#category_id").append('<option selected="selected" value="' + value.id + '" >' + value.name + '</option>');
+
+                            } else {
+                                $("#category_id").append("<option value='" + value.id + "' >" + value.name + "</option>");
+
+                            }
+                        });
+                        // $("#category_id option:eq(0)").attr('selected', 'selected'); //选中第一个
+                        $("#category_id").selectpicker('refresh');
+                    },
+                    function (response) {
+                        AjaxError(response);
+                    }
+                );
+            },
+            buttons: {
+                sayMyName: {
+                    text: '确认',
+                    btnClass: 'btn-orange',
+
+                    action: function () {
+                        const thumb = $("#thumb").val();
+                        if (thumb === "") {
+                            $.alert({
+                                title: '温馨提示',
+                                icon: 'mdi mdi-alert',
+                                type: 'orange',
+                                content: '请输入网站logo。',
+                            });
+                            return false;
+                        }
+
+                        const title = $("#title").val();
+                        if (title === "") {
+                            $.alert({
+                                title: '温馨提示',
+                                icon: 'mdi mdi-alert',
+                                type: 'orange',
+                                content: '请输入网站名称。',
+                            });
+                            return false;
+                        }
+
+                        const url = $("#url").val();
+                        if (url === "") {
+                            $.alert({
+                                title: '温馨提示',
+                                icon: 'mdi mdi-alert',
+                                type: 'orange',
+                                content: '请输入网站链接。',
+                            });
+                            return false;
+                        }
+
+                        const description = $("#description").val();
+                        if (description === "") {
+                            $.alert({
+                                title: '温馨提示',
+                                icon: 'mdi mdi-alert',
+                                type: 'orange',
+                                content: '请输入网站描述。',
+                            });
+                            return false;
+                        }
+
+                        const postData = {
+                            id: id,
+                            category_id: $("#category_id").val(),
+                            thumb: thumb,
+                            title: title,
+                            url: url,
+                            description: description,
+                        };
+                        AjaxForm(
+                            "PUT",
+                            "/api/site",
+                            postData,
+                            function () {
+                                $(this).hide();
+                                $("#btnLoading").show();
+                            },
+                            function (data) {
+                                $("#btnLoading").hide();
+                                $("#btnOk").show();
+
+                                $.alert({
+                                    title: '操作成功',
+                                    icon: 'mdi mdi-check-decagram',
+                                    type: 'green',
+                                    content: '编号：' + data.id + ' 修改完成。',
+                                    buttons: {
+                                        okay: {
+                                            text: '关闭',
+                                            action: function () {
+                                                location.href = "/admin/site";
+                                            }
+                                        }
+                                    }
+                                });
+                            },
+                            function (response) {
+                                $("#btnLoading").hide();
+                                $("#btnOk").show();
+
+                                AjaxError(response);
+                            }
+                        );
+
+                    }
+                },
+                '取消': function () {
+                }
+            }
+        });
+
+    })
+
+
 </script>
 </body>
 </html>
