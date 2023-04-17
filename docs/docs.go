@@ -2260,8 +2260,8 @@ var doc = `{
                     }
                 }
             },
-            "post": {
-                "description": "创建/编辑网站",
+            "put": {
+                "description": "编辑网站",
                 "consumes": [
                     "application/x-www-form-urlencoded"
                 ],
@@ -2271,7 +2271,71 @@ var doc = `{
                 "tags": [
                     "API.site"
                 ],
-                "summary": "创建/编辑网站",
+                "summary": "编辑网站",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站分类id",
+                        "name": "categoryId",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "网站描述",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "网站 logo",
+                        "name": "thumb",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "网站标题",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "网站地址",
+                        "name": "url",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/site.updateSiteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/code.Failure"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建网站",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API.site"
+                ],
+                "summary": "创建网站",
                 "parameters": [
                     {
                         "description": "请求信息",
@@ -3344,12 +3408,16 @@ var doc = `{
                     "description": "是否启用 1=启用 -1=禁用",
                     "type": "integer"
                 },
+                "level": {
+                    "description": "分类等级 1 一级分类  2 二级分类",
+                    "type": "integer"
+                },
                 "link": {
                     "description": "链接地址",
                     "type": "string"
                 },
                 "name": {
-                    "description": "分类名称",
+                    "description": "菜单名称",
                     "type": "string"
                 },
                 "pid": {
@@ -3880,6 +3948,10 @@ var doc = `{
                     "description": "分类",
                     "type": "string"
                 },
+                "category_id": {
+                    "description": "分类id",
+                    "type": "integer"
+                },
                 "created_at": {
                     "description": "创建时间",
                     "type": "string"
@@ -3965,6 +4037,15 @@ var doc = `{
                             "type": "integer"
                         }
                     }
+                }
+            }
+        },
+        "site.updateSiteResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "主键ID",
+                    "type": "integer"
                 }
             }
         },
