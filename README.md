@@ -9,7 +9,7 @@
 1. webstack - 导航首页
 2. 系统管理员 - 网站分类 
 3. 系统管理员 - 网站列表
-4. 支持网址自动获取 logo url
+4. 网站新增支持自动获取标题、Logo、网站描述
 5. 新增 docker-compose.yml 一键安装各个组件
 
 ## 快速开始
@@ -68,6 +68,10 @@
 > **网站分类**
 
 ![](assets/bootstrap/images/category.png)
+
+> **新增网站**
+
+![](assets/bootstrap/images/add_site.png)
 
 > **网站信息**
 
