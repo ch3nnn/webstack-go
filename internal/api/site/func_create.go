@@ -8,11 +8,8 @@ import (
 )
 
 type createRequest struct {
-	CategoryId  int32  `form:"category_id"`
-	Thumb       string `form:"thumb"`
-	Title       string `form:"title"`
-	Url         string `form:"url"`
-	Description string `form:"description"`
+	CategoryId int32  `form:"category_id"`
+	Url        string `form:"url"`
 }
 
 type createResponse struct {
@@ -44,10 +41,7 @@ func (h *handler) Create() core.HandlerFunc {
 
 		createData := new(site.CreateSiteData)
 		createData.CategoryId = req.CategoryId
-		createData.Thumb = req.Thumb
-		createData.Title = req.Title
 		createData.Url = req.Url
-		createData.Description = req.Description
 
 		id, err := h.siteService.Create(c, createData)
 		if err != nil {

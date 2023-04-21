@@ -21,6 +21,7 @@
                     <div class="card-title">新增网站</div>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述, 对内容不满可以点击编辑修改呦!</div>
                     <form>
                         <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -31,25 +32,10 @@
                         </select>
                         </div>
                         <div class="form-group">
-                            <label for="business_key">LOGO</label>
-                            <input type="text" class="form-control" maxlength="200" id="thumb"
-                                   placeholder="默认自动获取网站 LOGO">
+                            <label>网站地址</label>
+                            <input type="text" class="form-control" maxlength="200" id="url" placeholder="请输入网站地址">
                         </div>
-                        <div class="form-group">
-                            <label for="business_developer">名称</label>
-                            <input type="text" class="form-control" maxlength="50" id="title"
-                                   placeholder="请输入网站名称">
-                        </div>
-                        <div class="form-group">
-                            <label for="business_developer">链接</label>
-                            <input type="text" class="form-control" maxlength="200" id="url"
-                                   placeholder="请输入网站地址">
-                        </div>
-                        <div class="form-group">
-                            <label for="remark">描述</label>
-                            <textarea class="form-control" maxlength="225" rows="3" id="description"
-                                      placeholder="网站描述"></textarea>
-                        </div>
+
                         <button type="button" id="btnOk" class="btn btn-primary">确认</button>
                         <button type="button" id="btnLoading" class="btn btn-primary" disabled style="display: none">
                             <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
@@ -92,50 +78,12 @@
             }
         );
 
-
-        $("input#thumb").maxlength({
-            warningClass: "badge badge-info",
-            limitReachedClass: "badge badge-warning"
-        });
-
-        $("input#title").maxlength({
-            warningClass: "badge badge-info",
-            limitReachedClass: "badge badge-warning"
-        });
-
         $("input#url").maxlength({
             warningClass: "badge badge-info",
             limitReachedClass: "badge badge-warning"
         });
 
-        $("textarea#description").maxlength({
-            threshold: 255,
-            warningClass: "badge badge-info",
-            limitReachedClass: "badge badge-warning"
-        });
-
         $('#btnOk').on('click', function () {
-            const thumb = $("#thumb").val();
-            // if (thumb === "") {
-            //     $.alert({
-            //         title: '温馨提示',
-            //         icon: 'mdi mdi-alert',
-            //         type: 'orange',
-            //         content: '请输入网站LOGO。',
-            //     });
-            //     return false;
-            // }
-
-            const title = $("#title").val();
-            if (title === "") {
-                $.alert({
-                    title: '温馨提示',
-                    icon: 'mdi mdi-alert',
-                    type: 'orange',
-                    content: '请输入网站名称。',
-                });
-                return false;
-            }
 
             const url = $("#url").val();
             if (url === "") {
@@ -148,23 +96,9 @@
                 return false;
             }
 
-            const description = $("#description").val();
-            if (description === "") {
-                $.alert({
-                    title: '温馨提示',
-                    icon: 'mdi mdi-alert',
-                    type: 'orange',
-                    content: '请输入网站描述。',
-                });
-                return false;
-            }
-
             const postData = {
                 category_id: $("#category_id").val(),
-                thumb: thumb,
-                title: title,
                 url: url,
-                description: $("#description").val(),
             };
 
 
