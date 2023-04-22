@@ -46,9 +46,9 @@ function AjaxError(response) {
     if (errCode === 401) {
         // 跳转到登录页
         if (window.frames.length !== parent.frames.length) {
-            parent.window.open("/login",'_self');
-        }else{
-            window.open("/login",'_self');
+            parent.window.open("/login", '_self');
+        } else {
+            window.open("/login", '_self');
         }
         return;
     }
@@ -85,6 +85,28 @@ function AjaxForm(method, url, params, beforeSendFunction, successFunction, erro
         error: errorFunction,
     });
 }
+
+function AjaxMultipartForm(method, url, params, beforeSendFunction, successFunction, errorFunction) {
+    let authorizationData = GenerateAuthorization(url, method, params);
+
+    $.ajax({
+        url: url,
+        type: method,
+        data: params,
+        cache: false,  // 默认是true，但是一般不做缓存
+        processData: false,
+        contentType: false,
+        headers: {
+            'Authorization': authorizationData.authorization,
+            'Authorization-Date': authorizationData.date,
+            'Token': $.cookie("_login_token_"),
+        },
+        beforeSend: beforeSendFunction,
+        success: successFunction,
+        error: errorFunction,
+    });
+}
+
 
 function AjaxFormNoAsync(method, url, params, beforeSendFunction, successFunction, errorFunction) {
     let authorizationData = GenerateAuthorization(url, method, params);

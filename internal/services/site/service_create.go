@@ -15,7 +15,7 @@ type CreateSiteData struct {
 }
 
 // 获取网站 logo
-func getWebLogoIconUrl(siteData *CreateSiteData) string {
+func getWebLogoIconUrlByUrl(siteData *CreateSiteData) string {
 	b := besticon.New(besticon.WithLogger(besticon.NewDefaultLogger(ioutil.Discard))) // Disable verbose logging
 	icons, err := b.NewIconFinder().FetchIcons(siteData.Url)
 	if err != nil || len(icons) == 0 {
@@ -60,7 +60,7 @@ func (s *service) Create(ctx core.Context, siteData *CreateSiteData) (id int32, 
 	model.IsUsed = -1
 	model.CategoryId = siteData.CategoryId
 	model.Url = siteData.Url
-	model.Thumb = getWebLogoIconUrl(siteData)
+	model.Thumb = getWebLogoIconUrlByUrl(siteData)
 	model.Title = getWebTitle(siteData)
 	model.Description = getWebDescription(siteData)
 
