@@ -18,6 +18,7 @@ services:
     volumes:
       - ./configs:/opt/configs
       - ./logs/:/opt/logs/
+      - ./assets/upload/:/opt/assets/upload
     networks:
       - webstack-go
     healthcheck:
