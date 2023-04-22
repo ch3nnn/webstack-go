@@ -3,9 +3,12 @@ package core
 import (
 	"bytes"
 	stdctx "context"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 
@@ -145,6 +148,12 @@ type Context interface {
 
 	// ResponseWriter 获取 ResponseWriter 对象
 	ResponseWriter() gin.ResponseWriter
+
+	// FormFile returns the first file for the provided form key.
+	FormFile(name string) (*multipart.FileHeader, error)
+
+	// SaveUploadedFile uploads the form file to specific dst.
+	SaveUploadedFile(file *multipart.FileHeader, dst string) error
 }
 
 type context struct {
@@ -402,4 +411,38 @@ func (c *context) RequestContext() StdContext {
 // ResponseWriter 获取 ResponseWriter
 func (c *context) ResponseWriter() gin.ResponseWriter {
 	return c.ctx.Writer
+}
+
+// FormFile returns the first file for the provided form key.
+func (c *context) FormFile(name string) (*multipart.FileHeader, error) {
+	if c.ctx.Request.MultipartForm == nil {
+		// 设置较低的内存限制 8 MiB
+		if err := c.ctx.Request.ParseMultipartForm(8 << 20); err != nil {
+			return nil, err
+		}
+	}
+	f, fh, err := c.ctx.Request.FormFile(name)
+	if err != nil {
+		return nil, err
+	}
+	f.Close()
+	return fh, err
+}
+
+// SaveUploadedFile uploads the form file to specific dst.
+func (c *context) SaveUploadedFile(file *multipart.FileHeader, dst string) error {
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, src)
+	return err
 }

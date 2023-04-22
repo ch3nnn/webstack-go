@@ -4,16 +4,18 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/services/site"
+	"mime/multipart"
 	"net/http"
 )
 
 type updateSiteRequest struct {
-	Id          int32  `form:"id,omitempty"`
-	CategoryId  int32  `form:"category_id,omitempty"` // 网站分类id
-	Title       string `form:"title,omitempty"`       // 网站标题
-	Thumb       string `form:"thumb,omitempty"`       // 网站 logo
-	Description string `form:"description,omitempty"` // 网站描述
-	Url         string `form:"url,omitempty"`         //  网站地址
+	Id          int32                 `form:"id,omitempty"`
+	CategoryId  int32                 `form:"category_id,omitempty"` // 网站分类id
+	Title       string                `form:"title,omitempty"`       // 网站标题
+	Thumb       string                `form:"thumb,omitempty"`       // 网站 logo
+	Description string                `form:"description,omitempty"` // 网站描述
+	Url         string                `form:"url,omitempty"`         // 网站地址
+	File        *multipart.FileHeader `json:"file"`                  // 上传 logo 图片
 }
 
 type updateSiteResponse struct {
@@ -42,7 +44,9 @@ func (h *handler) UpdateSite() core.HandlerFunc {
 			)
 			return
 		}
-
+		if file, _ := c.FormFile("file"); file != nil {
+			req.File = file
+		}
 		if err := h.siteService.UpdateSite(c, (*site.UpdateSiteRequest)(req)); err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
@@ -51,7 +55,6 @@ func (h *handler) UpdateSite() core.HandlerFunc {
 			)
 			return
 		}
-
 		res.Id = req.Id
 		c.Payload(res)
 	}

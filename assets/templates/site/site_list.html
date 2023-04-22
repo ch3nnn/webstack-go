@@ -326,18 +326,23 @@
             title: '编辑网站',
             //content: 'url:form.html',  // 也可以采用url形式
             content: '<div class="form-group p-1 mb-0">' +
-                '<div className="input-group mb-3">' +
-                '<div className="input-group-prepend">' +
-                '<span className="input-group-text">分类</span>' +
-                ' </div>' +
+                '<div class="input-group mb-3">' +
+                '<div class="input-group-prepend">' +
+                '<span class="input-group-text">分类</span>' +
+                '</div>' +
                 '<select class="form-control select-picker col-lg-5" data-width="auto" data-live-search="true" id="category_id"></select>' +
                 '</div>' +
                 '<div>' +
                 '<input  style="display:none"  autofocus="" class="form-control" type="text"  maxLength="200" id="id" value="' + id + '">' +
                 '</div>' +
                 '<div>' +
-                '<label class="control-label">LOGO</label>' +
+                '<label class="control-label">Logo 链接</label>' +
                 '<input  autofocus="" class="form-control" type="text"  maxLength="200" id="thumb" placeholder="请输入网站 LOGO" value="' + thumb + '">' +
+                '</div>' +
+                '<div>' +
+                '<label class="control-label">上传 Logo 图片</label>' +
+                '<input id="file" name="file" type="file" >' +
+                '<label class="control-label">注: 优先以上传图片为主</label>' +
                 '</div>' +
                 '<div>' +
                 '  <label class="control-label">名称</label>' +
@@ -383,13 +388,15 @@
                     btnClass: 'btn-orange',
 
                     action: function () {
+                        const file = $("#file").val();
                         const thumb = $("#thumb").val();
-                        if (thumb === "") {
+
+                        if (thumb === "" && file === "") {
                             $.alert({
                                 title: '温馨提示',
                                 icon: 'mdi mdi-alert',
                                 type: 'orange',
-                                content: '请输入网站logo。',
+                                content: '请输入网站 logo 或者上传 logo 图片',
                             });
                             return false;
                         }
@@ -427,18 +434,19 @@
                             return false;
                         }
 
-                        const postData = {
-                            id: id,
-                            category_id: $("#category_id").val(),
-                            thumb: thumb,
-                            title: title,
-                            url: url,
-                            description: description,
-                        };
-                        AjaxForm(
+                        var formData = new FormData();
+                        formData.append('id',id);
+                        formData.append('thumb',thumb);
+                        formData.append('title',title);
+                        formData.append('url',url);
+                        formData.append('description',description);
+                        formData.append('file',$("#file")[0].files[0]);
+                        formData.append('category_id', $("#category_id").val());
+
+                        AjaxMultipartForm(
                             "PUT",
                             "/api/site",
-                            postData,
+                            formData,
                             function () {
                                 $(this).hide();
                                 $("#btnLoading").show();

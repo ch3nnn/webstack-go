@@ -252,7 +252,11 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 
 	fmt.Println(color.Blue(_UI))
 
+	// 配置上传静态文件
+	mux.engine.Static("upload", "assets/upload")
+	// 配置静态文件
 	mux.engine.StaticFS("assets", http.FS(assets.Bootstrap))
+	// 配置模板
 	mux.engine.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
 
 	// withoutTracePaths 这些请求，默认不记录日志
