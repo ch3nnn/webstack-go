@@ -25,11 +25,8 @@ services:
       test: "/bin/netstat -anpt|grep 9999"
       <<: *healthcheck_defaults
     depends_on:
-      webstack-go-mysql:
-        condition: service_healthy
-      webstack-go-redis:
-        condition: service_healthy
-
+      - webstack-go-mysql
+      - webstack-go-redis
 
   webstack-go-mysql:
     image: mysql/mysql-server:5.7
@@ -49,7 +46,6 @@ services:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       <<: *healthcheck_defaults
 
-
   webstack-go-redis:
     image: redis:6.2.4
     container_name: webstack-go-redis
@@ -61,63 +57,6 @@ services:
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       <<: *healthcheck_defaults
-
-
-  webstack-go-prometheus:
-    image: prom/prometheus:latest
-    container_name: webstack-go-prometheus
-    volumes:
-      - ./deployments/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - webstack-go
-    depends_on:
-      webstack-go-service:
-        condition: service_healthy
-
-
-  webstack-go-grafana:
-    image: grafana/grafana-enterprise:9.4.3
-    container_name: webstack-go-grafana
-    ports:
-      - "3000:3000"
-    networks:
-      - webstack-go
-    depends_on:
-      webstack-go-service:
-        condition: service_healthy
-
-
-  webstack-go-loki:
-    image: grafana/loki:2.7.3
-    container_name: webstack-go-loki
-    user: root
-    volumes:
-      - ./deployments/loki/loki.yaml:/etc/loki/loki.yaml
-    command: -config.file=/etc/loki/loki.yaml
-    ports:
-      - "3100:3100"
-    networks:
-      - webstack-go
-    depends_on:
-      webstack-go-service:
-        condition: service_healthy
-
-
-  webstack-go-promtail:
-    image: grafana/promtail:2.7.3
-    container_name: webstack-go-promtail
-    user: root
-    volumes:
-      - ./logs/:/data/logs/
-      - ./deployments/loki/promtail.yaml:/etc/promtail/promtail.yaml
-    command: -config.file=/etc/promtail/promtail.yaml
-    networks:
-      - webstack-go
-    depends_on:
-      webstack-go-service:
-        condition: service_healthy
 
 networks:
   webstack-go:
