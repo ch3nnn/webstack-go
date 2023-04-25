@@ -26,17 +26,15 @@ services:
       - webstack-go-redis
 
   webstack-go-mysql:
-    image: mysql/mysql-server:5.7
+    image: mysql:5.7
     container_name: webstack-go-mysql
     environment:
       MYSQL_DATABASE: webstack-go
       TZ: Asia/Shanghai
-      # 允许来自其他主机的根连接
-      # https://dev.mysql.com/doc/refman/5.7/en/docker-mysql-more-topics.html#docker_var_mysql-root-host
       MYSQL_ROOT_HOST: "%"
       MYSQL_ROOT_PASSWORD: 123456
     ports:
-      - "3305:3306"
+      - "3306:3306"
     networks:
       - webstack-go
     healthcheck:
@@ -48,7 +46,7 @@ services:
     container_name: webstack-go-redis
     command: redis-server --requirepass 123456
     ports:
-      - "6378:6379"
+      - "6379:6379"
     networks:
       - webstack-go
     healthcheck:
