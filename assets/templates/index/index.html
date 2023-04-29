@@ -64,7 +64,7 @@
             <header class="logo-env">
                 <!-- logo -->
                 <div class="logo">
-                    <a href="index.html" class="logo-expanded">
+                    <a href="/" class="logo-expanded">
                         <img src="./assets/bootstrap/static/index/images/logo@2x.png" width="100%" alt=""/>
                     </a>
                     <a href="index.html" class="logo-collapsed">
@@ -182,7 +182,7 @@
             {{ range .SiteList }}
             <div class="col-sm-3">
                 <div class="xe-widget xe-conversations box2 label-info" onclick="window.open('{{ .Url }}', '_blank')"
-                     data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{{ .Url }}">
+                     data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{{ .Description }}">
                     <div class="xe-comment-entry">
                         <a class="xe-user-img">
                             <img data-src="{{ .Thumb }}" class="lozad img-circle" width="40">
@@ -236,8 +236,8 @@
 
             } else {
                 $('.has-sub ul').each(function (id, ele) {
-                    var _that = $(this)
-                    if (_this.find('ul')[0] != ele) {
+                    const _that = $(this);
+                    if (_this.find('ul')[0] !== ele) {
                         setTimeout(function () {
                             _that.attr("style", "")
                         }, 300);
