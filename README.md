@@ -93,6 +93,10 @@
       webstack-go-service      webstack-go-webstack-go-service    "./webstack-go -env …"   webstack-go-service      3 minutes ago       Up 3 minutes (healthy)   0.0.0.0:9999->9999/tcp
     ```
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ch3nnn/webstack-go&type=Date)](https://star-history.com/#ch3nnn/webstack-go&Date)
+
 ## 效果图
 
 > **首页**
@@ -114,3 +118,6 @@
 > **监控组件**
 
 ![grafana.png](assets/bootstrap/images/grafana.png)![]()
+
+
+
