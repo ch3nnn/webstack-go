@@ -8,9 +8,16 @@ import (
 )
 
 func (s *service) Delete(ctx core.Context, id int32) (err error) {
-	qb := category.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
-	err = qb.Delete(s.db.GetDbW().WithContext(ctx.RequestContext()))
+
+	qb1 := category.NewQueryBuilder().WhereId(mysql.EqualPredicate, id)
+	err = qb1.Delete(s.db.GetDbW().WithContext(ctx.RequestContext()))
+	if err != nil {
+		return err
+	}
+
+	// 删除一级目录 id 需要删除二级分类
+	qb2 := category.NewQueryBuilder().WhereParentId(mysql.EqualPredicate, id)
+	err = qb2.Delete(s.db.GetDbW().WithContext(ctx.RequestContext()))
 	if err != nil {
 		return err
 	}
