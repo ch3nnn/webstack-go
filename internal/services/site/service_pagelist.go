@@ -12,6 +12,7 @@ type SearchData struct {
 	BusinessSecret    string `json:"business_secret"`    // 调用方secret
 	BusinessDeveloper string `json:"business_developer"` // 调用方对接人
 	Remark            string `json:"remark"`             // 备注
+	Search            string `json:"search"`             // 搜索关键字
 }
 
 func (s *service) PageList(ctx core.Context, searchData *SearchData) (listData []*site.Site, err error) {
@@ -29,6 +30,9 @@ func (s *service) PageList(ctx core.Context, searchData *SearchData) (listData [
 	offset := (page - 1) * pageSize
 
 	qb := site.NewQueryBuilder()
+	if searchData.Search != "" {
+		qb = qb.WhereTitleLike(searchData.Search)
+	}
 	listData, err = qb.
 		Limit(pageSize).
 		Offset(offset).

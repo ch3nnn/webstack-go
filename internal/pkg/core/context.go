@@ -59,6 +59,21 @@ var _ Context = (*context)(nil)
 type Context interface {
 	init()
 
+	// Query returns the keyed url query value if it exists,
+	// otherwise it returns an empty string `("")`.
+	// It is shortcut for `c.Request.URL.Query().Get(key)`
+	//
+	//	    GET /path?id=1234&name=Manu&value=
+	//		   c.Query("id") == "1234"
+	//		   c.Query("name") == "Manu"
+	//		   c.Query("value") == ""
+	//		   c.Query("wtf") == ""
+	Query(key string) (value string)
+
+	GetQuery(key string) (string, bool)
+
+	GetQueryArray(key string) (values []string, ok bool)
+
 	// ShouldBindQuery 反序列化 querystring
 	// tag: `form:"xxx"` (注：不要写成 query)
 	ShouldBindQuery(obj interface{}) error
@@ -174,6 +189,53 @@ func (c *context) init() {
 
 	c.ctx.Set(_BodyName, body)                                   // cache body是为了trace使用
 	c.ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body)) // re-construct req body
+}
+
+// Query returns the keyed url query value if it exists,
+// otherwise it returns an empty string `("")`.
+// It is shortcut for `c.Request.URL.Query().Get(key)`
+//
+//	    GET /path?id=1234&name=Manu&value=
+//		   c.Query("id") == "1234"
+//		   c.Query("name") == "Manu"
+//		   c.Query("value") == ""
+//		   c.Query("wtf") == ""
+func (c *context) Query(key string) (value string) {
+	value, _ = c.GetQuery(key)
+	return
+}
+
+// GetQuery is like Query(), it returns the keyed url query value
+// if it exists `(value, true)` (even when the value is an empty string),
+// otherwise it returns `("", false)`.
+// It is shortcut for `c.Request.URL.Query().Get(key)`
+//
+//	GET /?name=Manu&lastname=
+//	("Manu", true) == c.GetQuery("name")
+//	("", false) == c.GetQuery("id")
+//	("", true) == c.GetQuery("lastname")
+func (c *context) GetQuery(key string) (string, bool) {
+	if values, ok := c.GetQueryArray(key); ok {
+		return values[0], ok
+	}
+	return "", false
+}
+
+// GetQueryArray returns a slice of strings for a given query key, plus
+// a boolean value whether at least one value exists for the given key.
+func (c *context) GetQueryArray(key string) (values []string, ok bool) {
+	queryValues := c.initQueryCache()
+	values, ok = queryValues[key]
+	return
+}
+
+func (c *context) initQueryCache() url.Values {
+	if c.ctx.Request != nil {
+		return c.ctx.Request.URL.Query()
+	} else {
+		return url.Values{}
+	}
+
 }
 
 // ShouldBindQuery 反序列化querystring

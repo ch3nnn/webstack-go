@@ -6,6 +6,7 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/services/site"
 	"github.com/spf13/cast"
 	"net/http"
+	"strings"
 )
 
 type listRequest struct {
@@ -77,6 +78,7 @@ func (h *handler) List() core.HandlerFunc {
 		searchData.BusinessKey = req.BusinessKey
 		searchData.BusinessSecret = req.BusinessSecret
 		searchData.Remark = req.Remark
+		searchData.Search = strings.TrimSpace(c.Query("search"))
 
 		resListData, err := h.siteService.PageList(c, searchData)
 		if err != nil {

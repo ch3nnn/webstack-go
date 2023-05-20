@@ -227,6 +227,17 @@ func (qb *siteQueryBuilder) WhereTitle(p mysql.Predicate, value string) *siteQue
 	return qb
 }
 
+func (qb *siteQueryBuilder) WhereTitleLike(value string) *siteQueryBuilder {
+	qb.where = append(qb.where, struct {
+		prefix string
+		value  interface{}
+	}{
+		fmt.Sprintf("%v %v ?", "title ", "LIKE"),
+		"%" + value + "%",
+	})
+	return qb
+}
+
 func (qb *siteQueryBuilder) WhereTitleIn(value []string) *siteQueryBuilder {
 	qb.where = append(qb.where, struct {
 		prefix string
