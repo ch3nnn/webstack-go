@@ -8,9 +8,7 @@ import (
 func (s *service) List(ctx core.Context) (listData []*site.Site, err error) {
 
 	qb := site.NewQueryBuilder()
-
-	listData, err = qb.
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	listData, err = qb.QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
 	if err != nil {
 		return nil, err
 	}
