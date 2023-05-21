@@ -17,7 +17,7 @@ import (
 
 type CreateSiteData struct {
 	CategoryId int32  `json:"category_id"`
-	Url        string `json:"Url"`
+	Url        string `json:"Url" validate:"url, http_url"`
 }
 
 // 获取网站 logo
@@ -93,19 +93,23 @@ func getWebDescription(site *site.Site) string {
 	return description
 }
 
-func (s *service) Create(ctx core.Context, siteData *CreateSiteData) (id int32, err error) {
+func (s *service) Create(ctx core.Context, sitesData []*CreateSiteData) (successCount, failCount int32) {
 
-	model := site.NewModel()
-	model.IsUsed = -1
-	model.CategoryId = siteData.CategoryId
-	model.Url = siteData.Url
-	model.Title = getWebTitle(model)
-	model.Description = getWebDescription(model)
-	model.Thumb = getWebLogoIconUrlByUrl(model)
-
-	id, err = model.Create(s.db.GetDbW().WithContext(ctx.RequestContext()))
-	if err != nil {
-		return 0, err
+	for _, siteData := range sitesData {
+		model := site.NewModel()
+		model.IsUsed = site.Off
+		model.Url = siteData.Url
+		model.CategoryId = siteData.CategoryId
+		model.Title = getWebTitle(model)
+		model.Description = getWebDescription(model)
+		model.Thumb = getWebLogoIconUrlByUrl(model)
+		// 统计成功失败次数
+		if _, err := model.Create(s.db.GetDbW().WithContext(ctx.RequestContext())); err != nil {
+			failCount++
+		} else {
+			successCount++
+		}
 	}
+
 	return
 }

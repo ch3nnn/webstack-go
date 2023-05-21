@@ -4,7 +4,9 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/services/site"
+	"github.com/go-playground/validator/v10"
 	"net/http"
+	"strings"
 )
 
 type createRequest struct {
@@ -13,7 +15,8 @@ type createRequest struct {
 }
 
 type createResponse struct {
-	Id int32 `json:"id"`
+	SuccessCount int32 `json:"successCount"`
+	FailCount    int32 `json:"failCount"`
 }
 
 // Create 创建网站
@@ -38,22 +41,21 @@ func (h *handler) Create() core.HandlerFunc {
 			)
 			return
 		}
-
-		createData := new(site.CreateSiteData)
-		createData.CategoryId = req.CategoryId
-		createData.Url = req.Url
-
-		id, err := h.siteService.Create(c, createData)
-		if err != nil {
-			c.AbortWithError(core.Error(
-				http.StatusBadRequest,
-				code.SiteCreateError,
-				code.Text(code.SiteCreateError)).WithError(err),
-			)
-			return
+		sites := make([]*site.CreateSiteData, 0, 10)
+		for _, url := range strings.Split(req.Url, "\n") {
+			// 校验网址格式
+			if err := validator.New().Var(url, "http_url"); err != nil {
+				c.AbortWithError(core.Error(
+					http.StatusBadRequest,
+					code.ParamBindError,
+					code.Text(code.ParamBindError)).WithError(err),
+				)
+				return
+			}
+			sites = append(sites, &site.CreateSiteData{CategoryId: req.CategoryId, Url: url})
 		}
+		res.SuccessCount, res.FailCount = h.siteService.Create(c, sites)
 
-		res.Id = id
 		c.Payload(res)
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql/site"
 )
 
-func (s *service) UpdateUsed(ctx core.Context, id int32, used int32) (err error) {
+func (s *service) UpdateUsed(ctx core.Context, id int32, used site.IsUsedStatus) (err error) {
 	qb := site.NewQueryBuilder()
 	qb.WhereId(mysql.EqualPredicate, id)
 	data := map[string]any{"IsUsed": used}

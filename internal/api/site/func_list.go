@@ -3,6 +3,7 @@ package site
 import (
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	siteMd "github.com/ch3nnn/webstack-go/internal/repository/mysql/site"
 	"github.com/ch3nnn/webstack-go/internal/services/site"
 	"github.com/spf13/cast"
 	"net/http"
@@ -18,16 +19,16 @@ type listRequest struct {
 	Remark            string `form:"remark"`             // 备注
 }
 type listData struct {
-	Id          int    `json:"id"`          // ID
-	Thumb       string `json:"thumb"`       // 网站 logo
-	Title       string `json:"title"`       // 名称简介
-	Url         string `json:"url"`         // 链接
-	Category    string `json:"category"`    // 分类
-	CategoryId  int32  `json:"category_id"` // 分类id
-	Description string `json:"description"` // 描述
-	IsUsed      int    `json:"is_used"`     // 是否启用
-	CreatedAt   string `json:"created_at"`  // 创建时间
-	UpdatedAt   string `json:"updated_at"`  // 更新时间
+	Id          int                 `json:"id"`          // ID
+	Thumb       string              `json:"thumb"`       // 网站 logo
+	Title       string              `json:"title"`       // 名称简介
+	Url         string              `json:"url"`         // 链接
+	Category    string              `json:"category"`    // 分类
+	CategoryId  int32               `json:"category_id"` // 分类id
+	Description string              `json:"description"` // 描述
+	IsUsed      siteMd.IsUsedStatus `json:"is_used"`     // 是否启用
+	CreatedAt   string              `json:"created_at"`  // 创建时间
+	UpdatedAt   string              `json:"updated_at"`  // 更新时间
 }
 
 type listResponse struct {
@@ -123,7 +124,7 @@ func (h *handler) List() core.HandlerFunc {
 				Category:    v.Category.Title,
 				CategoryId:  v.Category.Id,
 				Description: v.Description,
-				IsUsed:      int(v.IsUsed),
+				IsUsed:      v.IsUsed,
 				CreatedAt:   v.CreatedAt.Format("2006-01-02 15:04:05"),
 				UpdatedAt:   v.UpdatedAt.Format("2006-01-02 15:04:05"),
 			}

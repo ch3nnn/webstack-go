@@ -33,7 +33,7 @@
                         </div>
                         <div class="form-group">
                             <label>网站地址</label>
-                            <input type="text" class="form-control" maxlength="200" id="url" placeholder="请输入网站地址">
+                            <textarea type="text" class="form-control" id="url" placeholder="URL 必须包含 http:// 或 https://且至少含有1个路径 例如: http://www.test.com/test.html，一行一个"></textarea>
                         </div>
 
                         <button type="button" id="btnOk" class="btn btn-primary">确认</button>
@@ -118,7 +118,7 @@
                         title: '操作成功',
                         icon: 'mdi mdi-check-decagram',
                         type: 'green',
-                        content: '编号：' + data.id + ' 创建完成。',
+                        content: '成功创建：' + data.successCount + '条。失败创建：' + data.failCount + '条。',
                         buttons: {
                             okay: {
                                 text: '关闭',

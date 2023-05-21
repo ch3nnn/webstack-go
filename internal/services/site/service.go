@@ -17,9 +17,9 @@ type Service interface {
 	CategoryList(ctx core.Context) (listData []*category.Category, err error)
 	PageList(ctx core.Context, searchData *SearchData) (listData []*site.Site, err error)
 	PageListCount(ctx core.Context, searchData *SearchData) (total int64, err error)
-	UpdateUsed(ctx core.Context, id int32, used int32) (err error)
+	UpdateUsed(ctx core.Context, id int32, used site.IsUsedStatus) (err error)
 	Delete(ctx core.Context, id int32) (err error)
-	Create(ctx core.Context, siteData *CreateSiteData) (id int32, err error)
+	Create(ctx core.Context, sitesData []*CreateSiteData) (successCount, failCount int32)
 	CategorySite(ctx core.Context) (categorySites []*CategorySite, err error)
 	UpdateSite(ctx core.Context, updateSite *UpdateSiteRequest) (err error)
 }
