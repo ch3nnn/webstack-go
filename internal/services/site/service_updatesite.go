@@ -2,15 +2,14 @@ package site
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/site"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"mime/multipart"
 	"path"
 )
 
 type UpdateSiteRequest struct {
-	Id          int32                 `json:"id"`
-	CategoryId  int32                 `json:"category_id"` // 网站分类id
+	Id          int64                 `json:"id"`
+	CategoryId  int64                 `json:"category_id"` // 网站分类id
 	Title       string                `json:"title"`       // 网站标题
 	Thumb       string                `json:"thumb"`       // 网站 logo
 	Description string                `json:"description"` // 网站描述
@@ -36,16 +35,15 @@ func getWebLogoIconUrlByUploadImg(ctx core.Context) string {
 }
 
 func (s *service) UpdateSite(ctx core.Context, updateSite *UpdateSiteRequest) (err error) {
-	qb := site.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, updateSite.Id)
-	data := map[string]any{
-		"CategoryId":  updateSite.CategoryId,
-		"Title":       updateSite.Title,
-		"Thumb":       getWebThumb(ctx, updateSite),
-		"Description": updateSite.Description,
-		"Url":         updateSite.Url,
-	}
-	if err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data); err != nil {
+	if _, err = query.Site.WithContext(ctx.RequestContext()).
+		Where(query.Site.ID.Eq(updateSite.Id)).
+		Updates(map[string]any{
+			"CategoryID":  updateSite.CategoryId,
+			"Title":       updateSite.Title,
+			"Thumb":       getWebThumb(ctx, updateSite),
+			"Description": updateSite.Description,
+			"Url":         updateSite.Url,
+		}); err != nil {
 		return err
 	}
 	return

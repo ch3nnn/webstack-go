@@ -1,21 +1,18 @@
 package category
 
 import (
-	"github.com/ch3nnn/webstack-go/internal/services/category"
-	"net/http"
-	"strconv"
-
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"net/http"
 )
 
 type detailRequest struct {
-	Id string `uri:"id"` // 主键 id
+	Id int64 `uri:"id"` // 主键 id
 }
 
 type detailResponse struct {
-	Id   int32  `json:"id"`   // 主键ID
-	Pid  int32  `json:"pid"`  // 父类ID
+	Id   int64  `json:"id"`   // 主键ID
+	Pid  int64  `json:"pid"`  // 父类ID
 	Name string `json:"name"` // 分类名称
 	Icon string `json:"icon"` // 图标
 }
@@ -34,7 +31,6 @@ type detailResponse struct {
 func (h *handler) Detail() core.HandlerFunc {
 	return func(c core.Context) {
 		req := new(detailRequest)
-
 		if err := c.ShouldBindURI(req); err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
@@ -44,15 +40,7 @@ func (h *handler) Detail() core.HandlerFunc {
 			return
 		}
 
-		id, err := strconv.Atoi(req.Id)
-		if err != nil {
-			return
-		}
-
-		searchOneData := new(category.SearchOneData)
-		searchOneData.Id = int32(id)
-
-		info, err := h.categoryService.Detail(c, searchOneData)
+		cat, err := h.categoryService.Detail(c, req.Id)
 		if err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
@@ -62,13 +50,11 @@ func (h *handler) Detail() core.HandlerFunc {
 			return
 		}
 
-		res := detailResponse{
-			Id:   info.Id,
-			Pid:  info.ParentId,
-			Name: info.Title,
-			Icon: info.Icon,
-		}
-
-		c.Payload(res)
+		c.Payload(detailResponse{
+			Id:   cat.ID,
+			Pid:  cat.ParentID,
+			Name: cat.Title,
+			Icon: cat.Icon,
+		})
 	}
 }

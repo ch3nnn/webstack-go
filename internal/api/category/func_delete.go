@@ -1,19 +1,17 @@
 package category
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"net/http"
 )
 
 type deleteRequest struct {
-	Id string `uri:"id"` // 主键 id
+	Id int64 `uri:"id"` // 主键 id
 }
 
 type deleteResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // Delete 删除分类
@@ -40,13 +38,7 @@ func (h *handler) Delete() core.HandlerFunc {
 			return
 		}
 
-		id, err := strconv.Atoi(req.Id)
-		if err != nil {
-			return
-		}
-
-		err = h.categoryService.Delete(c, int32(id))
-		if err != nil {
+		if err := h.categoryService.Delete(c, req.Id); err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
 				code.CategoryDeleteError,
@@ -55,7 +47,7 @@ func (h *handler) Delete() core.HandlerFunc {
 			return
 		}
 
-		res.Id = int32(id)
+		res.Id = req.Id
 		c.Payload(res)
 	}
 }

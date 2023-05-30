@@ -3,17 +3,16 @@ package site
 import (
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/site"
 	"net/http"
 )
 
 type updateUsedRequest struct {
-	Id   int32             `form:"id"`   // 主键ID
-	Used site.IsUsedStatus `form:"used"` // 是否启用 1:是 -1:否
+	Id   int64 `form:"id"`   // 主键ID
+	Used int64 `form:"used"` // 是否启用 1:是 -1:否
 }
 
 type updateUsedResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // UpdateUsed 更新网站为启用/禁用

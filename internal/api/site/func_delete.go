@@ -7,11 +7,11 @@ import (
 )
 
 type deleteRequest struct {
-	Id int32 `uri:"id"` // 主键ID
+	Id int64 `uri:"id"` // 主键ID
 }
 
 type deleteResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // Delete 删除网站信息

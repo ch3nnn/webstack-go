@@ -10,13 +10,13 @@ import (
 )
 
 type createRequest struct {
-	CategoryId int32  `form:"category_id"`
+	CategoryId int64  `form:"category_id"`
 	Url        string `form:"url"`
 }
 
 type createResponse struct {
-	SuccessCount int32 `json:"successCount"`
-	FailCount    int32 `json:"failCount"`
+	SuccessCount int64 `json:"successCount"`
+	FailCount    int64 `json:"failCount"`
 }
 
 // Create 创建网站

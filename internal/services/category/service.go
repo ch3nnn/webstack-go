@@ -3,7 +3,7 @@ package category
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/category"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 )
 
@@ -12,14 +12,14 @@ var _ Service = (*service)(nil)
 type Service interface {
 	i()
 
-	List(ctx core.Context, searchData *SearchData) (listData []*category.Category, err error)
+	List(ctx core.Context) (categories []*model.Category, err error)
 	Tree(ctx core.Context) (nodes []*TreeNode, err error)
-	Create(ctx core.Context, siteData *CreateCategoryData) (id int32, err error)
-	Modify(ctx core.Context, id int32, menuData *UpdateCategoryData) (err error)
-	Delete(ctx core.Context, id int32) error
-	Detail(ctx core.Context, searchOneData *SearchOneData) (info *category.Category, err error)
-	UpdateUsed(ctx core.Context, id int32, used int32) (err error)
-	UpdateSort(ctx core.Context, id int32, sort int32) (err error)
+	Create(ctx core.Context, siteData *CreateCategoryData) (err error)
+	Modify(ctx core.Context, id int64, updateCategory *UpdateCategory) (err error)
+	Delete(ctx core.Context, id int64) error
+	Detail(ctx core.Context, id int64) (category *model.Category, err error)
+	UpdateUsed(ctx core.Context, id, used int64) (err error)
+	UpdateSort(ctx core.Context, id, sort int64) (err error)
 }
 
 type service struct {

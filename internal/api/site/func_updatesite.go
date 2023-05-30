@@ -9,8 +9,8 @@ import (
 )
 
 type updateSiteRequest struct {
-	Id          int32                 `form:"id,omitempty"`
-	CategoryId  int32                 `form:"category_id,omitempty"` // 网站分类id
+	Id          int64                 `form:"id,omitempty"`
+	CategoryId  int64                 `form:"category_id,omitempty"` // 网站分类id
 	Title       string                `form:"title,omitempty"`       // 网站标题
 	Thumb       string                `form:"thumb,omitempty"`       // 网站 logo
 	Description string                `form:"description,omitempty"` // 网站描述
@@ -19,7 +19,7 @@ type updateSiteRequest struct {
 }
 
 type updateSiteResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // UpdateSite 编辑网站

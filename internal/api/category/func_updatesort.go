@@ -1,20 +1,18 @@
 package category
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"net/http"
 )
 
 type updateSortRequest struct {
-	Id   string `form:"id"`   // 主键 id
-	Sort int32  `form:"sort"` // 排序
+	Id   int64 `form:"id"`   // 主键 id
+	Sort int64 `form:"sort"` // 排序
 }
 
 type updateSortResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // UpdateSort 更新分类排序
@@ -41,13 +39,8 @@ func (h *handler) UpdateSort() core.HandlerFunc {
 			)
 			return
 		}
-		id, err := strconv.Atoi(req.Id)
-		if err != nil {
-			return
-		}
 
-		err = h.categoryService.UpdateSort(c, int32(id), req.Sort)
-		if err != nil {
+		if err := h.categoryService.UpdateSort(c, req.Id, req.Sort); err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
 				code.CategoryUpdateError,
@@ -56,7 +49,7 @@ func (h *handler) UpdateSort() core.HandlerFunc {
 			return
 		}
 
-		res.Id = int32(id)
+		res.Id = req.Id
 		c.Payload(res)
 	}
 }
