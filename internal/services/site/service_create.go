@@ -2,9 +2,11 @@ package site
 
 import (
 	"crypto/tls"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
+
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/pkg/tools"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/site"
 	"github.com/gocolly/colly"
 	"github.com/mat/besticon/besticon"
 	"io"
@@ -16,12 +18,12 @@ import (
 )
 
 type CreateSiteData struct {
-	CategoryId int32  `json:"category_id"`
+	CategoryId int64  `json:"category_id"`
 	Url        string `json:"Url" validate:"url, http_url"`
 }
 
 // 获取网站 logo
-func getWebLogoIconUrlByUrl(site *site.Site) string {
+func getWebLogoIconUrlByUrl(site *model.Site) string {
 
 	// https 不安全跳过验证
 	client := &http.Client{
@@ -33,7 +35,7 @@ func getWebLogoIconUrlByUrl(site *site.Site) string {
 		besticon.WithLogger(besticon.NewDefaultLogger(ioutil.Discard)), // 禁用详细日志记录
 		besticon.WithHTTPClient(client),                                // 设置用于请求的http客户端
 	)
-	icons, err := b.NewIconFinder().FetchIcons(site.Url)
+	icons, err := b.NewIconFinder().FetchIcons(site.URL)
 	if err != nil || len(icons) == 0 {
 		return ""
 	}
@@ -65,13 +67,13 @@ func getWebLogoIconUrlByUrl(site *site.Site) string {
 }
 
 // getWebTitle 获取网站标题
-func getWebTitle(site *site.Site) string {
+func getWebTitle(site *model.Site) string {
 	var title string
 	c := tools.NewColly()
 	c.OnHTML("title", func(e *colly.HTMLElement) {
 		title += e.Text
 	})
-	if err := c.Visit(site.Url); err != nil {
+	if err := c.Visit(site.URL); err != nil {
 		return ""
 	}
 	return title
@@ -79,7 +81,7 @@ func getWebTitle(site *site.Site) string {
 }
 
 // getWebDescription 获取网站描述
-func getWebDescription(site *site.Site) string {
+func getWebDescription(site *model.Site) string {
 	var description string
 	c := tools.NewColly()
 	c.OnXML("//meta[@name='description']/@content|//meta[@name='Description']/@content|//meta[@name='DESCRIPTION']",
@@ -87,24 +89,24 @@ func getWebDescription(site *site.Site) string {
 			description += e.Text
 		},
 	)
-	if err := c.Visit(site.Url); err != nil {
+	if err := c.Visit(site.URL); err != nil {
 		return ""
 	}
 	return description
 }
 
-func (s *service) Create(ctx core.Context, sitesData []*CreateSiteData) (successCount, failCount int32) {
+func (s *service) Create(ctx core.Context, sitesData []*CreateSiteData) (successCount, failCount int64) {
 
 	for _, siteData := range sitesData {
-		model := site.NewModel()
-		model.IsUsed = site.Off
-		model.Url = siteData.Url
-		model.CategoryId = siteData.CategoryId
-		model.Title = getWebTitle(model)
-		model.Description = getWebDescription(model)
-		model.Thumb = getWebLogoIconUrlByUrl(model)
-		// 统计成功失败次数
-		if _, err := model.Create(s.db.GetDbW().WithContext(ctx.RequestContext())); err != nil {
+		siteModel := new(model.Site)
+		siteModel.IsUsed = -1
+		siteModel.URL = siteData.Url
+		siteModel.CategoryID = siteData.CategoryId
+		siteModel.Title = getWebTitle(siteModel)
+		siteModel.Description = getWebDescription(siteModel)
+		siteModel.Thumb = getWebLogoIconUrlByUrl(siteModel)
+
+		if err := query.Site.WithContext(ctx.RequestContext()).Create(siteModel); err != nil {
 			failCount++
 		} else {
 			successCount++

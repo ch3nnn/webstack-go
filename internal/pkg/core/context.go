@@ -74,6 +74,10 @@ type Context interface {
 
 	GetQueryArray(key string) (values []string, ok bool)
 
+	ShouldBind(obj any) error
+
+	ShouldBindWith(obj any, b binding.Binding) error
+
 	// ShouldBindQuery 反序列化 querystring
 	// tag: `form:"xxx"` (注：不要写成 query)
 	ShouldBindQuery(obj interface{}) error
@@ -236,6 +240,15 @@ func (c *context) initQueryCache() url.Values {
 		return url.Values{}
 	}
 
+}
+
+func (c *context) ShouldBind(obj any) error {
+	b := binding.Default(c.ctx.Request.Method, c.ctx.ContentType())
+	return c.ShouldBindWith(obj, b)
+}
+
+func (c *context) ShouldBindWith(obj any, b binding.Binding) error {
+	return b.Bind(c.ctx.Request, obj)
 }
 
 // ShouldBindQuery 反序列化querystring

@@ -8,15 +8,15 @@ import (
 )
 
 type categoryListData struct {
-	Id     int32  `json:"id"`      // ID
+	Id     int64  `json:"id"`      // ID
 	HashID string `json:"hashid"`  // hashid
-	Pid    int32  `json:"pid"`     // 父类ID
+	Pid    int64  `json:"pid"`     // 父类ID
 	Name   string `json:"name"`    // 分类名称
 	Link   string `json:"link"`    // 链接地址
 	Icon   string `json:"icon"`    // 图标
-	IsUsed int32  `json:"is_used"` // 是否启用 1=启用 -1=禁用
-	Sort   int32  `json:"sort"`    // 排序
-	Level  int32  `json:"level"`   // 分类等级 1 一级分类  2 二级分类
+	IsUsed int64  `json:"is_used"` // 是否启用 1=启用 -1=禁用
+	Sort   int64  `json:"sort"`    // 排序
+	Level  int64  `json:"level"`   // 分类等级 1 一级分类  2 二级分类
 
 }
 
@@ -37,7 +37,7 @@ type categoryListResponse struct {
 func (h *handler) CategoryList() core.HandlerFunc {
 	return func(c core.Context) {
 		res := new(categoryListResponse)
-		resListData, err := h.siteService.CategoryList(c)
+		categories, err := h.siteService.CategoryList(c)
 		if err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
@@ -47,10 +47,10 @@ func (h *handler) CategoryList() core.HandlerFunc {
 			return
 		}
 
-		res.List = make([]categoryListData, len(resListData))
+		res.List = make([]categoryListData, len(categories))
 
-		for k, v := range resListData {
-			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
+		for i, cat := range categories {
+			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(cat.ID)})
 			if err != nil {
 				c.AbortWithError(core.Error(
 					http.StatusBadRequest,
@@ -61,17 +61,17 @@ func (h *handler) CategoryList() core.HandlerFunc {
 			}
 
 			data := categoryListData{
-				Id:     v.Id,
+				Id:     cat.ID,
 				HashID: hashId,
-				Pid:    v.ParentId,
-				Name:   v.Title,
-				Icon:   v.Icon,
-				IsUsed: v.IsUsed,
-				Sort:   v.Sort,
-				Level:  v.Level,
+				Pid:    cat.ParentID,
+				Name:   cat.Title,
+				Icon:   cat.Icon,
+				IsUsed: cat.IsUsed,
+				Sort:   cat.Sort,
+				Level:  cat.Level,
 			}
 
-			res.List[k] = data
+			res.List[i] = data
 		}
 
 		c.Payload(res)

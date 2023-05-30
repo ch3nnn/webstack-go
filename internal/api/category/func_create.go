@@ -4,21 +4,19 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/services/category"
-	"github.com/spf13/cast"
 	"net/http"
-	"strconv"
 )
 
 type createRequest struct {
-	Id    string `form:"id"`    // ID
-	Pid   int32  `form:"pid"`   // 父类ID
+	Id    int64  `form:"id"`    // ID
+	Pid   int64  `form:"pid"`   // 父类ID
 	Name  string `form:"name"`  // 分类名称
 	Icon  string `form:"icon"`  // 图标
-	Level int32  `form:"level"` // 分类等级
+	Level int64  `form:"level"` // 分类等级
 }
 
 type createResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // Create 创建/编辑分类
@@ -45,18 +43,13 @@ func (h *handler) Create() core.HandlerFunc {
 			return
 		}
 
-		if req.Id != "" { // 编辑功能
-			id, err := strconv.Atoi(req.Id)
-			if err != nil {
-				return
-			}
+		if req.Id != 0 { // 编辑功能
 
-			updateData := new(category.UpdateCategoryData)
-			updateData.Name = req.Name
-			updateData.Icon = req.Icon
+			updateCategory := new(category.UpdateCategory)
+			updateCategory.Name = req.Name
+			updateCategory.Icon = req.Icon
 
-			err = h.categoryService.Modify(c, int32(id), updateData)
-			if err != nil {
+			if err := h.categoryService.Modify(c, req.Id, updateCategory); err != nil {
 				c.AbortWithError(core.Error(
 					http.StatusBadRequest,
 					code.CategoryUpdateError,
@@ -65,11 +58,10 @@ func (h *handler) Create() core.HandlerFunc {
 				return
 			}
 
-			res.Id = int32(id)
+			res.Id = req.Id
 			c.Payload(res)
 
 		} else { // 新增功能
-
 			pid := req.Level
 			level := 2
 
@@ -82,10 +74,9 @@ func (h *handler) Create() core.HandlerFunc {
 			createData.Pid = pid
 			createData.Name = req.Name
 			createData.Icon = req.Icon
-			createData.Level = cast.ToInt32(level)
+			createData.Level = int64(level)
 
-			id, err := h.categoryService.Create(c, createData)
-			if err != nil {
+			if err := h.categoryService.Create(c, createData); err != nil {
 				c.AbortWithError(core.Error(
 					http.StatusBadRequest,
 					code.CategoryCreateError,
@@ -94,7 +85,6 @@ func (h *handler) Create() core.HandlerFunc {
 				return
 			}
 
-			res.Id = id
 			c.Payload(res)
 		}
 	}

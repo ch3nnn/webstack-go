@@ -5,24 +5,20 @@ import (
 
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/services/category"
-
 	"github.com/spf13/cast"
 )
 
 type listData struct {
-	Id     int32  `json:"id"`      // ID
+	Id     int64  `json:"id"`      // ID
 	HashID string `json:"hashid"`  // hashid
-	Pid    int32  `json:"pid"`     // 父类ID
+	Pid    int64  `json:"pid"`     // 父类ID
 	Name   string `json:"name"`    // 菜单名称
 	Link   string `json:"link"`    // 链接地址
 	Icon   string `json:"icon"`    // 图标
-	IsUsed int32  `json:"is_used"` // 是否启用 1=启用 -1=禁用
-	Sort   int32  `json:"sort"`    // 排序
-	Level  int32  `json:"level"`   // 分类等级 1 一级分类  2 二级分类
+	IsUsed int64  `json:"is_used"` // 是否启用 1=启用 -1=禁用
+	Sort   int64  `json:"sort"`    // 排序
+	Level  int64  `json:"level"`   // 分类等级 1 一级分类  2 二级分类
 }
-
-type listRequest struct{}
 
 type listResponse struct {
 	List []listData `json:"list"`
@@ -41,7 +37,7 @@ type listResponse struct {
 func (h *handler) List() core.HandlerFunc {
 	return func(c core.Context) {
 		res := new(listResponse)
-		resListData, err := h.categoryService.List(c, new(category.SearchData))
+		categories, err := h.categoryService.List(c)
 		if err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
@@ -51,10 +47,10 @@ func (h *handler) List() core.HandlerFunc {
 			return
 		}
 
-		res.List = make([]listData, len(resListData))
+		res.List = make([]listData, len(categories))
 
-		for k, v := range resListData {
-			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
+		for i, cat := range categories {
+			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(cat.ID)})
 			if err != nil {
 				c.AbortWithError(core.Error(
 					http.StatusBadRequest,
@@ -64,18 +60,16 @@ func (h *handler) List() core.HandlerFunc {
 				return
 			}
 
-			data := listData{
-				Id:     v.Id,
+			res.List[i] = listData{
+				Id:     cat.ID,
 				HashID: hashId,
-				Pid:    v.ParentId,
-				Name:   v.Title,
-				Icon:   v.Icon,
-				IsUsed: v.IsUsed,
-				Sort:   v.Sort,
-				Level:  v.Level,
+				Pid:    cat.ParentID,
+				Name:   cat.Title,
+				Icon:   cat.Icon,
+				IsUsed: cat.IsUsed,
+				Sort:   cat.Sort,
+				Level:  cat.Level,
 			}
-
-			res.List[k] = data
 		}
 
 		c.Payload(res)

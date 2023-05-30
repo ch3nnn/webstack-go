@@ -1,20 +1,18 @@
 package category
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"net/http"
 )
 
 type updateUsedRequest struct {
-	Id   string `form:"id"`   // 主键ID
-	Used int32  `form:"used"` // 是否启用 1:是 -1:否
+	Id   int64 `form:"id"`   // 主键ID
+	Used int64 `form:"used"` // 是否启用 1:是 -1:否
 }
 
 type updateUsedResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // UpdateUsed 更新分类为启用/禁用
@@ -42,13 +40,7 @@ func (h *handler) UpdateUsed() core.HandlerFunc {
 			return
 		}
 
-		id, err := strconv.Atoi(req.Id)
-		if err != nil {
-			return
-		}
-
-		err = h.categoryService.UpdateUsed(c, int32(id), req.Used)
-		if err != nil {
+		if err := h.categoryService.UpdateUsed(c, req.Id, req.Used); err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
 				code.CategoryUpdateError,
@@ -57,7 +49,7 @@ func (h *handler) UpdateUsed() core.HandlerFunc {
 			return
 		}
 
-		res.Id = int32(id)
+		res.Id = req.Id
 		c.Payload(res)
 	}
 }

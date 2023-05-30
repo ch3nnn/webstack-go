@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"time"
 
 	"github.com/ch3nnn/webstack-go/configs"
@@ -52,6 +53,7 @@ func New() (Repo, error) {
 		return nil, err
 	}
 
+	query.SetDefault(dbr)
 	return &dbRepo{
 		DbR: dbr,
 		DbW: dbw,
