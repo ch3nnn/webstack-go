@@ -131,6 +131,14 @@ func init() {
 		}
 	}
 
+	
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
+	if err := viper.Unmarshal(config); err != nil {
+		panic(err)
+	}
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		if err := viper.Unmarshal(config); err != nil {
