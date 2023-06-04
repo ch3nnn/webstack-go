@@ -12,7 +12,7 @@ type deleteRequest struct {
 }
 
 type deleteResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // Delete 删除菜单
@@ -49,9 +49,7 @@ func (h *handler) Delete() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
-
-		err = h.menuService.Delete(c, id)
+		err = h.menuService.Delete(c, int64(ids[0]))
 		if err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
@@ -61,7 +59,7 @@ func (h *handler) Delete() core.HandlerFunc {
 			return
 		}
 
-		res.Id = id
+		res.Id = int64(ids[0])
 		c.Payload(res)
 	}
 }

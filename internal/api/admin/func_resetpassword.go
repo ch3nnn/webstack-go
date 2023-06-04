@@ -12,7 +12,7 @@ type resetPasswordRequest struct {
 }
 
 type resetPasswordResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // ResetPassword 重置密码
@@ -49,7 +49,7 @@ func (h *handler) ResetPassword() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int64(ids[0])
 
 		err = h.adminService.ResetPassword(c, id)
 		if err != nil {

@@ -3,32 +3,28 @@ package authorized
 import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 
 	"gorm.io/gorm"
 )
 
-func (s *service) Delete(ctx core.Context, id int32) (err error) {
+func (s *service) Delete(ctx core.Context, id int64) (err error) {
 	// 先查询 id 是否存在
-	authorizedInfo, err := authorized.NewQueryBuilder().
-		WhereIsDeleted(mysql.EqualPredicate, -1).
-		WhereId(mysql.EqualPredicate, id).
-		First(s.db.GetDbR().WithContext(ctx.RequestContext()))
-
+	authorizedInfo, err := query.Authorized.WithContext(ctx.RequestContext()).
+		Where(query.Authorized.IsDeleted.Eq(-1)).
+		Where(query.Authorized.ID.Eq(id)).
+		First()
 	if err == gorm.ErrRecordNotFound {
 		return nil
 	}
 
-	data := map[string]interface{}{
-		"is_deleted":   1,
-		"updated_user": ctx.SessionUserInfo().UserName,
-	}
-
-	qb := authorized.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
-	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
+	_, err = query.Authorized.WithContext(ctx.RequestContext()).
+		Where(query.Authorized.ID.Eq(id)).
+		UpdateColumnSimple(
+			query.Authorized.IsDeleted.Value(1),
+			query.Authorized.UpdatedUser.Value(ctx.SessionUserInfo().UserName),
+		)
 	if err != nil {
 		return err
 	}

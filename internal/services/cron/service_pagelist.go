@@ -2,50 +2,30 @@ package cron
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/cron_task"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
 type SearchData struct {
-	Page     int    // 第几页
-	PageSize int    // 每页显示条数
+	Page     int64  // 第几页
+	PageSize int64  // 每页显示条数
 	Name     string // 任务名称
-	Protocol int32  // 执行方式
-	IsUsed   int32  // 是否启用
+	Protocol int64  // 执行方式
+	IsUsed   int64  // 是否启用
 }
 
-func (s *service) PageList(ctx core.Context, searchData *SearchData) (listData []*cron_task.CronTask, err error) {
-	page := searchData.Page
-	if page == 0 {
-		page = 1
-	}
-
-	pageSize := searchData.PageSize
-	if pageSize == 0 {
-		pageSize = 10
-	}
-
-	offset := (page - 1) * pageSize
-
-	qb := cron_task.NewQueryBuilder()
-
+func (s *service) PageList(ctx core.Context, searchData *SearchData) (cronTasks []*model.CronTask, err error) {
+	iCronTaskDo := query.CronTask.WithContext(ctx.RequestContext())
 	if searchData.Name != "" {
-		qb.WhereName(mysql.EqualPredicate, searchData.Name)
+		iCronTaskDo = iCronTaskDo.Where(query.CronTask.Name.Eq(searchData.Name))
 	}
-
 	if searchData.Protocol != 0 {
-		qb.WhereProtocol(mysql.EqualPredicate, searchData.Protocol)
+		iCronTaskDo = iCronTaskDo.Where(query.CronTask.Protocol.Eq(searchData.Protocol))
 	}
-
 	if searchData.IsUsed != 0 {
-		qb.WhereIsUsed(mysql.EqualPredicate, searchData.IsUsed)
+		iCronTaskDo = iCronTaskDo.Where(query.CronTask.IsUsed.Eq(searchData.IsUsed))
 	}
-
-	listData, err = qb.
-		Limit(pageSize).
-		Offset(offset).
-		OrderById(false).
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	cronTasks, _, err = iCronTaskDo.Order(query.CronTask.ID.Desc()).FindByPage(int((searchData.Page-1)*searchData.PageSize), int(searchData.PageSize))
 	if err != nil {
 		return nil, err
 	}

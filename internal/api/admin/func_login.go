@@ -72,11 +72,11 @@ func (h *handler) Login() core.HandlerFunc {
 			return
 		}
 
-		token := password.GenerateLoginToken(info.Id)
+		token := password.GenerateLoginToken(info.ID)
 
 		// 用户信息
 		sessionUserInfo := &proposal.SessionUserInfo{
-			UserID:   info.Id,
+			UserID:   info.ID,
 			UserName: info.Username,
 		}
 
@@ -92,7 +92,7 @@ func (h *handler) Login() core.HandlerFunc {
 		}
 
 		searchMenuData := new(admin.SearchMyMenuData)
-		searchMenuData.AdminId = info.Id
+		searchMenuData.AdminId = info.ID
 		menu, err := h.adminService.MyMenu(c, searchMenuData)
 		if err != nil {
 			c.AbortWithError(core.Error(
@@ -118,7 +118,7 @@ func (h *handler) Login() core.HandlerFunc {
 		}
 
 		searchActionData := new(admin.SearchMyActionData)
-		searchActionData.AdminId = info.Id
+		searchActionData.AdminId = info.ID
 		action, err := h.adminService.MyAction(c, searchActionData)
 		if err != nil {
 			c.AbortWithError(core.Error(

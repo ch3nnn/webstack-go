@@ -2,29 +2,25 @@ package menu
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/menu"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
 type SearchOneData struct {
-	Id     int32 // 用户ID
-	IsUsed int32 // 是否启用 1:是  -1:否
+	Id     int64 // 用户ID
+	IsUsed int64 // 是否启用 1:是  -1:否
 }
 
-func (s *service) Detail(ctx core.Context, searchOneData *SearchOneData) (info *menu.Menu, err error) {
-
-	qb := menu.NewQueryBuilder()
-	qb.WhereIsDeleted(mysql.EqualPredicate, -1)
-
+func (s *service) Detail(ctx core.Context, searchOneData *SearchOneData) (menu *model.Menu, err error) {
+	iMenuDo := query.Menu.WithContext(ctx.RequestContext())
+	iMenuDo = iMenuDo.Where(query.Menu.IsDeleted.Eq(-1))
 	if searchOneData.Id != 0 {
-		qb.WhereId(mysql.EqualPredicate, searchOneData.Id)
+		iMenuDo = iMenuDo.Where(query.Menu.ID.Eq(searchOneData.Id))
 	}
-
 	if searchOneData.IsUsed != 0 {
-		qb.WhereIsUsed(mysql.EqualPredicate, searchOneData.IsUsed)
+		iMenuDo = iMenuDo.Where(query.Menu.IsUsed.Eq(searchOneData.IsUsed))
 	}
-
-	info, err = qb.QueryOne(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	menu, err = iMenuDo.First()
 	if err != nil {
 		return nil, err
 	}

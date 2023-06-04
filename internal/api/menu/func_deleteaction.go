@@ -12,7 +12,7 @@ type deleteActionRequest struct {
 }
 
 type deleteActionResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // DeleteAction 删除功能权限
@@ -49,7 +49,7 @@ func (h *handler) DeleteAction() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int64(ids[0])
 
 		err = h.menuService.DeleteAction(c, id)
 		if err != nil {

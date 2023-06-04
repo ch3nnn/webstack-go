@@ -60,7 +60,7 @@ func (h *handler) ListAPI() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int64(ids[0])
 
 		// 通过 id 查询出 business_key
 		authorizedInfo, err := h.authorizedService.Detail(c, id)
@@ -91,7 +91,7 @@ func (h *handler) ListAPI() core.HandlerFunc {
 		res.List = make([]listAPIData, len(resListData))
 
 		for k, v := range resListData {
-			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
+			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.ID)})
 			if err != nil {
 				c.AbortWithError(core.Error(
 					http.StatusBadRequest,
@@ -105,7 +105,7 @@ func (h *handler) ListAPI() core.HandlerFunc {
 				HashId:      hashId,
 				BusinessKey: v.BusinessKey,
 				Method:      v.Method,
-				API:         v.Api,
+				API:         v.API,
 			}
 
 			res.List[k] = data

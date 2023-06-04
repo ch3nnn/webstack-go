@@ -2,53 +2,42 @@ package authorized
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
 type SearchData struct {
-	Page              int    `json:"page"`               // 第几页
-	PageSize          int    `json:"page_size"`          // 每页显示条数
+	Page              int64  `json:"page"`               // 第几页
+	PageSize          int64  `json:"page_size"`          // 每页显示条数
 	BusinessKey       string `json:"business_key"`       // 调用方key
 	BusinessSecret    string `json:"business_secret"`    // 调用方secret
 	BusinessDeveloper string `json:"business_developer"` // 调用方对接人
 	Remark            string `json:"remark"`             // 备注
 }
 
-func (s *service) PageList(ctx core.Context, searchData *SearchData) (listData []*authorized.Authorized, err error) {
+func (s *service) PageList(ctx core.Context, searchData *SearchData) (authorizedList []*model.Authorized, err error) {
 
-	page := searchData.Page
-	if page == 0 {
-		page = 1
-	}
+	offset := (searchData.Page - 1) * searchData.PageSize
 
-	pageSize := searchData.PageSize
-	if pageSize == 0 {
-		pageSize = 10
-	}
-
-	offset := (page - 1) * pageSize
-
-	qb := authorized.NewQueryBuilder()
-	qb = qb.WhereIsDeleted(mysql.EqualPredicate, -1)
-
+	iAuthorizedDo := query.Authorized.WithContext(ctx.RequestContext())
+	iAuthorizedDo = iAuthorizedDo.Where(query.Authorized.IsDeleted.Eq(-1))
 	if searchData.BusinessKey != "" {
-		qb.WhereBusinessKey(mysql.EqualPredicate, searchData.BusinessKey)
+		iAuthorizedDo = iAuthorizedDo.Where(query.Authorized.BusinessKey.Eq(searchData.BusinessKey))
 	}
 
 	if searchData.BusinessSecret != "" {
-		qb.WhereBusinessSecret(mysql.EqualPredicate, searchData.BusinessSecret)
+		iAuthorizedDo = iAuthorizedDo.Where(query.Authorized.BusinessSecret.Eq(searchData.BusinessSecret))
 	}
 
 	if searchData.BusinessDeveloper != "" {
-		qb.WhereBusinessDeveloper(mysql.EqualPredicate, searchData.BusinessDeveloper)
+		iAuthorizedDo = iAuthorizedDo.Where(query.Authorized.BusinessDeveloper.Eq(searchData.BusinessDeveloper))
 	}
 
-	listData, err = qb.
-		Limit(pageSize).
-		Offset(offset).
-		OrderById(false).
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	authorizedList, err = iAuthorizedDo.
+		Limit(int(searchData.PageSize)).
+		Offset(int(offset)).
+		Order(query.Authorized.ID.Desc()).
+		Find()
 	if err != nil {
 		return nil, err
 	}

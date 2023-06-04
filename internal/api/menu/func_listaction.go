@@ -16,7 +16,7 @@ type listActionRequest struct {
 
 type listActionData struct {
 	HashId string `json:"hash_id"` // hashID
-	MenuId int32  `json:"menu_id"` // 菜单栏ID
+	MenuId int64  `json:"menu_id"` // 菜单栏ID
 	Method string `json:"method"`  // 调用方secret
 	API    string `json:"api"`     // 调用方对接人
 }
@@ -60,10 +60,8 @@ func (h *handler) ListAction() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
-
 		searchOneData := new(menu.SearchOneData)
-		searchOneData.Id = id
+		searchOneData.Id = int64(ids[0])
 
 		menuInfo, err := h.menuService.Detail(c, searchOneData)
 		if err != nil {
@@ -78,7 +76,7 @@ func (h *handler) ListAction() core.HandlerFunc {
 		res.MenuName = menuInfo.Name
 
 		searchListData := new(menu.SearchListActionData)
-		searchListData.MenuId = menuInfo.Id
+		searchListData.MenuId = menuInfo.ID
 
 		resListData, err := h.menuService.ListAction(c, searchListData)
 		if err != nil {
@@ -93,7 +91,7 @@ func (h *handler) ListAction() core.HandlerFunc {
 		res.List = make([]listActionData, len(resListData))
 
 		for k, v := range resListData {
-			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
+			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.ID)})
 			if err != nil {
 				c.AbortWithError(core.Error(
 					http.StatusBadRequest,
@@ -105,9 +103,9 @@ func (h *handler) ListAction() core.HandlerFunc {
 
 			data := listActionData{
 				HashId: hashId,
-				MenuId: v.MenuId,
+				MenuId: v.MenuID,
 				Method: v.Method,
-				API:    v.Api,
+				API:    v.API,
 			}
 
 			res.List[k] = data

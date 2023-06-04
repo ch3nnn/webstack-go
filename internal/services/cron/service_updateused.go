@@ -2,41 +2,34 @@ package cron
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/cron_task"
-
-	"github.com/spf13/cast"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/constant"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
-func (s *service) UpdateUsed(ctx core.Context, id int32, used int32) (err error) {
-	data := map[string]interface{}{
-		"is_used":      used,
-		"updated_user": ctx.SessionUserInfo().UserName,
-	}
-
-	qb := cron_task.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
-	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
+func (s *service) UpdateUsed(ctx core.Context, id, used int64) (err error) {
+	_, err = query.CronTask.WithContext(ctx.RequestContext()).
+		Where(query.CronTask.ID.Eq(id)).
+		UpdateColumnSimple(
+			query.CronTask.IsUsed.Value(used),
+			query.CronTask.UpdatedUser.Value(ctx.SessionUserInfo().UserName),
+		)
 	if err != nil {
 		return err
 	}
 
 	// region 操作定时任务 避免主从同步延迟，在这需要查询主库
-	if used == cron_task.IsUsedNo {
-		s.cronServer.RemoveTask(cast.ToInt(id))
+	if used == constant.IsUsedNo {
+		s.cronServer.RemoveTask(id)
 	} else {
-		qb = cron_task.NewQueryBuilder()
-		qb.WhereId(mysql.EqualPredicate, id)
-		info, err := qb.QueryOne(s.db.GetDbW().WithContext(ctx.RequestContext()))
+		cronTask, err := query.CronTask.WithContext(ctx.RequestContext()).Where(query.CronTask.ID.Eq(id)).First()
 		if err != nil {
 			return err
 		}
 
-		s.cronServer.RemoveTask(cast.ToInt(id))
-		s.cronServer.AddTask(info)
+		s.cronServer.RemoveTask(id)
+		s.cronServer.AddTask(cronTask)
 
 	}
-	// endregion
 
 	return
 }

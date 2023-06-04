@@ -3,7 +3,8 @@ package authorized
 import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized_api"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 )
 
@@ -13,15 +14,14 @@ type CreateAuthorizedAPIData struct {
 	API         string `json:"api"`          // 请求地址
 }
 
-func (s *service) CreateAPI(ctx core.Context, authorizedAPIData *CreateAuthorizedAPIData) (id int32, err error) {
-	model := authorized_api.NewModel()
-	model.BusinessKey = authorizedAPIData.BusinessKey
-	model.Method = authorizedAPIData.Method
-	model.Api = authorizedAPIData.API
-	model.CreatedUser = ctx.SessionUserInfo().UserName
-	model.IsDeleted = -1
-
-	id, err = model.Create(s.db.GetDbW().WithContext(ctx.RequestContext()))
+func (s *service) CreateAPI(ctx core.Context, authorizedAPIData *CreateAuthorizedAPIData) (id int64, err error) {
+	err = query.AuthorizedAPI.WithContext(ctx.RequestContext()).Create(&model.AuthorizedAPI{
+		BusinessKey: authorizedAPIData.BusinessKey,
+		Method:      authorizedAPIData.Method,
+		API:         authorizedAPIData.API,
+		IsDeleted:   -1,
+		CreatedUser: ctx.SessionUserInfo().UserName,
+	})
 	if err != nil {
 		return 0, err
 	}

@@ -2,12 +2,10 @@ package authorized
 
 import (
 	"encoding/json"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized_api"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 )
 
@@ -15,7 +13,7 @@ import (
 type CacheAuthorizedData struct {
 	Key    string         `json:"key"`     // 调用方 key
 	Secret string         `json:"secret"`  // 调用方 secret
-	IsUsed int32          `json:"is_used"` // 调用方启用状态 1=启用 -1=禁用
+	IsUsed int64          `json:"is_used"` // 调用方启用状态 1=启用 -1=禁用
 	Apis   []cacheApiData `json:"apis"`    // 调用方授权的 Apis
 }
 
@@ -30,22 +28,20 @@ func (s *service) DetailByKey(ctx core.Context, key string) (cacheData *CacheAut
 
 	if !s.cache.Exists(cacheKey) {
 		// 查询调用方信息
-		authorizedInfo, err := authorized.NewQueryBuilder().
-			WhereIsDeleted(mysql.EqualPredicate, -1).
-			WhereBusinessKey(mysql.EqualPredicate, key).
-			First(s.db.GetDbR().WithContext(ctx.RequestContext()))
-
+		authorizedInfo, err := query.Authorized.WithContext(ctx.RequestContext()).
+			Where(query.Authorized.IsDeleted.Eq(-1)).
+			Where(query.Authorized.BusinessKey.Eq(key)).
+			First()
 		if err != nil {
 			return nil, err
 		}
 
 		// 查询调用方授权 API 信息
-		authorizedApiInfo, err := authorized_api.NewQueryBuilder().
-			WhereIsDeleted(mysql.EqualPredicate, -1).
-			WhereBusinessKey(mysql.EqualPredicate, key).
-			OrderById(false).
-			QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
-
+		authorizedAPIS, err := query.AuthorizedAPI.WithContext(ctx.RequestContext()).
+			Where(query.AuthorizedAPI.IsDeleted.Eq(-1)).
+			Where(query.AuthorizedAPI.BusinessKey.Eq(key)).
+			Order(query.AuthorizedAPI.ID.Desc()).
+			Find()
 		if err != nil {
 			return nil, err
 		}
@@ -55,14 +51,13 @@ func (s *service) DetailByKey(ctx core.Context, key string) (cacheData *CacheAut
 		cacheData.Key = key
 		cacheData.Secret = authorizedInfo.BusinessSecret
 		cacheData.IsUsed = authorizedInfo.IsUsed
-		cacheData.Apis = make([]cacheApiData, len(authorizedApiInfo))
+		cacheData.Apis = make([]cacheApiData, len(authorizedAPIS))
 
-		for k, v := range authorizedApiInfo {
-			data := cacheApiData{
+		for k, v := range authorizedAPIS {
+			cacheData.Apis[k] = cacheApiData{
 				Method: v.Method,
-				Api:    v.Api,
+				Api:    v.API,
 			}
-			cacheData.Apis[k] = data
 		}
 
 		cacheDataByte, _ := json.Marshal(cacheData)

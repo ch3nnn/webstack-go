@@ -11,14 +11,14 @@ import (
 )
 
 type listData struct {
-	Id     int32  `json:"id"`      // ID
+	Id     int64  `json:"id"`      // ID
 	HashID string `json:"hashid"`  // hashid
-	Pid    int32  `json:"pid"`     // 父类ID
+	Pid    int64  `json:"pid"`     // 父类ID
 	Name   string `json:"name"`    // 菜单名称
 	Link   string `json:"link"`    // 链接地址
 	Icon   string `json:"icon"`    // 图标
-	IsUsed int32  `json:"is_used"` // 是否启用 1=启用 -1=禁用
-	Sort   int32  `json:"sort"`    // 排序
+	IsUsed int64  `json:"is_used"` // 是否启用 1=启用 -1=禁用
+	Sort   int64  `json:"sort"`    // 排序
 }
 
 type listResponse struct {
@@ -38,7 +38,7 @@ type listResponse struct {
 func (h *handler) List() core.HandlerFunc {
 	return func(c core.Context) {
 		res := new(listResponse)
-		resListData, err := h.menuService.List(c, new(menu.SearchData))
+		menus, err := h.menuService.List(c, new(menu.SearchData))
 		if err != nil {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
@@ -48,10 +48,10 @@ func (h *handler) List() core.HandlerFunc {
 			return
 		}
 
-		res.List = make([]listData, len(resListData))
+		res.List = make([]listData, len(menus))
 
-		for k, v := range resListData {
-			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
+		for i, m := range menus {
+			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(m.ID)})
 			if err != nil {
 				c.AbortWithError(core.Error(
 					http.StatusBadRequest,
@@ -61,18 +61,16 @@ func (h *handler) List() core.HandlerFunc {
 				return
 			}
 
-			data := listData{
-				Id:     v.Id,
+			res.List[i] = listData{
+				Id:     m.ID,
 				HashID: hashId,
-				Pid:    v.Pid,
-				Name:   v.Name,
-				Link:   v.Link,
-				Icon:   v.Icon,
-				IsUsed: v.IsUsed,
-				Sort:   v.Sort,
+				Pid:    m.Pid,
+				Name:   m.Name,
+				Link:   m.Link,
+				Icon:   m.Icon,
+				IsUsed: m.IsUsed,
+				Sort:   m.Sort,
 			}
-
-			res.List[k] = data
 		}
 
 		c.Payload(res)

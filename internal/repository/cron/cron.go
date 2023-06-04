@@ -1,10 +1,10 @@
 package cron
 
 import (
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
 	"sync"
 
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/cron_task"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 	"github.com/xinliangnote/go-gin-api/pkg/errors"
 
@@ -58,13 +58,13 @@ type Server interface {
 	Stop()
 
 	// AddTask 增加定时任务
-	AddTask(task *cron_task.CronTask)
+	AddTask(task *model.CronTask)
 
 	// RemoveTask 删除定时任务
-	RemoveTask(taskId int)
+	RemoveTask(taskId int64)
 
 	// AddJob 增加定时任务执行的工作内容
-	AddJob(task *cron_task.CronTask) cron.FuncJob
+	AddJob(task *model.CronTask) cron.FuncJob
 }
 
 func New(logger *zap.Logger, db mysql.Repo, cache redis.Repo) (Server, error) {

@@ -13,8 +13,8 @@ type detailRequest struct {
 }
 
 type detailResponse struct {
-	Id   int32  `json:"id"`   // 主键ID
-	Pid  int32  `json:"pid"`  // 父类ID
+	Id   int64  `json:"id"`   // 主键ID
+	Pid  int64  `json:"pid"`  // 父类ID
 	Name string `json:"name"` // 菜单名称
 	Link string `json:"link"` // 链接地址
 	Icon string `json:"icon"` // 图标
@@ -54,10 +54,8 @@ func (h *handler) Detail() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
-
 		searchOneData := new(menu.SearchOneData)
-		searchOneData.Id = id
+		searchOneData.Id = int64(ids[0])
 
 		info, err := h.menuService.Detail(c, searchOneData)
 		if err != nil {
@@ -69,7 +67,7 @@ func (h *handler) Detail() core.HandlerFunc {
 			return
 		}
 
-		res.Id = info.Id
+		res.Id = info.ID
 		res.Pid = info.Pid
 		res.Name = info.Name
 		res.Link = info.Link

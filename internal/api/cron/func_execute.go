@@ -6,8 +6,6 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/pkg/validation"
-
-	"github.com/spf13/cast"
 )
 
 type executeRequest struct {
@@ -15,7 +13,7 @@ type executeRequest struct {
 }
 
 type executeResponse struct {
-	Id int `json:"id"` // ID
+	Id int64 `json:"id"` // ID
 }
 
 // Execute 手动执行单条任务
@@ -52,7 +50,7 @@ func (h *handler) Execute() core.HandlerFunc {
 			return
 		}
 
-		err = h.cronService.Execute(ctx, cast.ToInt32(ids[0]))
+		err = h.cronService.Execute(ctx, int64(ids[0]))
 		if err != nil {
 			ctx.AbortWithError(core.Error(
 				http.StatusBadRequest,
@@ -62,7 +60,7 @@ func (h *handler) Execute() core.HandlerFunc {
 			return
 		}
 
-		res.Id = ids[0]
+		res.Id = int64(ids[0])
 		ctx.Payload(res)
 	}
 }

@@ -3,10 +3,10 @@ package authorized
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"io"
-
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
+	"io"
 )
 
 type CreateAuthorizedData struct {
@@ -15,21 +15,21 @@ type CreateAuthorizedData struct {
 	Remark            string `json:"remark"`             // 备注
 }
 
-func (s *service) Create(ctx core.Context, authorizedData *CreateAuthorizedData) (id int32, err error) {
+func (s *service) Create(ctx core.Context, authorizedData *CreateAuthorizedData) (id int64, err error) {
 	buf := make([]byte, 10)
 	io.ReadFull(rand.Reader, buf)
 	secret := hex.EncodeToString(buf)
 
-	model := authorized.NewModel()
-	model.BusinessKey = authorizedData.BusinessKey
-	model.BusinessSecret = secret
-	model.BusinessDeveloper = authorizedData.BusinessDeveloper
-	model.Remark = authorizedData.Remark
-	model.CreatedUser = ctx.SessionUserInfo().UserName
-	model.IsUsed = 1
-	model.IsDeleted = -1
+	err = query.Authorized.WithContext(ctx.RequestContext()).Create(&model.Authorized{
+		BusinessKey:       authorizedData.BusinessKey,
+		BusinessSecret:    secret,
+		BusinessDeveloper: authorizedData.BusinessDeveloper,
+		Remark:            authorizedData.Remark,
+		IsUsed:            1,
+		IsDeleted:         -1,
+		CreatedUser:       ctx.SessionUserInfo().UserName,
+	})
 
-	id, err = model.Create(s.db.GetDbW().WithContext(ctx.RequestContext()))
 	if err != nil {
 		return 0, err
 	}

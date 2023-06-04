@@ -9,11 +9,11 @@ import (
 
 type updateSortRequest struct {
 	Id   string `form:"id"`   // HashId
-	Sort int32  `form:"sort"` // 排序
+	Sort int64  `form:"sort"` // 排序
 }
 
 type updateSortResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // UpdateSort 更新菜单排序
@@ -51,7 +51,7 @@ func (h *handler) UpdateSort() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int64(ids[0])
 
 		err = h.menuService.UpdateSort(c, id, req.Sort)
 		if err != nil {
