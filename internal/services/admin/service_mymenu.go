@@ -2,65 +2,57 @@ package admin
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/admin_menu"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/menu"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
 type SearchMyMenuData struct {
-	AdminId int32 `json:"admin_id"` // 管理员ID
+	AdminId int64 `json:"admin_id"` // 管理员ID
 }
 
 type ListMyMenuData struct {
-	Id   int32  `json:"id"`   // ID
-	Pid  int32  `json:"pid"`  // 父类ID
+	Id   int64  `json:"id"`   // ID
+	Pid  int64  `json:"pid"`  // 父类ID
 	Name string `json:"name"` // 菜单名称
 	Link string `json:"link"` // 链接地址
 	Icon string `json:"icon"` // 图标
 }
 
 func (s *service) MyMenu(ctx core.Context, searchData *SearchMyMenuData) (menuData []ListMyMenuData, err error) {
-	adminMenuQb := admin_menu.NewQueryBuilder()
+	iAdminMenuDo := query.AdminMenu.WithContext(ctx.RequestContext())
 	if searchData.AdminId != 0 {
-		adminMenuQb.WhereAdminId(mysql.EqualPredicate, searchData.AdminId)
+		iAdminMenuDo = iAdminMenuDo.Where(query.AdminMenu.AdminID.Eq(searchData.AdminId))
 	}
-
-	adminMenuListData, err := adminMenuQb.
-		OrderById(false).
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	adminMenus, err := iAdminMenuDo.Order(query.AdminMenu.ID.Desc()).Find()
 	if err != nil {
 		return nil, err
 	}
 
-	if len(adminMenuListData) <= 0 {
+	if len(adminMenus) <= 0 {
 		return
 	}
 
-	menuQb := menu.NewQueryBuilder()
-	menuQb.WhereIsDeleted(mysql.EqualPredicate, -1)
-	menuListData, err := menuQb.
-		OrderBySort(true).
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	menus, err := query.Menu.WithContext(ctx.RequestContext()).
+		Where(query.Menu.IsDeleted.Eq(-1)).
+		Order(query.Menu.Sort).
+		Find()
 	if err != nil {
 		return nil, err
 	}
 
-	if len(menuListData) <= 0 {
+	if len(menus) <= 0 {
 		return
 	}
 
-	for _, menuAllV := range menuListData {
-		for _, v := range adminMenuListData {
-			if menuAllV.Id == v.MenuId {
-				data := ListMyMenuData{
-					Id:   menuAllV.Id,
-					Pid:  menuAllV.Pid,
-					Name: menuAllV.Name,
-					Link: menuAllV.Link,
-					Icon: menuAllV.Icon,
-				}
-
-				menuData = append(menuData, data)
+	for _, menu := range menus {
+		for _, adminMenu := range adminMenus {
+			if menu.ID == adminMenu.MenuID {
+				menuData = append(menuData, ListMyMenuData{
+					Id:   menu.ID,
+					Pid:  menu.Pid,
+					Name: menu.Name,
+					Link: menu.Link,
+					Icon: menu.Icon,
+				})
 			}
 		}
 	}

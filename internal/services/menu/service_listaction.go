@@ -2,26 +2,21 @@ package menu
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/menu_action"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
 type SearchListActionData struct {
-	MenuId int32 `json:"menu_id"` // 菜单栏ID
+	MenuId int64 `json:"menu_id"` // 菜单栏ID
 }
 
-func (s *service) ListAction(ctx core.Context, searchData *SearchListActionData) (listData []*menu_action.MenuAction, err error) {
-
-	qb := menu_action.NewQueryBuilder()
-	qb.WhereIsDeleted(mysql.EqualPredicate, -1)
-
+func (s *service) ListAction(ctx core.Context, searchData *SearchListActionData) (menuActions []*model.MenuAction, err error) {
+	iMenuActionDo := query.MenuAction.WithContext(ctx.RequestContext())
+	iMenuActionDo = iMenuActionDo.Where(query.MenuAction.IsDeleted.Eq(-1))
 	if searchData.MenuId != 0 {
-		qb.WhereMenuId(mysql.EqualPredicate, searchData.MenuId)
+		iMenuActionDo = iMenuActionDo.Where(query.MenuAction.MenuID.Eq(searchData.MenuId))
 	}
-
-	listData, err = qb.
-		OrderById(false).
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	menuActions, err = iMenuActionDo.Order(query.MenuAction.ID.Desc()).Find()
 	if err != nil {
 		return nil, err
 	}

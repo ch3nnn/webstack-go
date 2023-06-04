@@ -12,22 +12,22 @@ import (
 )
 
 type listRequest struct {
-	Page              int    `form:"page"`               // 第几页
-	PageSize          int    `form:"page_size"`          // 每页显示条数
-	BusinessKey       string `form:"business_key"`       // 调用方key
-	BusinessSecret    string `form:"business_secret"`    // 调用方secret
-	BusinessDeveloper string `form:"business_developer"` // 调用方对接人
-	Remark            string `form:"remark"`             // 备注
+	Page              int64  `form:"page,default=1"`       // 第几页
+	PageSize          int64  `form:"page_size,default=10"` // 每页显示条数
+	BusinessKey       string `form:"business_key"`         // 调用方key
+	BusinessSecret    string `form:"business_secret"`      // 调用方secret
+	BusinessDeveloper string `form:"business_developer"`   // 调用方对接人
+	Remark            string `form:"remark"`               // 备注
 }
 
 type listData struct {
-	Id                int    `json:"id"`                 // ID
+	Id                int64  `json:"id"`                 // ID
 	HashID            string `json:"hashid"`             // hashid
 	BusinessKey       string `json:"business_key"`       // 调用方key
 	BusinessSecret    string `json:"business_secret"`    // 调用方secret
 	BusinessDeveloper string `json:"business_developer"` // 调用方对接人
 	Remark            string `json:"remark"`             // 备注
-	IsUsed            int    `json:"is_used"`            // 是否启用 1:是 -1:否
+	IsUsed            int64  `json:"is_used"`            // 是否启用 1:是 -1:否
 	CreatedAt         string `json:"created_at"`         // 创建时间
 	CreatedUser       string `json:"created_user"`       // 创建人
 	UpdatedAt         string `json:"updated_at"`         // 更新时间
@@ -37,9 +37,9 @@ type listData struct {
 type listResponse struct {
 	List       []listData `json:"list"`
 	Pagination struct {
-		Total        int `json:"total"`
-		CurrentPage  int `json:"current_page"`
-		PerPageCount int `json:"per_page_count"`
+		Total        int64 `json:"total"`
+		CurrentPage  int64 `json:"current_page"`
+		PerPageCount int64 `json:"per_page_count"`
 	} `json:"pagination"`
 }
 
@@ -72,19 +72,9 @@ func (h *handler) List() core.HandlerFunc {
 			return
 		}
 
-		page := req.Page
-		if page == 0 {
-			page = 1
-		}
-
-		pageSize := req.PageSize
-		if pageSize == 0 {
-			pageSize = 10
-		}
-
 		searchData := new(authorized.SearchData)
-		searchData.Page = page
-		searchData.PageSize = pageSize
+		searchData.Page = req.Page
+		searchData.PageSize = req.PageSize
 		searchData.BusinessKey = req.BusinessKey
 		searchData.BusinessSecret = req.BusinessSecret
 		searchData.Remark = req.Remark
@@ -108,13 +98,13 @@ func (h *handler) List() core.HandlerFunc {
 			)
 			return
 		}
-		res.Pagination.Total = cast.ToInt(resCountData)
-		res.Pagination.PerPageCount = pageSize
-		res.Pagination.CurrentPage = page
+		res.Pagination.Total = resCountData
+		res.Pagination.PerPageCount = req.PageSize
+		res.Pagination.CurrentPage = req.Page
 		res.List = make([]listData, len(resListData))
 
 		for k, v := range resListData {
-			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
+			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.ID)})
 			if err != nil {
 				c.AbortWithError(core.Error(
 					http.StatusBadRequest,
@@ -124,21 +114,19 @@ func (h *handler) List() core.HandlerFunc {
 				return
 			}
 
-			data := listData{
-				Id:                cast.ToInt(v.Id),
+			res.List[k] = listData{
+				Id:                v.ID,
 				HashID:            hashId,
 				BusinessKey:       v.BusinessKey,
 				BusinessSecret:    v.BusinessSecret,
 				BusinessDeveloper: v.BusinessDeveloper,
 				Remark:            v.Remark,
-				IsUsed:            cast.ToInt(v.IsUsed),
+				IsUsed:            v.IsUsed,
 				CreatedAt:         v.CreatedAt.Format(timeutil.CSTLayout),
 				CreatedUser:       v.CreatedUser,
 				UpdatedAt:         v.UpdatedAt.Format(timeutil.CSTLayout),
 				UpdatedUser:       v.UpdatedUser,
 			}
-
-			res.List[k] = data
 		}
 
 		c.Payload(res)

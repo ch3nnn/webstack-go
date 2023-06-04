@@ -15,7 +15,7 @@ type createActionRequest struct {
 }
 
 type createActionResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // CreateAction 创建功能权限
@@ -54,10 +54,8 @@ func (h *handler) CreateAction() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
-
 		searchOneData := new(menu.SearchOneData)
-		searchOneData.Id = id
+		searchOneData.Id = int64(ids[0])
 		menuInfo, err := h.menuService.Detail(c, searchOneData)
 		if err != nil {
 			c.AbortWithError(core.Error(
@@ -69,7 +67,7 @@ func (h *handler) CreateAction() core.HandlerFunc {
 		}
 
 		createActionData := new(menu.CreateMenuActionData)
-		createActionData.MenuId = menuInfo.Id
+		createActionData.MenuId = menuInfo.ID
 		createActionData.Method = req.Method
 		createActionData.API = req.API
 
@@ -83,7 +81,7 @@ func (h *handler) CreateAction() core.HandlerFunc {
 			return
 		}
 
-		res.Id = createId
+		res.Id = int64(createId)
 		c.Payload(res)
 	}
 }

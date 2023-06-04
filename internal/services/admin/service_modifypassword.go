@@ -4,21 +4,18 @@ import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/pkg/password"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/admin"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 )
 
-func (s *service) ModifyPassword(ctx core.Context, id int32, newPassword string) (err error) {
-	data := map[string]interface{}{
-		"password":     password.GeneratePassword(newPassword),
-		"updated_user": ctx.SessionUserInfo().UserName,
-	}
+func (s *service) ModifyPassword(ctx core.Context, id int64, newPassword string) (err error) {
 
-	qb := admin.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
-	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
-	if err != nil {
+	if _, err = query.Admin.WithContext(ctx.RequestContext()).
+		Where(query.Admin.ID.Eq(id)).
+		UpdateColumnSimple(
+			query.Admin.Password.Value(password.GeneratePassword(newPassword)),
+			query.Admin.UpdatedUser.Value(ctx.SessionUserInfo().UserName),
+		); err != nil {
 		return err
 	}
 

@@ -12,7 +12,7 @@ type deleteAPIRequest struct {
 }
 
 type deleteAPIResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // DeleteAPI 删除调用方接口地址
@@ -49,7 +49,7 @@ func (h *handler) DeleteAPI() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int64(ids[0])
 
 		err = h.authorizedService.DeleteAPI(c, id)
 		if err != nil {

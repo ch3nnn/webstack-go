@@ -5,6 +5,7 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/services/site"
 	"github.com/spf13/cast"
+	"github.com/xinliangnote/go-gin-api/pkg/timeutil"
 	"net/http"
 	"strings"
 )
@@ -111,8 +112,8 @@ func (h *handler) List() core.HandlerFunc {
 				CategoryId:  sit.Category.ID,
 				Description: sit.Description,
 				IsUsed:      sit.IsUsed,
-				CreatedAt:   sit.CreatedAt.Format("2006-01-02 15:04:05"),
-				UpdatedAt:   sit.UpdatedAt.Format("2006-01-02 15:04:05"),
+				CreatedAt:   sit.CreatedAt.Format(timeutil.CSTLayout),
+				UpdatedAt:   sit.UpdatedAt.Format(timeutil.CSTLayout),
 			}
 		}
 

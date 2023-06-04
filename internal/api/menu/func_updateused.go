@@ -9,11 +9,11 @@ import (
 
 type updateUsedRequest struct {
 	Id   string `form:"id"`   // 主键ID
-	Used int32  `form:"used"` // 是否启用 1:是 -1:否
+	Used int64  `form:"used"` // 是否启用 1:是 -1:否
 }
 
 type updateUsedResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // UpdateUsed 更新菜单为启用/禁用
@@ -51,7 +51,7 @@ func (h *handler) UpdateUsed() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int64(ids[0])
 
 		err = h.menuService.UpdateUsed(c, id, req.Used)
 		if err != nil {

@@ -37,7 +37,7 @@ func ResetPassword() (password string) {
 	return
 }
 
-func GenerateLoginToken(id int32) (token string) {
+func GenerateLoginToken(id int64) (token string) {
 	m := md5.New()
 	m.Write([]byte(fmt.Sprintf("%d%s", id, saltPassword)))
 	token = hex.EncodeToString(m.Sum(nil))

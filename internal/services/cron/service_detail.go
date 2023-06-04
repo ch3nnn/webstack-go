@@ -2,22 +2,21 @@ package cron
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/cron_task"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
 type SearchOneData struct {
-	Id int32 // 任务ID
+	Id int64 // 任务ID
 }
 
-func (s *service) Detail(ctx core.Context, searchOneData *SearchOneData) (info *cron_task.CronTask, err error) {
-	qb := cron_task.NewQueryBuilder()
-
+func (s *service) Detail(ctx core.Context, searchOneData *SearchOneData) (cronTask *model.CronTask, err error) {
+	iCronTaskDo := query.CronTask.WithContext(ctx.RequestContext())
 	if searchOneData.Id != 0 {
-		qb.WhereId(mysql.EqualPredicate, searchOneData.Id)
+		iCronTaskDo = iCronTaskDo.Where(query.CronTask.ID.Eq(searchOneData.Id))
 	}
 
-	info, err = qb.QueryOne(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	cronTask, err = iCronTaskDo.First()
 	if err != nil {
 		return nil, err
 	}

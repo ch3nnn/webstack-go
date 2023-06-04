@@ -3,36 +3,32 @@ package authorized
 import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized_api"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 
 	"gorm.io/gorm"
 )
 
-func (s *service) DeleteAPI(ctx core.Context, id int32) (err error) {
+func (s *service) DeleteAPI(ctx core.Context, id int64) (err error) {
 	// 先查询 id 是否存在
-	authorizedApiInfo, err := authorized_api.NewQueryBuilder().
-		WhereIsDeleted(mysql.EqualPredicate, -1).
-		WhereId(mysql.EqualPredicate, id).
-		First(s.db.GetDbR().WithContext(ctx.RequestContext()))
-
+	authorizedAPI, err := query.AuthorizedAPI.WithContext(ctx.RequestContext()).
+		Where(query.AuthorizedAPI.IsDeleted.Eq(-1)).
+		Where(query.AuthorizedAPI.ID.Eq(id)).
+		First()
 	if err == gorm.ErrRecordNotFound {
 		return nil
 	}
 
-	data := map[string]interface{}{
-		"is_deleted":   1,
-		"updated_user": ctx.SessionUserInfo().UserName,
-	}
-
-	qb := authorized_api.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
-	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
+	_, err = query.AuthorizedAPI.WithContext(ctx.RequestContext()).
+		Where(query.AuthorizedAPI.ID.Eq(id)).
+		UpdateColumnSimple(
+			query.AuthorizedAPI.IsDeleted.Value(1),
+			query.AuthorizedAPI.UpdatedUser.Value(ctx.SessionUserInfo().UserName),
+		)
 	if err != nil {
 		return err
 	}
 
-	s.cache.Del(configs.RedisKeyPrefixSignature+authorizedApiInfo.BusinessKey, redis.WithTrace(ctx.Trace()))
+	s.cache.Del(configs.RedisKeyPrefixSignature+authorizedAPI.BusinessKey, redis.WithTrace(ctx.Trace()))
 	return
 }

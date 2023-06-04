@@ -4,7 +4,7 @@ import "encoding/json"
 
 // SessionUserInfo 当前用户会话信息
 type SessionUserInfo struct {
-	UserID   int32  `json:"user_id"`   // 用户ID
+	UserID   int64  `json:"user_id"`   // 用户ID
 	UserName string `json:"user_name"` // 用户名
 }
 

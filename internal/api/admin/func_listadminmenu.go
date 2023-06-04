@@ -52,7 +52,7 @@ func (h *handler) ListAdminMenu() core.HandlerFunc {
 		}
 
 		searchOneData := new(admin.SearchOneData)
-		searchOneData.Id = int32(ids[0])
+		searchOneData.Id = int64(ids[0])
 		searchOneData.IsUsed = 1
 
 		info, err := h.adminService.Detail(c, searchOneData)
@@ -68,7 +68,7 @@ func (h *handler) ListAdminMenu() core.HandlerFunc {
 		res.UserName = info.Username
 
 		searchData := new(admin.SearchListMenuData)
-		searchData.AdminId = int32(ids[0])
+		searchData.AdminId = int64(ids[0])
 
 		listData, err := h.adminService.ListMenu(c, searchData)
 		if err != nil {

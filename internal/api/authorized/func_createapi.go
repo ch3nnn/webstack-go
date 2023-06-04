@@ -15,7 +15,7 @@ type createAPIRequest struct {
 }
 
 type createAPIResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // CreateAPI 授权调用方接口地址
@@ -54,7 +54,7 @@ func (h *handler) CreateAPI() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int64(ids[0])
 
 		// 通过 id 查询出 business_key
 		authorizedInfo, err := h.authorizedService.Detail(c, id)

@@ -4,21 +4,17 @@ import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/pkg/password"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/admin"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 )
 
-func (s *service) UpdateUsed(ctx core.Context, id int32, used int32) (err error) {
-	data := map[string]interface{}{
-		"is_used":      used,
-		"updated_user": ctx.SessionUserInfo().UserName,
-	}
-
-	qb := admin.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
-	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
-	if err != nil {
+func (s *service) UpdateUsed(ctx core.Context, id, used int64) (err error) {
+	if _, err = query.Admin.WithContext(ctx.RequestContext()).
+		Where(query.Admin.ID.Eq(id)).
+		UpdateColumnSimple(
+			query.Admin.IsUsed.Value(used),
+			query.Admin.UpdatedUser.Value(ctx.SessionUserInfo().UserName),
+		); err != nil {
 		return err
 	}
 

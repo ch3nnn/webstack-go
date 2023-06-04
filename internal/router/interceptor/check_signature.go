@@ -1,6 +1,7 @@
 package interceptor
 
 import (
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/constant"
 	"net/http"
 	"strings"
 
@@ -8,7 +9,6 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/pkg/env"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized"
 	"github.com/xinliangnote/go-gin-api/pkg/errors"
 	"github.com/xinliangnote/go-gin-api/pkg/signature"
 	"github.com/xinliangnote/go-gin-api/pkg/urltable"
@@ -69,7 +69,7 @@ func (i *interceptor) CheckSignature() core.HandlerFunc {
 			return
 		}
 
-		if data.IsUsed == authorized.IsUsedNo {
+		if data.IsUsed == constant.IsUsedNo {
 			c.AbortWithError(core.Error(
 				http.StatusBadRequest,
 				code.AuthorizationError,

@@ -2,30 +2,26 @@ package authorized
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/authorized"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
-func (s *service) List(ctx core.Context, searchData *SearchData) (listData []*authorized.Authorized, err error) {
+func (s *service) List(ctx core.Context, searchData *SearchData) (authorizedList []*model.Authorized, err error) {
 
-	qb := authorized.NewQueryBuilder()
-	qb = qb.WhereIsDeleted(mysql.EqualPredicate, -1)
-
+	iAuthorizedDo := query.Authorized.WithContext(ctx.RequestContext())
+	iAuthorizedDo = iAuthorizedDo.Where(query.Authorized.IsDeleted.Eq(-1))
 	if searchData.BusinessKey != "" {
-		qb.WhereBusinessKey(mysql.EqualPredicate, searchData.BusinessKey)
+		iAuthorizedDo = iAuthorizedDo.Where(query.Authorized.BusinessKey.Eq(searchData.BusinessKey))
 	}
 
 	if searchData.BusinessSecret != "" {
-		qb.WhereBusinessSecret(mysql.EqualPredicate, searchData.BusinessSecret)
+		iAuthorizedDo = iAuthorizedDo.Where(query.Authorized.BusinessSecret.Eq(searchData.BusinessSecret))
 	}
 
 	if searchData.BusinessDeveloper != "" {
-		qb.WhereBusinessDeveloper(mysql.EqualPredicate, searchData.BusinessDeveloper)
+		iAuthorizedDo = iAuthorizedDo.Where(query.Authorized.BusinessDeveloper.Eq(searchData.BusinessDeveloper))
 	}
-
-	listData, err = qb.
-		OrderById(false).
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	authorizedList, err = iAuthorizedDo.Order(query.Authorized.ID.Desc()).Find()
 	if err != nil {
 		return nil, err
 	}

@@ -2,26 +2,20 @@ package menu
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/menu"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
 type SearchData struct {
-	Pid int32 // 父类ID
+	Pid int64 // 父类ID
 }
 
-func (s *service) List(ctx core.Context, searchData *SearchData) (listData []*menu.Menu, err error) {
-
-	qb := menu.NewQueryBuilder()
-	qb.WhereIsDeleted(mysql.EqualPredicate, -1)
-
+func (s *service) List(ctx core.Context, searchData *SearchData) (menus []*model.Menu, err error) {
+	iMenuDo := query.Menu.WithContext(ctx.RequestContext()).Where(query.Menu.IsDeleted.Eq(-1))
 	if searchData.Pid != 0 {
-		qb.WherePid(mysql.EqualPredicate, searchData.Pid)
+		iMenuDo = iMenuDo.Where(query.Menu.Pid.Eq(searchData.Pid))
 	}
-
-	listData, err = qb.
-		OrderBySort(true).
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	menus, err = iMenuDo.Order(query.Menu.Sort).Find()
 	if err != nil {
 		return nil, err
 	}

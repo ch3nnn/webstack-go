@@ -6,21 +6,19 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/services/menu"
-
-	"github.com/spf13/cast"
 )
 
 type createRequest struct {
 	Id    string `form:"id"`    // ID
-	Pid   int32  `form:"pid"`   // 父类ID
+	Pid   int64  `form:"pid"`   // 父类ID
 	Name  string `form:"name"`  // 菜单名称
 	Link  string `form:"link"`  // 链接地址
 	Icon  string `form:"icon"`  // 图标
-	Level int32  `form:"level"` // 菜单类型 1:一级菜单 2:二级菜单
+	Level int64  `form:"level"` // 菜单类型 1:一级菜单 2:二级菜单
 }
 
 type createResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // Create 创建/编辑菜单
@@ -58,7 +56,7 @@ func (h *handler) Create() core.HandlerFunc {
 				return
 			}
 
-			id := int32(ids[0])
+			id := int64(ids[0])
 
 			updateData := new(menu.UpdateMenuData)
 			updateData.Name = req.Name
@@ -93,7 +91,7 @@ func (h *handler) Create() core.HandlerFunc {
 			createData.Name = req.Name
 			createData.Icon = req.Icon
 			createData.Link = req.Link
-			createData.Level = cast.ToInt32(level)
+			createData.Level = int64(level)
 
 			id, err := h.menuService.Create(c, createData)
 			if err != nil {

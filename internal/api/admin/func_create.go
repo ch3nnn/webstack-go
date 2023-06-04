@@ -17,7 +17,7 @@ type createRequest struct {
 }
 
 type createResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // Create 新增管理员

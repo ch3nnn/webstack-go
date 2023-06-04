@@ -2,10 +2,8 @@ package cron
 
 import (
 	"fmt"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"math"
-
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/cron_task"
 
 	"go.uber.org/zap"
 )
@@ -14,9 +12,7 @@ func (s *server) Start() {
 	s.cron.Start()
 	go s.taskCount.Wait()
 
-	qb := cron_task.NewQueryBuilder()
-	qb.WhereIsUsed(mysql.EqualPredicate, cron_task.IsUsedYES)
-	totalNum, err := qb.Count(s.db.GetDbR())
+	totalNum, err := query.CronTask.Where(query.CronTask.IsUsed.Eq(1)).Count()
 	if err != nil {
 		s.logger.Fatal("cron initialize tasks count err", zap.Error(err))
 	}
@@ -28,19 +24,18 @@ func (s *server) Start() {
 	s.logger.Info("开始初始化后台任务")
 
 	for page := 1; page <= maxPage; page++ {
-		qb = cron_task.NewQueryBuilder()
-		qb.WhereIsUsed(mysql.EqualPredicate, cron_task.IsUsedYES)
-		listData, err := qb.
+		cronTasks, err := query.CronTask.Where(query.CronTask.IsUsed.Eq(1)).
 			Limit(pageSize).
 			Offset((page - 1) * pageSize).
-			OrderById(false).
-			QueryAll(s.db.GetDbR())
+			Order(query.CronTask.ID).
+			Find()
+
 		if err != nil {
 			s.logger.Fatal("cron initialize tasks list err", zap.Error(err))
 		}
 
-		for _, item := range listData {
-			s.AddTask(item)
+		for _, cronTask := range cronTasks {
+			s.AddTask(cronTask)
 			taskNum++
 		}
 	}

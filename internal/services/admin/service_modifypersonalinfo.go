@@ -2,8 +2,7 @@ package admin
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
-	"github.com/ch3nnn/webstack-go/internal/repository/mysql/admin"
+	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 )
 
 type ModifyData struct {
@@ -11,17 +10,15 @@ type ModifyData struct {
 	Mobile   string // 手机号
 }
 
-func (s *service) ModifyPersonalInfo(ctx core.Context, id int32, modifyData *ModifyData) (err error) {
-	data := map[string]interface{}{
-		"nickname":     modifyData.Nickname,
-		"mobile":       modifyData.Mobile,
-		"updated_user": ctx.SessionUserInfo().UserName,
-	}
+func (s *service) ModifyPersonalInfo(ctx core.Context, id int64, modifyData *ModifyData) (err error) {
 
-	qb := admin.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
-	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
-	if err != nil {
+	if _, err = query.Admin.WithContext(ctx.RequestContext()).
+		Where(query.Admin.ID.Eq(id)).
+		UpdateColumnSimple(
+			query.Admin.Nickname.Value(modifyData.Nickname),
+			query.Admin.Mobile.Value(modifyData.Mobile),
+			query.Admin.UpdatedUser.Value(ctx.SessionUserInfo().UserName),
+		); err != nil {
 		return err
 	}
 

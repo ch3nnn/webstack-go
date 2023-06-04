@@ -12,7 +12,7 @@ type deleteRequest struct {
 }
 
 type deleteResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int64 `json:"id"` // 主键ID
 }
 
 // Delete 删除管理员
@@ -49,7 +49,7 @@ func (h *handler) Delete() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int64(ids[0])
 
 		err = h.adminService.Delete(c, id)
 		if err != nil {

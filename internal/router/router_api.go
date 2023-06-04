@@ -42,8 +42,8 @@ func setApiRouter(r *resource) {
 	}
 
 	// 需要签名验证、登录验证、RBAC 权限验证 TODO
-	api := r.mux.Group("/api", core.WrapAuthHandler(r.interceptors.CheckLogin), r.interceptors.CheckSignature(), r.interceptors.CheckRBAC())
-	//api := r.mux.Group("/api")
+	//api := r.mux.Group("/api", core.WrapAuthHandler(r.interceptors.CheckLogin), r.interceptors.CheckSignature(), r.interceptors.CheckRBAC())
+	api := r.mux.Group("/api")
 	{
 		// authorized
 		authorizedHandler := authorized.New(r.logger, r.db, r.cache)
