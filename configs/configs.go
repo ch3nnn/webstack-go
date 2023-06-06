@@ -1,9 +1,7 @@
 package configs
 
 import (
-	"bytes"
 	_ "embed"
-	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -65,51 +63,8 @@ type Config struct {
 	} `toml:"language"`
 }
 
-var (
-	//go:embed dev_configs.toml
-	devConfigs []byte
-
-	//go:embed fat_configs.toml
-	fatConfigs []byte
-
-	//go:embed uat_configs.toml
-	uatConfigs []byte
-
-	//go:embed pro_configs.toml
-	proConfigs []byte
-
-	//go:embed docker_configs.toml
-	dockerConfigs []byte
-)
-
 func init() {
-	var r io.Reader
-
-	switch env.Active().Value() {
-	case "dev":
-		r = bytes.NewReader(devConfigs)
-	case "fat":
-		r = bytes.NewReader(fatConfigs)
-	case "uat":
-		r = bytes.NewReader(uatConfigs)
-	case "pro":
-		r = bytes.NewReader(proConfigs)
-	case "docker":
-		r = bytes.NewReader(dockerConfigs)
-	default:
-		r = bytes.NewReader(fatConfigs)
-	}
-
 	viper.SetConfigType("toml")
-
-	if err := viper.ReadConfig(r); err != nil {
-		panic(err)
-	}
-
-	if err := viper.Unmarshal(config); err != nil {
-		panic(err)
-	}
-
 	viper.SetConfigName(env.Active().Value() + "_configs")
 	viper.AddConfigPath("./configs")
 
@@ -131,9 +86,7 @@ func init() {
 		}
 	}
 
-	
-	err := viper.ReadInConfig()
-	if err != nil {
+	if err := viper.ReadInConfig(); err != nil {
 		panic(err)
 	}
 	if err := viper.Unmarshal(config); err != nil {
