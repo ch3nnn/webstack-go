@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/ch3nnn/webstack-go/configs"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

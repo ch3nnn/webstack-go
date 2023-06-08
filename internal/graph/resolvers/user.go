@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/ch3nnn/webstack-go/internal/graph/model"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
 )
 
 func (r *queryResolver) BySex(ctx context.Context, sex string) ([]*model.User, error) {

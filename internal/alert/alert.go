@@ -2,9 +2,9 @@ package alert
 
 import (
 	"github.com/ch3nnn/webstack-go/configs"
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
+	"github.com/ch3nnn/webstack-go/internal/pkg/mail"
 	"github.com/ch3nnn/webstack-go/internal/proposal"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
-	"github.com/xinliangnote/go-gin-api/pkg/mail"
 
 	"go.uber.org/zap"
 )

@@ -1,11 +1,11 @@
 package mysql
 
 import (
+	"github.com/ch3nnn/webstack-go/internal/pkg/timeutil"
 	"time"
 
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/pkg/timeutil"
-	"github.com/xinliangnote/go-gin-api/pkg/trace"
+	"github.com/ch3nnn/webstack-go/internal/pkg/trace"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/utils"

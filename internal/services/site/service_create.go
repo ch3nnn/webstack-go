@@ -4,10 +4,6 @@ import (
 	"crypto/tls"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
-
-	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/ch3nnn/webstack-go/internal/pkg/tools"
-	"github.com/gocolly/colly"
 	"github.com/mat/besticon/besticon"
 	"io"
 	"io/ioutil"
@@ -15,6 +11,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/pkg/tools"
+	"github.com/gocolly/colly"
 )
 
 type CreateSiteData struct {

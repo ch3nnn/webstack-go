@@ -1,15 +1,14 @@
 package redis
 
 import (
+	"github.com/ch3nnn/webstack-go/internal/pkg/timeutil"
+	"github.com/go-redis/redis/v7"
 	"strings"
 	"time"
 
 	"github.com/ch3nnn/webstack-go/configs"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
-	"github.com/xinliangnote/go-gin-api/pkg/timeutil"
-	"github.com/xinliangnote/go-gin-api/pkg/trace"
-
-	"github.com/go-redis/redis/v7"
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
+	"github.com/ch3nnn/webstack-go/internal/pkg/trace"
 )
 
 type Option func(*option)

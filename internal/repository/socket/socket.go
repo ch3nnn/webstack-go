@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
