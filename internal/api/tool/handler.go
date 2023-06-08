@@ -3,9 +3,9 @@ package tool
 import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/pkg/hash"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
-	"github.com/xinliangnote/go-gin-api/pkg/hash"
 
 	"go.uber.org/zap"
 )

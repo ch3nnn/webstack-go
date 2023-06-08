@@ -4,9 +4,9 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
 	"sync"
 
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
 
 	"github.com/jakecoffman/cron"
 	"go.uber.org/zap"

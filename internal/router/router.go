@@ -5,12 +5,12 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/alert"
 	"github.com/ch3nnn/webstack-go/internal/metrics"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
+	"github.com/ch3nnn/webstack-go/internal/pkg/file"
 	"github.com/ch3nnn/webstack-go/internal/repository/cron"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 	"github.com/ch3nnn/webstack-go/internal/router/interceptor"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
-	"github.com/xinliangnote/go-gin-api/pkg/file"
 
 	"go.uber.org/zap"
 )

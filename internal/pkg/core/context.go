@@ -12,8 +12,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/ch3nnn/webstack-go/internal/pkg/trace"
 	"github.com/ch3nnn/webstack-go/internal/proposal"
-	"github.com/xinliangnote/go-gin-api/pkg/trace"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

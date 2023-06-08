@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/ch3nnn/webstack-go/internal/pkg/env"
-	"github.com/xinliangnote/go-gin-api/pkg/file"
+	"github.com/ch3nnn/webstack-go/internal/pkg/file"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"

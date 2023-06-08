@@ -6,7 +6,7 @@ import (
 
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/pkg/file"
+	"github.com/ch3nnn/webstack-go/internal/pkg/file"
 
 	"go.uber.org/zap"
 )

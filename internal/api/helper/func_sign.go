@@ -8,8 +8,8 @@ import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
-	"github.com/xinliangnote/go-gin-api/pkg/signature"
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
+	"github.com/ch3nnn/webstack-go/internal/pkg/signature"
 )
 
 type signRequest struct {

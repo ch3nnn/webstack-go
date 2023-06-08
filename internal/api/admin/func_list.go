@@ -1,16 +1,13 @@
 package admin
 
 import (
-	"net/http"
-
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
 	"github.com/ch3nnn/webstack-go/internal/pkg/password"
 	"github.com/ch3nnn/webstack-go/internal/services/admin"
-	"github.com/xinliangnote/go-gin-api/pkg/timeutil"
-
 	"github.com/spf13/cast"
+	"net/http"
 )
 
 type listRequest struct {
@@ -127,9 +124,9 @@ func (h *handler) List() core.HandlerFunc {
 				Mobile:      v.Mobile,
 				IsUsed:      v.IsUsed,
 				IsOnline:    int64(isOnline),
-				CreatedAt:   v.CreatedAt.Format(timeutil.CSTLayout),
+				CreatedAt:   v.CreatedAt.Format("2006-01-02 15:04:05"),
 				CreatedUser: v.CreatedUser,
-				UpdatedAt:   v.UpdatedAt.Format(timeutil.CSTLayout),
+				UpdatedAt:   v.UpdatedAt.Format("2006-01-02 15:04:05"),
 				UpdatedUser: v.UpdatedUser,
 			}
 		}

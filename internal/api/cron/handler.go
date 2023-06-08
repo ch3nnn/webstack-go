@@ -3,11 +3,11 @@ package cron
 import (
 	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/pkg/hash"
 	cronRepo "github.com/ch3nnn/webstack-go/internal/repository/cron"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql"
 	"github.com/ch3nnn/webstack-go/internal/repository/redis"
 	"github.com/ch3nnn/webstack-go/internal/services/cron"
-	"github.com/xinliangnote/go-gin-api/pkg/hash"
 
 	"go.uber.org/zap"
 )

@@ -2,7 +2,7 @@ package handlergen
 
 import (
 	"fmt"
-	"github.com/xinliangnote/go-gin-api/pkg/errors"
+	"github.com/ch3nnn/webstack-go/internal/pkg/errors"
 	"go/token"
 	"io/ioutil"
 	"os"
@@ -73,7 +73,7 @@ func GenerateHandler(handlerName string) (err error) {
 
 					funcContent := fmt.Sprintf("package %s\n\n", handlerName)
 					funcContent += "import (\n"
-					funcContent += `"github.com/xinliangnote/go-gin-api/internal/pkg/core"`
+					funcContent += `"github.com/ch3nnn/webstack-go/internal/pkg/core"`
 					funcContent += "\n)\n\n"
 					funcContent += fmt.Sprintf("\n\ntype %sRequest struct {}\n\n", Lcfirst(v.Names[0].String()))
 					funcContent += fmt.Sprintf("type %sResponse struct {}\n\n", Lcfirst(v.Names[0].String()))
