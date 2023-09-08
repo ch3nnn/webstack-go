@@ -2,6 +2,7 @@ package site
 
 import (
 	"crypto/tls"
+	"fmt"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql/model"
 	"github.com/ch3nnn/webstack-go/internal/repository/mysql/query"
 	"github.com/mat/besticon/besticon"
@@ -37,7 +38,7 @@ func getWebLogoIconUrlByUrl(site *model.Site) string {
 	)
 	icons, err := b.NewIconFinder().FetchIcons(site.URL)
 	if err != nil || len(icons) == 0 {
-		return ""
+		return "/upload/favicon.png"
 	}
 	// 获取图片格式
 	var format string
@@ -45,21 +46,21 @@ func getWebLogoIconUrlByUrl(site *model.Site) string {
 		format = ext[1:]
 	}
 	// 图片保存静态资源目录
-	dst := path.Join("/upload/" + site.Title + "." + format)
+	dst := path.Join("/upload/", fmt.Sprintf("%s.%s", site.Title, format))
 	file, err := os.Create(path.Join("assets", dst))
 	if err != nil {
-		return ""
+		return "/upload/favicon.png"
 	}
 	defer file.Close()
 
 	response, err := client.Get(icons[0].URL)
 	if err != nil {
-		return ""
+		return "/upload/favicon.png"
 	}
 	defer response.Body.Close()
 
 	if _, err := io.Copy(file, response.Body); err != nil {
-		return ""
+		return "/upload/favicon.png"
 	}
 
 	return dst
