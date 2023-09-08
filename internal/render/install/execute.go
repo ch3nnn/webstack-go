@@ -221,15 +221,7 @@ func (h *Handler) Execute() core.HandlerFunc {
 
 		// region 生成 install 完成标识
 		dir, file := path.Split(configs.ProjectInstallMark)
-		if err := os.Mkdir(dir, os.ModePerm); err != nil {
-			ctx.AbortWithError(core.Error(
-				http.StatusBadRequest,
-				code.MySQLExecError,
-				code.Text(code.MySQLExecError)+" "+err.Error()).WithError(err),
-			)
-
-			return
-		}
+		_ = os.Mkdir(dir, os.ModePerm)
 		f, err := os.Create(path.Join(dir, file))
 		if err != nil {
 			ctx.AbortWithError(core.Error(
