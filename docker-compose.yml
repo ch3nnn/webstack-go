@@ -19,6 +19,7 @@ services:
       - ./configs:/opt/configs
       - ./logs/:/opt/logs/
       - ./assets/upload/:/opt/assets/upload
+      - ./lock/:/opt/lock
     networks:
       - webstack-go
     healthcheck:
