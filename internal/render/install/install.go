@@ -11,17 +11,17 @@ import (
 	"go.uber.org/zap"
 )
 
-type handler struct {
+type Handler struct {
 	logger *zap.Logger
 }
 
-func New(logger *zap.Logger) *handler {
-	return &handler{
+func New(logger *zap.Logger) *Handler {
+	return &Handler{
 		logger: logger,
 	}
 }
 
-func (h *handler) View() core.HandlerFunc {
+func (h *Handler) View() core.HandlerFunc {
 	type viewResponse struct {
 		Config       configs.Config
 		MinGoVersion float64

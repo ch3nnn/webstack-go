@@ -25,7 +25,7 @@ const (
 	ProjectCronLogFile = "./logs/" + ProjectName + "-cron.log"
 
 	// ProjectInstallMark 项目安装完成标识
-	ProjectInstallMark = "INSTALL.lock"
+	ProjectInstallMark = "./lock/INSTALL.lock"
 
 	// HeaderLoginToken 登录验证 Token，Header 中传递的参数
 	HeaderLoginToken = "Token"

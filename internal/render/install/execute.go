@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"runtime"
 
 	"github.com/ch3nnn/webstack-go/configs"
@@ -31,7 +32,7 @@ type initExecuteRequest struct {
 	MySQLName string `form:"mysql_name"`
 }
 
-func (h *handler) Execute() core.HandlerFunc {
+func (h *Handler) Execute() core.HandlerFunc {
 
 	installTableList := map[string]map[string]string{
 		"authorized": {
@@ -134,7 +135,7 @@ func (h *handler) Execute() core.HandlerFunc {
 			NamingStrategy: schema.NamingStrategy{
 				SingularTable: true,
 			},
-			//Logger: logger.Default.LogMode(logger.Info), // 日志配置
+			// Logger: logger.Default.LogMode(logger.Info), // 日志配置
 		})
 
 		if err != nil {
@@ -219,7 +220,17 @@ func (h *handler) Execute() core.HandlerFunc {
 		// endregion
 
 		// region 生成 install 完成标识
-		f, err := os.Create(configs.ProjectInstallMark)
+		dir, file := path.Split(configs.ProjectInstallMark)
+		if err := os.Mkdir(dir, os.ModePerm); err != nil {
+			ctx.AbortWithError(core.Error(
+				http.StatusBadRequest,
+				code.MySQLExecError,
+				code.Text(code.MySQLExecError)+" "+err.Error()).WithError(err),
+			)
+
+			return
+		}
+		f, err := os.Create(path.Join(dir, file))
 		if err != nil {
 			ctx.AbortWithError(core.Error(
 				http.StatusBadRequest,
