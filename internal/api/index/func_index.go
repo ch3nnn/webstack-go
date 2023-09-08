@@ -1,8 +1,10 @@
 package index
 
 import (
+	"github.com/ch3nnn/webstack-go/configs"
 	"github.com/ch3nnn/webstack-go/internal/code"
 	"github.com/ch3nnn/webstack-go/internal/pkg/core"
+	"github.com/ch3nnn/webstack-go/internal/pkg/file"
 	"github.com/ch3nnn/webstack-go/internal/services/category"
 	"github.com/ch3nnn/webstack-go/internal/services/site"
 	"net/http"
@@ -15,6 +17,10 @@ type indexResponse struct {
 
 func (h *handler) Index() core.HandlerFunc {
 	return func(c core.Context) {
+
+		if _, ok := file.IsExists(configs.ProjectInstallMark); !ok {
+			c.Redirect(http.StatusTemporaryRedirect, "/install")
+		}
 
 		categoryTree, err := h.categoryService.Tree(c)
 		if err != nil {
