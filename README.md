@@ -7,17 +7,13 @@
 - 后端 Gin 框架: 基于 [go-gin-api ](https://github.com/xinliangnote/go-gin-api)项目二次开发
 
 原有后端项目基础上新增功能：
-
 - [x] 新增 webstack - 导航首页
 - [x] 新增 系统管理员 - 网站分类
 - [x] 新增 系统管理员 - 网站列表
 - [x] 网站新增支持自动获取标题、Logo、网站描述
 - [x] 新增 `docker-compose.yml` 一键安装各组件
-- [x] 新增 首页看板娘
 - [x] 批量添加网址
-- [x] 优化: GEN 代码生成
-- [ ] 图片管理
-- [ ] 城市天气, 每日一句经典语录
+- [x] 优化: 由 [gorm-gen](https://github.com/go-gorm/gen) 代码生成提供支持的友好且更安全的 GORM
 
 ## 快速开始
 
