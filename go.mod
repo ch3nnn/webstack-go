@@ -19,7 +19,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.1
 	github.com/rs/cors v1.8.0
-	github.com/shirou/gopsutil v3.21.10+incompatible
+	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/speps/go-hashids v1.0.0
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/viper v1.9.0
@@ -42,7 +42,6 @@ require (
 	github.com/PuerkitoBio/goquery v1.6.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/agnivade/levenshtein v1.1.0 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/antchfx/htmlquery v1.3.0 // indirect
@@ -54,7 +53,7 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/go-ole/go-ole v1.2.5 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.5 // indirect
 	github.com/go-openapi/spec v0.20.3 // indirect
@@ -97,6 +96,7 @@ require (
 	github.com/tklauser/numcpus v0.3.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
+	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
