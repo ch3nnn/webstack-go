@@ -69,6 +69,7 @@
    ```
 3. docker container 正常运行后, 在浏览器中打开安装界面，链接地址：http://127.0.0.1:9999/install
 4. 点击 `初始化项目` 会看到如下图所示, 如果提示重新运行服务说明项目初始化完成, 只需重新运行 `webstack-go-service` 容器服务就 OK 了!
+
    <img src="assets/bootstrap/images/init_project.png" width="600"/>
 
 **二、prometheus、grafana监控服务**
