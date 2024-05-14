@@ -1,16 +1,9 @@
 package configs
 
 import (
-	"bytes"
-	_ "embed"
-	"io"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/ch3nnn/webstack-go/internal/pkg/env"
-	"github.com/ch3nnn/webstack-go/internal/pkg/file"
-
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
@@ -65,71 +58,14 @@ type Config struct {
 	} `toml:"language"`
 }
 
-var (
-	//go:embed dev_configs.toml
-	devConfigs []byte
-
-	//go:embed fat_configs.toml
-	fatConfigs []byte
-
-	//go:embed uat_configs.toml
-	uatConfigs []byte
-
-	//go:embed pro_configs.toml
-	proConfigs []byte
-
-	//go:embed docker_configs.toml
-	dockerConfigs []byte
-)
+func Get() Config {
+	return *config
+}
 
 func init() {
-	var r io.Reader
-
-	switch env.Active().Value() {
-	case "dev":
-		r = bytes.NewReader(devConfigs)
-	case "fat":
-		r = bytes.NewReader(fatConfigs)
-	case "uat":
-		r = bytes.NewReader(uatConfigs)
-	case "pro":
-		r = bytes.NewReader(proConfigs)
-	case "docker":
-		r = bytes.NewReader(dockerConfigs)
-	default:
-		r = bytes.NewReader(fatConfigs)
-	}
-
-	viper.SetConfigType("toml")
-
-	if err := viper.ReadConfig(r); err != nil {
-		panic(err)
-	}
-
-	if err := viper.Unmarshal(config); err != nil {
-		panic(err)
-	}
-
 	viper.SetConfigName(env.Active().Value() + "_configs")
+	viper.SetConfigType("toml")
 	viper.AddConfigPath("./configs")
-
-	configFile := "./configs/" + env.Active().Value() + "_configs.toml"
-	_, ok := file.IsExists(configFile)
-	if !ok {
-		if err := os.MkdirAll(filepath.Dir(configFile), 0766); err != nil {
-			panic(err)
-		}
-
-		f, err := os.Create(configFile)
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
-
-		if err := viper.WriteConfig(); err != nil {
-			panic(err)
-		}
-	}
 
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
@@ -137,8 +73,12 @@ func init() {
 			panic(err)
 		}
 	})
-}
 
-func Get() Config {
-	return *config
+	if err := viper.ReadInConfig(); err != nil {
+		panic(err)
+	}
+
+	if err := viper.Unmarshal(config); err != nil {
+		panic(err)
+	}
 }
