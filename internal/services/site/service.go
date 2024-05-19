@@ -20,6 +20,7 @@ type Service interface {
 	Create(ctx core.Context, sitesData []*CreateSiteData) (successCount, failCount int64)
 	CategorySite(ctx core.Context) (categorySites []*CategorySite, err error)
 	UpdateSite(ctx core.Context, updateSite *UpdateSiteRequest) (err error)
+	Sync(ctx core.Context, id int64) (err error)
 }
 
 type service struct {

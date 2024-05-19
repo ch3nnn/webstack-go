@@ -45,6 +45,11 @@ type Handler interface {
 	// @Tags API.site
 	// @Router /api/site [put]
 	UpdateSite() core.HandlerFunc
+
+	// SyncSite 一键同步
+	// @Tags API.site
+	// @Router /api/site/sync [patch]
+	SyncSite() core.HandlerFunc
 }
 
 type handler struct {
