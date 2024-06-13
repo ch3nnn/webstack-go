@@ -427,6 +427,13 @@
                 return false;
             }
 
+            if (id === ""){
+                msg = '分类：' + name + ' 创建完成。'
+            }else{
+                msg = '分类：' + name + ' 修改完成。'
+            }
+
+
             const postData = {
                 level: level,
                 name: name,
@@ -450,7 +457,7 @@
                         title: '操作成功',
                         icon: 'mdi mdi-check-decagram',
                         type: 'green',
-                        content: '分类：' + name + ' 创建完成。',
+                        content: msg,
                         buttons: {
                             okay: {
                                 text: '关闭',
