@@ -142,6 +142,10 @@
                                 '<td style="text-align: center; ">' + showUsedBadge + '</td>\n' +
                                 '<td style="text-align: center; ">\n' +
                                 '<div class="btn-group">\n' +
+                                '    <a class="btn btn-xs btn-default btn-sync" href="#!" title=""\n' +
+                                '                                           data-id="' + value.id + '"' +
+                                '                                           data-title="' + value.title + '"' +
+                                '                                           data-toggle="tooltip" data-original-title="一键同步">一键同步</a>\n' +
                                 '    <a class="btn btn-xs btn-default btn-detail" href="#!" title=""\n' +
                                 '                                           data-title="' + value.title + '"' +
                                 '                                           data-description="' + value.description + '"' +
@@ -179,6 +183,58 @@
                 }
             );
         }
+        // 一键同步
+        $(document).on('click', '.btn-sync', function () {
+            const id = $(this).attr('data-id');
+            const business_title = $(this).attr('data-title');
+
+            $.confirm({
+                title: '谨慎操作',
+                content: '确认要 <strong style="color: red">一键同步 </strong>：'+ business_title + ' 吗？',
+                icon: 'mdi mdi-alert',
+                animation: 'scale',
+                closeAnimation: 'zoom',
+                buttons: {
+                    okay: {
+                        text: '确认',
+                        keys: ['enter'],
+                        btnClass: 'btn-orange',
+                        action: function () {
+                            AjaxForm(
+                                "GET",
+                                '/api/site/sync/' + id,
+                                "",
+                                function () {
+                                },
+                                function (data) {
+                                    $.alert({
+                                        title: '操作成功',
+                                        icon: 'mdi mdi-check-decagram',
+                                        type: 'green',
+                                        content: '编号：' + data.id + ' 已同步。',
+                                        buttons: {
+                                            okay: {
+                                                text: '关闭',
+                                                action: function () {
+                                                    location.reload();
+                                                }
+                                            }
+                                        }
+                                    });
+                                },
+                                function (response) {
+                                    AjaxError(response);
+                                }
+                            );
+                        }
+                    },
+                    cancel: {
+                        text: '取消',
+                        keys: ['ctrl', 'shift'],
+                    }
+                }
+            });
+        });
 
         // 详情
         $(document).on('click', '.btn-detail', function () {

@@ -95,6 +95,7 @@ func setApiRouter(r *resource) {
 		api.POST("/site", siteHandler.Create())
 		api.PUT("/site", siteHandler.UpdateSite())
 		api.GET("/site/category", siteHandler.CategoryList())
+		api.GET("/site/sync/:id", siteHandler.SyncSite())
 
 		// tool
 		toolHandler := tool.New(r.logger, r.db, r.cache)
