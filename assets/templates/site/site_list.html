@@ -10,6 +10,8 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-confirm@3.3.4/dist/jquery-confirm.min.css">
     <link href="/assets/bootstrap/css/style.min.css" rel="stylesheet">
+    <!-- 引入 bootstrap-fileinput CSS-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/css/fileinput.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -73,6 +75,10 @@
 
 <script type="text/javascript" src="/assets/bootstrap/js/httpclient/httpclient.js"></script>
 <script type="text/javascript" src="/assets/bootstrap/js/jquery.pagination.js"></script>
+<!-- 引入 bootstrap-fileinput JS 和 引入语言包-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/js/fileinput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/js/locales/zh.min.js"></script>
+
 <script type="text/javascript">
     $(document).ready(function () {
         // 加载列表页数据
@@ -398,11 +404,7 @@
                     '<div>' +
                     '<label class="control-label">Logo 链接</label>' +
                     '<input  autofocus="" class="form-control" type="text"  maxLength="200" id="thumb" placeholder="请输入网站 LOGO" value="' + thumb + '">' +
-                    '</div>' +
-                    '<div>' +
-                    '<label class="control-label">上传 Logo 图片</label>' +
-                    '<input id="file" name="file" type="file" >' +
-                    '<label class="control-label">注: 优先以上传图片为主</label>' +
+                    '<input id="file" name="file" type="file" class="file">' +
                     '</div>' +
                     '<div>' +
                     '  <label class="control-label">名称</label>' +
@@ -417,6 +419,19 @@
                     '  <textarea class="form-control" maxlength="225" rows="2" id="description" placeholder="网站描述"  id="title">' + description + '</textarea>' +
                     '</div>',
                 onOpen: function () {
+                    // bootstrap-fileinput 初始化引导文件输入插件
+                    $('#file').fileinput({
+                        language: 'zh',
+                        showPreview: false,  // 显示预览
+                        maxFileSize: 2500,  // 最大文件大小
+                        initialPreviewAsData: true,
+                        initialPreview: [thumb],  // 初始预览数据
+                        allowedFileExtensions: ["jpg", "png"],  // 允许的文件扩展名
+                        browseLabel: '选择文件', // 自定义浏览按钮标签
+                        removeLabel: '删除', // 自定义删除按钮标签
+                        showUpload: false // 隐藏上传按钮
+                    });
+
                     AjaxFormNoAsync(
                         "GET",
                         "/api/site/category",
