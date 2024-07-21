@@ -1,5 +1,5 @@
-# FROM 基于 golang:1.18-alpine
-FROM golang:1.18-alpine AS builder
+# FROM 基于 golang:1.20-alpine
+FROM golang:1.20-alpine AS builder
 
 # ENV 设置环境变量
 ENV GO111MODULE=on
