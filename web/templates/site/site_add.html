@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css" >
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
+</head>
+
+<body>
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">新增网站</div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述, 对内容不满可以点击编辑修改呦!</div>
+                    <form>
+                        <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">分类</span>
+                        </div>
+                        <select class="form-control select-picker col-lg-3" data-width="auto"
+                                data-live-search="true" id="category_id">
+                        </select>
+                        </div>
+                        <div class="form-group">
+                            <label>网站地址</label>
+                            <textarea type="text" class="form-control" id="url" placeholder="URL 必须包含 http:// 或 https://且至少含有1个路径 例如: http://www.test.com/test.html，一行一个"></textarea>
+                        </div>
+
+                        <button type="button" id="btnOk" class="btn btn-primary">确认</button>
+                        <button type="button" id="btnLoading" class="btn btn-primary" disabled style="display: none">
+                            <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                            执行中...
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/jquery-confirm/jquery-confirm.min.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/bootstrap-select/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/bootstrap-select/i18n/defaults-zh_CN.min.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/bootstrap-multitabs/multitabs.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        AjaxFormNoAsync(
+            "GET",
+            "/api/admin/category",
+            "",
+            function () {
+            },
+            function (data) {
+                $("#category_id").append("<option value='-1'>一级目录</option>");
+                $.each(data.list, function (index, value) {
+                    $("#category_id").append("<option value='" + value.id + "'>" + value.name + "</option>");
+                });
+
+                $("#category_id option:eq(0)").attr('selected', 'selected'); //选中第一个
+                $("#category_id").selectpicker('refresh');
+            },
+            function (response) {
+                AjaxError(response);
+            }
+        );
+
+        $("input#url").maxlength({
+            warningClass: "badge badge-info",
+            limitReachedClass: "badge badge-warning"
+        });
+
+        $('#btnOk').on('click', function () {
+
+            const url = $("#url").val();
+            if (url === "") {
+                $.alert({
+                    title: '温馨提示',
+                    icon: 'mdi mdi-alert',
+                    type: 'orange',
+                    content: '请输入网站链接。',
+                });
+                return false;
+            }
+
+            const postData = {
+                category_id: $("#category_id").val(),
+                url: url,
+            };
+
+
+            AjaxForm(
+                "POST",
+                "/api/admin/site",
+                postData,
+                function () {
+                    $(this).hide();
+                    $("#btnLoading").show();
+                },
+                function (data) {
+                    $("#btnLoading").hide();
+                    $("#btnOk").show();
+
+                    $.alert({
+                        title: '操作成功',
+                        icon: 'mdi mdi-check-decagram',
+                        type: 'green',
+                        content: '成功创建：' + data.successCount + '条。失败创建：' + data.failCount + '条。',
+                        buttons: {
+                            okay: {
+                                text: '关闭',
+                                action: function () {
+                                    location.href = "/admin/site";
+                                }
+                            }
+                        }
+                    });
+                },
+                function (response) {
+                    $("#btnLoading").hide();
+                    $("#btnOk").show();
+
+                    AjaxError(response);
+                }
+            );
+        });
+    })
+</script>
+</body>
+</html>
