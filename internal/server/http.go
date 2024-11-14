@@ -24,16 +24,6 @@ import (
 	assets "github.com/ch3nnn/webstack-go/web"
 )
 
-//const UploadDirName = "upload"
-//
-//func init() {
-//	if !fileutil.IsExist(UploadDirName) {
-//		if err := fileutil.CreateDir(UploadDirName); err != nil {
-//			panic(err)
-//		}
-//	}
-//}
-
 func NewHTTPServer(
 	engine *gin.Engine,
 	logger *log.Logger,
