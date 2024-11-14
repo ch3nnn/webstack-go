@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
+</head>
+  
+<body>
+<div class="container-fluid p-t-15">
+  
+  <div class="row">
+
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-secondary">
+        <header class="card-header">
+          <div class="card-title">项目信息 <span class="badge badge-pill badge-warning">{{ .ProjectVersion }}</span> </div>
+        </header>
+        <div class="card-body">
+          <p>介绍：基于 go-gin-api 二次开发 Golang 网址导航后台系统</p>
+          <p>操作系统：{{ .GoOS }}
+            <span class="badge badge-brown"> {{ .GoArch }} </span>
+            <span class="badge badge-info"> {{ .GoVersion }} </span>
+          </p>
+          <p>项目地址：{{ .ProjectPath }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-secondary">
+        <header class="card-header">
+          <div class="card-title">内存信息</div>
+        </header>
+        <div class="card-body">
+          <p>总量：{{ .MemTotal }}</p>
+          <p>已使用：{{ .MemUsed }}</p>
+          <p>使用率：<span class="badge
+            {{if gt .MemUsedPercent 95.0}} badge-danger
+            {{else if gt .MemUsedPercent 90.0 }} badge-warning
+            {{else}} badge-success
+            {{end}} ">{{ .MemUsedPercent }}%</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-secondary">
+        <header class="card-header">
+          <div class="card-title">硬盘信息</div>
+        </header>
+        <div class="card-body">
+          <p>总量：{{ .DiskTotal }}</p>
+          <p>已使用：{{ .DiskUsed }}</p>
+          <p>使用率：<span class="badge
+            {{if gt .DiskUsedPercent 95.0}} badge-danger
+            {{else if gt .DiskUsedPercent 90.0 }} badge-warning
+            {{else}} badge-success
+            {{end}}">{{ .DiskUsedPercent }}%</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-secondary">
+        <header class="card-header">
+          <div class="card-title">CPU 信息</div>
+        </header>
+        <div class="card-body">
+          <p>CPU：{{ .CpuName }}</p>
+          <p>核数：{{ .CpuCores }}</p>
+          <p>CPU 使用率：<span class="badge
+            {{if gt .CpuUsedPercent 95.0}} badge-danger
+            {{else if gt .CpuUsedPercent 90.0 }} badge-warning
+            {{else}} badge-success
+            {{end}}">{{ .CpuUsedPercent }}%</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-secondary">
+        <header class="card-header">
+          <div class="card-title">开源信息</div>
+        </header>
+        <div class="card-body">
+          <p>GitHub 地址：<a target="_blank" href="https://github.com/ch3nnn/webstack-go">[webstack-go 源码地址]</a></p>
+          <p>GitHub Stars：<a href="https://github.com/ch3nnn/webstack-go/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/ch3nnn/webstack-go?style=flat-square"></a></p>
+          <p>GitHub Forks：<a href="https://github.com/ch3nnn/webstack-go/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/ch3nnn/webstack-go?style=flat-square"></a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-secondary">
+        <header class="card-header">
+          <div class="card-title">欢迎交流</div>
+        </header>
+        <div class="card-body text-center">
+          <p style="height: 105px;">
+            <img style="height: 100px;" src="/assets/static/admin/image/gr-code.png"/>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+</body>
+</html>
