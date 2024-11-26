@@ -8,8 +8,8 @@ package v1
 import "time"
 
 type Category struct {
-	ID        int        `json:"id"`
-	ParentID  int        `json:"parent_id"`
+	ID        int        `json:"id"`         // 主键ID
+	ParentID  int        `json:"parent_id"`  // 父级分类ID
 	Sort      int        `json:"sort"`       // 排序
 	Title     string     `json:"title"`      // 名称
 	Icon      string     `json:"icon"`       // 图标
@@ -39,7 +39,7 @@ type (
 		Name   string `json:"name"`    // 菜单名称
 		Link   string `json:"link"`    // 链接地址
 		Icon   string `json:"icon"`    // 图标
-		IsUsed bool   `json:"is_used"` // 是否启用 1=启用 -1=禁用
+		IsUsed bool   `json:"is_used"` // 是否启用 1=启用 0=禁用
 		Sort   int    `json:"sort"`    // 排序
 		Level  int32  `json:"level"`   // 分类等级 1 一级分类  2 二级分类
 	}
@@ -83,6 +83,6 @@ type (
 	}
 
 	CategoryUpdateResp struct {
-		Category
+		Category // 分类信息
 	}
 )

@@ -9,7 +9,6 @@ data:
   db:
     user:
       driver: sqlite
-#      dsn: storage/nunu-test2.db?_busy_timeout=5000
       dsn: storage/webstack-go.db?_busy_timeout=5000
 
 log:
