@@ -12,7 +12,7 @@ const TableNameSysUser = "sys_user"
 
 // SysUser mapped from table <sys_user>
 type SysUser struct {
-	ID        int        `gorm:"column:id;type:INTEGER" json:"id"`
+	ID        int        `gorm:"column:id;type:INTEGER;primaryKey" json:"id"`
 	Username  string     `gorm:"column:username;type:varchar(32);not null" json:"username"`
 	Password  string     `gorm:"column:password;type:varchar(100);not null" json:"password"`
 	CreatedAt *time.Time `gorm:"column:created_at;type:datetime;not null;default:CURRENT_TIMESTAMP not null" json:"created_at"`

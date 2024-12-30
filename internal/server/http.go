@@ -43,7 +43,6 @@ func NewHTTPServer(
 		httpx.WithServerPort(conf.GetInt("http.port")),
 	)
 
-	s.Static("/upload", "web/upload")
 	s.StaticFS("/assets", http.FS(assets.Static))
 	s.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
 

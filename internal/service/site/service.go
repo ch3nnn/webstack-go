@@ -8,15 +8,10 @@ package site
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
+	"encoding/base64"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"os"
-	"path"
-	"path/filepath"
 
-	"github.com/duke-git/lancet/v2/random"
 	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly"
 	"github.com/mat/besticon/besticon"
@@ -58,9 +53,10 @@ func (s *service) i() {}
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 
-const defaultIcon = "/upload/favicon.png"
+// default icon base64
+const defaultIcon = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAA+VBMVEUAAAC6sWUzNjZCQkIsLi8sLjAsLi//tSs6Oj8tLzAsLi/9sycsLi/9sycsLi/9tCctLi/8tSj/tSguMTEuMzQzMzMwMzb/ujP9tCcsLi8uLzEtLy8sLi8sLi8tLi8sLi8tLi8sLi8tLjAsLi8sLy8sLi8sLjAsLjAtLy8tLzAtLzAuMDAuMDL/tyn9tCf8tCctLi/8tCf8tCf8tCf9sycsLjD9tCgsLjD9tSf9tCgtLzAtMDAuLzAvLzEvLzL/ty0tLy/+tij9tCj9tCj9syf9syj9tCf9tCj9tCf9tCn8tSj/tCj/tikwMDT/vzP/v0AsLy/8sycsLi+FeN01AAAAUXRSTlMAAg8F/uOqIwv7+Pjp6dLQdWM/KSIcFg3v7Uv18tzZzce5ta+ej4eBb2lUQT0x+8jBvrWvqpqLiollZGBcNjAck1T039fNo5h7cFpHOB8UCKLRW+BFAAACmElEQVRYw82VaVPyMBSFW5aC7FulgMiqICIIIiq4gPvum/7/H/NOe+00xwZL+OTzhZkm5wz35txE+eOo2ZExyqob63NpZpHObSaPTJjDJCIvL57HmUv8vChbfJIhyawqVzwg2YrICRNzEpEoHpBohXoBxXtIXqhSxUu0QlS8ZCuK0zhbj/i0KFu8fyuO0kyO9BHqDSaLAQ5jJs+YNzCYPAZvMGTyDHmDVybPq8KTjUvK41kFuZlI6Sc3gjl4WFv+kPO7hpD1L6fidOArH8AgeIiM/eITWSUtdIP279v9L/L7N3tPsFv4KY/ux8xwj1rxYqzK3gsV3wubsf0o6AN10+L4WrH4fBqIin/6tFevj+299QBv0DaJ0Ok2TefIox/R9G2fhkyizRuETYfSdyuWdyC/W34XXzIdwrzBrumyW7Y/fT3fMofb5y/7Wxn28QZnJk8zT+l+ZMQj5TbfhF1nvEFQg7WtPerQ+9Aa23fq894W7NGCCjBPwHJiplKwlhQcdfZjfa6IksBT63OL/RqsuSkACi0T0D4U4kPDhRaXQ+QwBRsrnYBVfKcCX1OHv72tByW0aC1aKC8dqCuniZq9wGYjW4uAuxfp10JtinG+sVLfyFOc2yGnxZiknQydba8qlFd7lJnMDuTIJuPsKbt7ANe97LhneIOU4F+CXFBfijdIeGN8Vef09StvnBO8gSY6qcuwM7iXojPWeAO9KspKtBOzctuJilJW1RVwEKdV7/7r6uKc6z4xhnmBSYM4Y4ydVkLl0A0iIYgzNBl7T+eBxyRCdGuFmrPyrBny3ndi4N4E4Mb1AWIsirMv9HYA+Or4Q68XQu+eBL0wqunllSEKN2GF4iyHrkFuN6FfwxdCHnXeKDXmqvKn+Q+oeE3vIQF62QAAAABJRU5ErkJggg=="
 
-func getWebLogoIconByURL(url string) string {
+func getWebLogoIcon(url string) string {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -68,7 +64,7 @@ func getWebLogoIconByURL(url string) string {
 	}
 
 	b := besticon.New(
-		besticon.WithLogger(besticon.NewDefaultLogger(ioutil.Discard)), // disable verbose logging
+		besticon.WithLogger(besticon.NewDefaultLogger(io.Discard)), // disable verbose logging
 		besticon.WithHTTPClient(client),
 	)
 
@@ -77,31 +73,18 @@ func getWebLogoIconByURL(url string) string {
 		return defaultIcon
 	}
 
-	// get picture format
-	var format string
-	if ext := filepath.Ext(icons[0].URL); ext != "" {
-		format = ext[1:]
-	}
-
-	// image save static resource directory
-	dst := path.Join("upload", fmt.Sprintf("%s.%s", random.RandNumeralOrLetter(6), format))
-	file, err := os.Create(filepath.Join("web", dst))
+	resp, err := client.Get(icons[0].URL)
 	if err != nil {
 		return defaultIcon
 	}
-	defer file.Close()
+	defer resp.Body.Close()
 
-	response, err := client.Get(icons[0].URL)
+	imgData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return defaultIcon
 	}
-	defer response.Body.Close()
 
-	if _, err := io.Copy(file, response.Body); err != nil {
-		return defaultIcon
-	}
-
-	return filepath.Join("/", dst)
+	return base64.StdEncoding.EncodeToString(imgData)
 }
 
 func getWebTitle(url string) (title string) {

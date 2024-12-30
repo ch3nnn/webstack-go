@@ -12,7 +12,7 @@ const TableNameSysMenu = "sys_menu"
 
 // SysMenu mapped from table <sys_menu>
 type SysMenu struct {
-	ID        int        `gorm:"column:id;type:INTEGER" json:"id"`
+	ID        int        `gorm:"column:id;type:INTEGER;primaryKey" json:"id"`
 	Pid       int        `gorm:"column:pid;type:int(11);not null" json:"pid"`
 	Name      string     `gorm:"column:name;type:varchar(32);not null" json:"name"`
 	Link      string     `gorm:"column:link;type:varchar(100);not null" json:"link"`
