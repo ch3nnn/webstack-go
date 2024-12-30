@@ -15,7 +15,7 @@ type StSite struct {
 	ID          int        `gorm:"column:id;type:INTEGER" json:"id"`
 	CategoryID  int        `gorm:"column:category_id;type:int(11)" json:"category_id"`
 	Title       string     `gorm:"column:title;type:varchar(50)" json:"title"`
-	Icon        string     `gorm:"column:icon;type:varchar(255)" json:"icon"`
+	Icon        string     `gorm:"column:icon;type:text" json:"icon"`
 	Description string     `gorm:"column:description;type:varchar(500)" json:"description"`
 	URL         string     `gorm:"column:url;type:varchar(255);not null" json:"url"`
 	IsUsed      bool       `gorm:"column:is_used;type:bool;default:false" json:"is_used"`

@@ -12,7 +12,7 @@ const TableNameStCategory = "st_category"
 
 // StCategory mapped from table <st_category>
 type StCategory struct {
-	ID        int        `gorm:"column:id;type:INTEGER" json:"id"`
+	ID        int        `gorm:"column:id;type:INTEGER;primaryKey" json:"id"`
 	ParentID  int        `gorm:"column:parent_id;type:int(11);not null" json:"parent_id"`
 	Sort      int        `gorm:"column:sort;type:int(11);not null" json:"sort"`
 	Title     string     `gorm:"column:title;type:varchar(50);not null" json:"title"`

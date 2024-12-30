@@ -12,7 +12,7 @@ const TableNameSysUserMenu = "sys_user_menu"
 
 // SysUserMenu mapped from table <sys_user_menu>
 type SysUserMenu struct {
-	ID        int        `gorm:"column:id;type:INTEGER" json:"id"`
+	ID        int        `gorm:"column:id;type:INTEGER;primaryKey" json:"id"`
 	UserID    int        `gorm:"column:user_id;type:int(11);not null" json:"user_id"`
 	MenuID    int        `gorm:"column:menu_id;type:int(11);not null" json:"menu_id"`
 	CreatedAt *time.Time `gorm:"column:created_at;type:datetime;not null;default:CURRENT_TIMESTAMP not null" json:"created_at"`

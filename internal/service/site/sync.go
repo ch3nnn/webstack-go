@@ -20,7 +20,7 @@ func (s *service) Sync(ctx *gin.Context, req *v1.SiteSyncReq) (resp *v1.SiteSync
 
 	_, err = s.siteRepository.WithContext(ctx).Update(&model.StSite{
 		Title:       getWebTitle(site.URL),
-		Icon:        getWebLogoIconByURL(site.URL),
+		Icon:        getWebLogoIcon(site.URL),
 		Description: getWebDescription(site.URL),
 		IsUsed:      false,
 	},
