@@ -399,8 +399,8 @@
                     '<input  style="display:none"  autofocus="" class="form-control" type="text"  maxLength="200" id="id" value="' + id + '">' +
                     '</div>' +
                     '<div>' +
-                    '<label class="control-label">Logo 链接</label>' +
-                    '<input  autofocus="" class="form-control" type="text"  maxLength="200" id="thumb" placeholder="请输入网站 LOGO" value="' + thumb + '">' +
+                    '<label class="control-label">Logo</label>' +
+                    '<input  autofocus="" class="form-control" type="text"  maxLength="200" id="thumb" placeholder="请输入Logo链接" value="">' +
                     '</div>' +
                     '<input id="file" name="file" type="file" class="file">' +
                     '<div>' +
@@ -422,7 +422,7 @@
                         showPreview: false,  // 显示预览
                         maxFileSize: 2500,  // 最大文件大小
                         initialPreviewAsData: true,
-                        initialPreview: [thumb],  // 初始预览数据
+                        initialPreview: [],  // 初始预览数据
                         allowedFileExtensions: ["jpg", "png"],  // 允许的文件扩展名
                         browseLabel: '选择文件', // 自定义浏览按钮标签
                         removeLabel: '删除', // 自定义删除按钮标签
@@ -461,20 +461,9 @@
                         btnClass: 'btn-orange',
 
                         action: function () {
-                            const file = $("#file").val();
                             const thumb = $("#thumb").val();
-
-                            if (thumb === "" && file === "") {
-                                $.alert({
-                                    title: '温馨提示',
-                                    icon: 'mdi mdi-alert',
-                                    type: 'orange',
-                                    content: '请输入网站 logo 或者上传 logo 图片',
-                                });
-                                return false;
-                            }
-
                             const title = $("#title").val();
+
                             if (title === "") {
                                 $.alert({
                                     title: '温馨提示',

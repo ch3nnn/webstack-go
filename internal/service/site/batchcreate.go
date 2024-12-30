@@ -38,7 +38,7 @@ func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.S
 			return nil
 		})
 		g.Go(func() error {
-			icon = getWebLogoIcon(url)
+			icon = getWebLogoIconBase64(url)
 			return nil
 		})
 		g.Go(func() error {

@@ -64,11 +64,11 @@ type (
 type (
 	SiteUpdateReq struct {
 		Id          int                   `json:"id" uri:"id"`                    // ID
-		Icon        *string               `json:"thumb" form:"thumb"`             // 网站 logo
-		Title       *string               `json:"title" form:"title"`             // 名称简介
-		Url         *string               `json:"url" form:"url"`                 // 链接
-		CategoryId  *int                  `json:"category_id" form:"category_id"` // 分类id
-		Description *string               `json:"description" form:"description"` // 描述
+		Icon        string                `json:"thumb" form:"thumb"`             // 网站 logo
+		Title       string                `json:"title" form:"title"`             // 名称简介
+		Url         string                `json:"url" form:"url"`                 // 链接
+		CategoryId  int                   `json:"category_id" form:"category_id"` // 分类id
+		Description string                `json:"description" form:"description"` // 描述
 		IsUsed      *bool                 `json:"is_used" form:"is_used"`         // 是否启用
 		File        *multipart.FileHeader `json:"file"`                           // 上传 logo 图片
 	}
