@@ -6,51 +6,71 @@
 package site
 
 import (
-	"path/filepath"
+	"crypto/tls"
+	"encoding/base64"
+	"io"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 )
 
-func IconPath(ctx *gin.Context, req *v1.SiteUpdateReq) string {
-	// 修改操作是否手动上传 logo 图片
-	if req.File != nil {
-		return getWebLogoIconUrlByUploadImg(ctx)
+func getIconBase64ByFormFile(req *v1.SiteUpdateReq) string {
+	file, err := req.File.Open()
+	if err != nil {
+		return defaultIcon
+	}
+	defer file.Close()
+
+	imgData, err := io.ReadAll(file)
+	if err != nil {
+		return defaultIcon
 	}
 
-	if req.Icon == nil {
-		return ""
-	}
-
-	return *req.Icon
+	return base64.StdEncoding.EncodeToString(imgData)
 }
 
-func getWebLogoIconUrlByUploadImg(ctx *gin.Context) string {
-	file, _ := ctx.FormFile("file")
-	dst := filepath.Join("upload", file.Filename) // 上传静态文件 url
-	if err := ctx.SaveUploadedFile(file, filepath.Join("web", dst)); err != nil {
-		return ""
+func getIconBase64ByURL(req *v1.SiteUpdateReq) string {
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
 	}
-	return filepath.Join("/", dst)
+
+	resp, err := client.Get(req.Icon)
+	if err != nil {
+		return defaultIcon
+	}
+	defer resp.Body.Close()
+
+	imgData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return defaultIcon
+	}
+
+	return base64.StdEncoding.EncodeToString(imgData)
 }
 
 func (s *service) Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.SiteUpdateResp, err error) {
 	update := make(map[string]any)
 
-	if req.CategoryId != nil {
+	if req.CategoryId != 0 {
 		update["CategoryID"] = req.CategoryId
 	}
-	if req.Title != nil {
+	if req.Title != "" {
 		update["Title"] = req.Title
 	}
-	if req.Icon != nil {
-		update["Icon"] = IconPath(ctx, req)
+	if req.Icon != "" {
+		update["Icon"] = getIconBase64ByURL(req)
 	}
-	if req.Description != nil {
+	if req.File != nil {
+		update["Icon"] = getIconBase64ByFormFile(req)
+	}
+	if req.Description != "" {
 		update["Description"] = req.Description
 	}
-	if req.Url != nil {
+	if req.Url != "" {
 		update["Url"] = req.Url
 	}
 	if req.IsUsed != nil {
