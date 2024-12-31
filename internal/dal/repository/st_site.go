@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"gorm.io/gen"
+	"gorm.io/gen/field"
 
+	"github.com/ch3nnn/webstack-go/internal/dal/model"
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
 )
 
@@ -27,11 +29,20 @@ type (
 
 		// TODO Custom DaoFunc ....
 		// ...
+
+		FindSiteCategoryWithPage(page, pageSize int, result any, whereFunc ...func(dao gen.Dao) gen.Dao) (count int64, err error)
 	}
 
 	// not edit interface name
 	customStSiteDao struct {
 		stSiteDao
+	}
+)
+
+type (
+	SiteCategory struct {
+		model.StSite
+		model.StCategory
 	}
 )
 
@@ -55,4 +66,18 @@ func (d *customStSiteDao) LikeInByTitleOrDescOrURL(search string) func(dao gen.D
 			Or(query.StSite.Description.Like("%" + search + "%")).
 			Or(query.StSite.URL.Like("%" + search + "%"))
 	}
+}
+
+func (d *customStSiteDao) FindSiteCategoryWithPage(page, pageSize int, result any, whereFunc ...func(dao gen.Dao) gen.Dao) (count int64, err error) {
+	return d.stSiteDo.
+		Select(
+			field.NewField(query.StSite.TableName(), "*"),
+			field.NewField(query.StCategory.TableName(), "*"),
+		).
+		Join(
+			query.StCategory,
+			query.StCategory.ID.EqCol(query.StSite.CategoryID),
+		).
+		Scopes(whereFunc...).
+		ScanByPage(result, (page-1)*pageSize, pageSize)
 }

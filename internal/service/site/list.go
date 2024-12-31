@@ -10,34 +10,29 @@ import (
 	"time"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
+	"github.com/ch3nnn/webstack-go/internal/dal/repository"
 )
 
 func (s *service) List(ctx context.Context, req *v1.SiteListReq) (resp *v1.SiteListResp, err error) {
-	sites, count, err := s.siteRepository.WithContext(ctx).FindPage(req.Page, req.PageSize, nil, s.siteRepository.LikeInByTitleOrDescOrURL(req.Search))
+	var siteCategories []repository.SiteCategory
+	count, err := s.siteRepository.WithContext(ctx).FindSiteCategoryWithPage(req.Page, req.PageSize, &siteCategories, s.siteRepository.LikeInByTitleOrDescOrURL(req.Search))
 	if err != nil {
 		return nil, err
 	}
 
-	list := make([]v1.Site, len(sites))
-	for i, site := range sites {
-
-		var categoryName string
-		category, _ := s.categoryRepository.WithContext(ctx).FindOne(s.categoryRepository.WhereByID(site.CategoryID))
-		if category != nil {
-			categoryName = category.Title
-		}
-
+	list := make([]v1.Site, len(siteCategories))
+	for i, siteCategory := range siteCategories {
 		list[i] = v1.Site{
-			Id:          site.ID,
-			Thumb:       site.Icon,
-			Title:       site.Title,
-			Url:         site.URL,
-			Category:    categoryName,
-			CategoryId:  site.CategoryID,
-			Description: site.Description,
-			IsUsed:      site.IsUsed,
-			CreatedAt:   site.CreatedAt.Format(time.DateTime),
-			UpdatedAt:   site.UpdatedAt.Format(time.DateTime),
+			Id:          siteCategory.StSite.ID,
+			Thumb:       siteCategory.StSite.Icon,
+			Title:       siteCategory.StSite.Title,
+			Url:         siteCategory.StSite.URL,
+			Category:    siteCategory.StCategory.Title,
+			CategoryId:  siteCategory.StSite.CategoryID,
+			Description: siteCategory.StSite.Description,
+			IsUsed:      siteCategory.StSite.IsUsed,
+			CreatedAt:   siteCategory.StSite.CreatedAt.Format(time.DateTime),
+			UpdatedAt:   siteCategory.StSite.UpdatedAt.Format(time.DateTime),
 		}
 	}
 
