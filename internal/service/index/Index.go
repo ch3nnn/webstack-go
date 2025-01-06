@@ -7,6 +7,7 @@ package index
 
 import (
 	"context"
+	"sort"
 
 	"golang.org/x/sync/errgroup"
 
@@ -15,7 +16,9 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
 )
 
-func buildTree(nodes []*v1.TreeNode, pid int) (treeNodes []*v1.TreeNode) {
+// buildTree 构建树形结构
+func buildTree(nodes []*v1.TreeNode, pid int) []*v1.TreeNode {
+	var treeNodes []*v1.TreeNode
 	for _, node := range nodes {
 		if node.Pid == pid {
 			node.Child = buildTree(nodes, node.Id)
@@ -25,6 +28,48 @@ func buildTree(nodes []*v1.TreeNode, pid int) (treeNodes []*v1.TreeNode) {
 	return treeNodes
 }
 
+// categoryTree 对树形结构按 Sort 字段排序
+func categoryTree(nodes []*v1.TreeNode) []*v1.TreeNode {
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].Sort < nodes[j].Sort
+	})
+
+	for _, node := range nodes {
+		if len(node.Child) > 0 {
+			categoryTree(node.Child)
+		}
+	}
+	return nodes
+}
+
+// categorySites 将站点数据归类到分类站点中
+func categorySites(sites []*model.StSite, treeNodes []*v1.TreeNode) (data []*v1.CategorySite) {
+	for _, node := range treeNodes {
+		categorySite := &v1.CategorySite{
+			Category: node.Name,
+			SiteList: []model.StSite{},
+		}
+
+		for _, site := range sites {
+			if site.CategoryID == node.Id {
+				categorySite.SiteList = append(categorySite.SiteList, *site)
+			}
+		}
+
+		if len(categorySite.SiteList) > 0 {
+			data = append(data, categorySite)
+		}
+
+		if len(node.Child) > 0 {
+			childCategorySites := categorySites(sites, node.Child)
+			data = append(data, childCategorySites...)
+		}
+	}
+
+	return data
+}
+
+// Index 获取首页数据
 func (s *service) Index(ctx context.Context) (*v1.IndexResponseData, error) {
 	var (
 		g          errgroup.Group
@@ -34,19 +79,12 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResponseData, error) {
 
 	g.Go(func() (err error) {
 		categories, err = s.categoryRepo.WithContext(ctx).FindAllOrderBySort(query.StCategory.Sort.Abs(), s.categoryRepo.WhereByIsUsed(true))
-		if err != nil {
-			return err
-		}
-		return nil
+		return err
 	})
 
 	g.Go(func() (err error) {
 		sites, err = s.siteRepo.WithContext(ctx).FindAll(s.siteRepo.WhereByIsUsed(true))
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return err
 	})
 
 	if err := g.Wait(); err != nil {
@@ -56,30 +94,19 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResponseData, error) {
 	nodes := make([]*v1.TreeNode, len(categories))
 	for i, category := range categories {
 		nodes[i] = &v1.TreeNode{
-			Id:    category.ID,
-			Pid:   category.ParentID,
-			Name:  category.Title,
-			Icon:  category.Icon,
-			Child: nil,
+			Id:   category.ID,
+			Pid:  category.ParentID,
+			Name: category.Title,
+			Icon: category.Icon,
+			Sort: category.Sort,
 		}
 	}
 
-	categorySites := make([]*v1.CategorySite, len(categories))
-	for i, category := range categories {
-		var siteList []model.StSite
-		for _, st := range sites {
-			if category.ID == st.CategoryID {
-				siteList = append(siteList, *st)
-			}
-		}
-		categorySites[i] = &v1.CategorySite{
-			Category: category.Title,
-			SiteList: siteList,
-		}
-	}
+	categoryTree := categoryTree(buildTree(nodes, 0))
+	categorySites := categorySites(sites, categoryTree)
 
 	return &v1.IndexResponseData{
-		CategoryTree:  buildTree(nodes, 0),
+		CategoryTree:  categoryTree,
 		CategorySites: categorySites,
 	}, nil
 }

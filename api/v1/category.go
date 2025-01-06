@@ -26,7 +26,6 @@ type (
 		Name     string `form:"name"`      // 菜单名称
 		Icon     string `form:"icon"`      // 图标
 		IsUsed   bool   `form:"is_used"`   // 是否启用 1:是 0:否
-
 	}
 
 	CategoryCreateResp struct {

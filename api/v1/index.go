@@ -12,6 +12,7 @@ type TreeNode struct {
 	Pid   int         // 父节点ID
 	Name  string      // 节点名称
 	Icon  string      // 图标
+	Sort  int         // 排序
 	Child []*TreeNode // 获取子节点切片
 }
 
@@ -22,5 +23,5 @@ type CategorySite struct {
 
 type IndexResponseData struct {
 	CategoryTree  []*TreeNode     // 分类树
-	CategorySites []*CategorySite // 分类站点列表
+	CategorySites []*CategorySite // 归类站点数据
 }
