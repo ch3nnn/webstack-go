@@ -49,6 +49,21 @@
                         <!--                        <input type="text" class="form-control" id="icon" placeholder="请输入分类图标">-->
                     </div>
 
+                    <div class="form-group">
+                        <label>是否启用</label>
+                        <div class="clearfix">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0"
+                                       checked="">
+                                <label class="custom-control-label" for="statusOne">禁用</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1">
+                                <label class="custom-control-label" for="statusTwo">启用</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <input type="hidden" id="id">
 
                     <button type="button" id="btnOk" class="btn btn-primary">提交</button>
@@ -89,17 +104,17 @@
         // Font Awesome 图标列表
         const icons = [
             'linecons-music', 'linecons-search', 'linecons-mail', 'linecons-heart',
-             'linecons-star', 'linecons-user', 'linecons-videocam', 'linecons-camera',
-              'linecons-photo', 'linecons-attach', 'linecons-lock', 'linecons-eye',
-               'linecons-tag', 'linecons-thumbs-up', 'linecons-pencil', 'linecons-comment',
-                'linecons-location', 'linecons-cup', 'linecons-trash', 'linecons-doc',
-                 'linecons-note', 'linecons-cog', 'linecons-params', 'linecons-calendar',
-                 'linecons-sound', 'linecons-clock', 'linecons-lightbulb', 'linecons-tv',
-                 'linecons-desktop', 'linecons-mobile', 'linecons-cd', 'linecons-inbox',
-                 'linecons-globe', 'linecons-cloud', 'linecons-paper-plane', 'linecons-fire',
-                 'linecons-graduation-cap', 'linecons-megaphone', 'linecons-database', 'linecons-key',
-                  'linecons-beaker', 'linecons-truck', 'linecons-money', 'linecons-food', 'linecons-shop',
-                  'linecons-diamond', 'linecons-t-shirt', 'linecons-wallet',
+            'linecons-star', 'linecons-user', 'linecons-videocam', 'linecons-camera',
+            'linecons-photo', 'linecons-attach', 'linecons-lock', 'linecons-eye',
+            'linecons-tag', 'linecons-thumbs-up', 'linecons-pencil', 'linecons-comment',
+            'linecons-location', 'linecons-cup', 'linecons-trash', 'linecons-doc',
+            'linecons-note', 'linecons-cog', 'linecons-params', 'linecons-calendar',
+            'linecons-sound', 'linecons-clock', 'linecons-lightbulb', 'linecons-tv',
+            'linecons-desktop', 'linecons-mobile', 'linecons-cd', 'linecons-inbox',
+            'linecons-globe', 'linecons-cloud', 'linecons-paper-plane', 'linecons-fire',
+            'linecons-graduation-cap', 'linecons-megaphone', 'linecons-database', 'linecons-key',
+            'linecons-beaker', 'linecons-truck', 'linecons-money', 'linecons-food', 'linecons-shop',
+            'linecons-diamond', 'linecons-t-shirt', 'linecons-wallet',
             // 添加更多图标...
         ];
 
@@ -122,10 +137,8 @@
             function (data) {
                 $("#level").append("<option value='0'>一级目录</option>");
                 $.each(data.list, function (index, value) {
-                    if (value.level === 1){
+                    if (value.pid === 0) {
                         $("#level").append("<option value='" + value.id + "'>" + value.name + "</option>");
-                    }else{
-                        $("#level").append("<option value='" + value.id + "'>&nbsp;&nbsp;&nbsp;" + value.name + "</option>");
                     }
                 });
 
@@ -158,14 +171,14 @@
                     field: 'sort',
                     title: '排序',
                     formatter: function (value, row, index) {
-                        return '<input type="text" value="'+ row.sort +'" data-id="' + row.id + '" data-name="' + row.name + '" class="form-control sort" style="width:60px;">';
+                        return '<input type="text" value="' + row.sort + '" data-id="' + row.id + '" data-name="' + row.name + '" class="form-control sort" style="width:60px;">';
                     }
                 },
                 {
                     field: 'link',
                     title: '分类图标',
                     formatter: function (value, row, index) {
-                        return '<i class="'+ row.icon+ '"></i>'
+                        return '<i class="' + row.icon + '"></i>'
                     }
                 },
                 {
@@ -179,7 +192,7 @@
                         } else {
                             is_checked = '';
                         }
-                        return '<div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input" id="'+ row.id + '"' + is_checked + '><label class="custom-control-label customSwitch" state="' + value + '"id="' + row.id + '" for="customSwitch' + row.id + ')"></label></div>';
+                        return '<div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input" id="' + row.id + '"' + is_checked + '><label class="custom-control-label customSwitch" state="' + value + '"id="' + row.id + '" for="customSwitch' + row.id + ')"></label></div>';
                     },
                 },
                 {
@@ -296,6 +309,24 @@
                 },
                 function (data) {
                     if (op === 'add') {
+                        // 二级分类禁止创建
+                        if (!data.is_add) {
+                            $.alert({
+                                title: '操作失败',
+                                icon: 'mdi mdi-alert',
+                                type: 'red',
+                                content: '二级分类不可创建分类!',
+                                buttons: {
+                                    okay: {
+                                        text: '关闭',
+                                        action: function () {
+                                            location.reload();
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
                         $('#level').selectpicker('val', data.id);
                         $("#level").selectpicker('refresh');
                         $("#level").attr("disabled", "");
@@ -378,7 +409,7 @@
             let state = $(this).attr("state");
             const id = $(this).attr("id");
 
-            const is_used = (state === 'true') ? false : true ;
+            const is_used = (state !== 'true');
             const is_used_msg = (state === 'true') ? "禁用" : "启用";
 
             $.confirm({
@@ -435,6 +466,16 @@
             const icon = $("#icon").val();
             const id = $("#id").val();
 
+            // 获取所有 name 为 customRadioInline 的单选按钮
+            const radios = document.querySelectorAll('input[name="customRadioInline"]');
+            // 遍历单选按钮，找到选中的值
+            let selectedValue;
+            radios.forEach(radio => {
+                if (radio.checked) {
+                    selectedValue = radio.value;
+                }
+            });
+
             if (level === "") {
                 $.alert({
                     title: '温馨提示',
@@ -460,17 +501,18 @@
                 name: name,
                 icon: icon[0],
                 id: id,
+                is_used: selectedValue === "1",
             };
 
 
-            if (id != '' ){
-               msg =  '分类：' + name + ' 修改完成。'
-               method = "PUT"
-               url = "/api/admin/category/update"
-            }else{
-               msg =  '分类：' + name + ' 创建完成。'
-               method = "POST"
-               url = "/api/admin/category"
+            if (id !== '') {
+                msg = '分类：' + name + ' 修改完成。'
+                method = "PUT"
+                url = "/api/admin/category/update"
+            } else {
+                msg = '分类：' + name + ' 创建完成。'
+                method = "POST"
+                url = "/api/admin/category"
             }
 
             AjaxForm(

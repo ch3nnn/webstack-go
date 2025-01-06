@@ -62,6 +62,7 @@ func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.S
 				Description: desc,
 				URL:         url,
 				CategoryID:  req.CategoryID,
+				IsUsed:      req.IsUsed,
 			})
 			if err != nil {
 				failCnt++

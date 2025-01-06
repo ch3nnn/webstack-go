@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css">
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css" >
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css">
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css">
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
 </head>
@@ -19,19 +19,35 @@
                     <div class="card-title">新增网站</div>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述, 对内容不满可以点击编辑修改呦!</div>
+                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述,
+                        对内容不满可以点击编辑修改呦!
+                    </div>
                     <form>
                         <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">分类</span>
-                        </div>
-                        <select class="form-control select-picker col-lg-3" data-width="auto"
-                                data-live-search="true" id="category_id">
-                        </select>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">分类</span>
+                            </div>
+                            <select class="form-control selectpicker col-lg-3" id="category_id" tabindex="null"></select>
                         </div>
                         <div class="form-group">
                             <label>网站地址</label>
-                            <textarea type="text" class="form-control" id="url" placeholder="URL 必须包含 http:// 或 https://且至少含有1个路径 例如: http://www.test.com/test.html，一行一个"></textarea>
+                            <textarea type="text" class="form-control" id="url"
+                                      placeholder="URL 必须包含 http:// 或 https://且至少含有1个路径 例如: http://www.test.com/test.html，一行一个"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>网站启用</label>
+                            <small class="help-block">网站关闭后将不能展示!</small>
+                            <div class="clearfix">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0"
+                                           checked="">
+                                    <label class="custom-control-label" for="statusOne">禁用</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1">
+                                    <label class="custom-control-label" for="statusTwo">启用</label>
+                                </div>
+                            </div>
                         </div>
 
                         <button type="button" id="btnOk" class="btn btn-primary">确认</button>
@@ -53,7 +69,36 @@
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-select/i18n/defaults-zh_CN.min.js"></script>
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-multitabs/multitabs.min.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
+
 <script type="text/javascript">
+    /**
+     * 递归渲染树形结构到 <select>
+     * @param {Array} data - 树形结构数据
+     * @param {HTMLElement} parent - 父元素
+     * @param {number} level - 当前层级（用于缩进）
+     */
+    function renderTreeToSelect(data, parent, level = 0) {
+        data.forEach(item => {
+            if (item.children && item.children.length > 0) {
+                // 如果是分组，创建 <optgroup>
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = item.name;
+                parent.appendChild(optgroup);
+
+                // 递归渲染子节点
+                renderTreeToSelect(item.children, optgroup, level + 1);
+            } else {
+                // 如果是选项，创建 <option>
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.text = ' '.repeat(level * 4) + item.name; // 缩进显示
+                parent.appendChild(option);
+            }
+        });
+    }
+
+
     $(document).ready(function () {
 
         AjaxFormNoAsync(
@@ -63,13 +108,14 @@
             function () {
             },
             function (data) {
-                $("#category_id").append("<option value='-1'>一级目录</option>");
-                $.each(data.list, function (index, value) {
-                    $("#category_id").append("<option value='" + value.id + "'>" + value.name + "</option>");
-                });
-
-                $("#category_id option:eq(0)").attr('selected', 'selected'); //选中第一个
-                $("#category_id").selectpicker('refresh');
+                // 将扁平化数据转换为树形结构
+                const treeData = buildTree(data.list);
+                // 获取 <select> 元素
+                const selectElement = document.getElementById('category_id');
+                // 渲染树形结构到 <select>
+                renderTreeToSelect(treeData, selectElement);
+                // 初始化 Bootstrap Select
+                $('#tree-select').selectpicker();
             },
             function (response) {
                 AjaxError(response);
@@ -82,7 +128,6 @@
         });
 
         $('#btnOk').on('click', function () {
-
             const url = $("#url").val();
             if (url === "") {
                 $.alert({
@@ -94,9 +139,20 @@
                 return false;
             }
 
+            // 获取所有 name 为 customRadioInline 的单选按钮
+            const radios = document.querySelectorAll('input[name="customRadioInline"]');
+            // 遍历单选按钮，找到选中的值
+            let selectedValue;
+            radios.forEach(radio => {
+                if (radio.checked) {
+                    selectedValue = radio.value;
+                }
+            });
+
             const postData = {
                 category_id: $("#category_id").val(),
                 url: url,
+                is_used: selectedValue === "1",
             };
 
 

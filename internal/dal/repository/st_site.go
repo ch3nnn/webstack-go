@@ -78,6 +78,7 @@ func (d *customStSiteDao) FindSiteCategoryWithPage(page, pageSize int, result an
 			query.StCategory,
 			query.StCategory.ID.EqCol(query.StSite.CategoryID),
 		).
+		Order(query.StSite.CreatedAt.Desc()).
 		Scopes(whereFunc...).
 		ScanByPage(result, (page-1)*pageSize, pageSize)
 }

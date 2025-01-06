@@ -18,9 +18,10 @@ func (s *service) Detail(ctx context.Context, req *v1.CategoryDetailReq) (*v1.Ca
 	}
 
 	return &v1.CategoryDetailResp{
-		Id:   category.ID,
-		Pid:  category.ParentID,
-		Name: category.Title,
-		Icon: category.Icon,
+		Id:    category.ID,
+		Pid:   category.ParentID,
+		Name:  category.Title,
+		Icon:  category.Icon,
+		IsAdd: category.ParentID == 0,
 	}, err
 }

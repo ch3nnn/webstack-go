@@ -19,7 +19,7 @@ func (s *service) Create(ctx context.Context, req *v1.CategoryCreateReq) (*v1.Ca
 			Title:    req.Name,
 			Icon:     req.Icon,
 			Level:    req.Level,
-			IsUsed:   false,
+			IsUsed:   req.IsUsed,
 		})
 	if err != nil {
 		return nil, err
