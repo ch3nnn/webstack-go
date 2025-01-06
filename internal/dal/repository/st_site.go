@@ -74,7 +74,7 @@ func (d *customStSiteDao) FindSiteCategoryWithPage(page, pageSize int, result an
 			field.NewField(query.StSite.TableName(), "*"),
 			field.NewField(query.StCategory.TableName(), "*"),
 		).
-		Join(
+		LeftJoin(
 			query.StCategory,
 			query.StCategory.ID.EqCol(query.StSite.CategoryID),
 		).

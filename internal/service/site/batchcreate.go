@@ -13,6 +13,7 @@ import (
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/model"
+	"github.com/ch3nnn/webstack-go/pkg/tools"
 )
 
 func (s *service) parseURL(url string) (urls []string) {
@@ -24,46 +25,54 @@ func (s *service) parseURL(url string) (urls []string) {
 }
 
 func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.SiteCreateResp, error) {
+	workerPool := tools.NewWorkerPool(5, 20)
+	workerPool.Start()
+
 	var failCnt, successCnt int
 	for _, url := range s.parseURL(req.Url) {
-		var (
-			g                 errgroup.Group
-			title, icon, desc string
-		)
+		workerPool.AddJob(func() {
+			var (
+				g                 errgroup.Group
+				title, icon, desc string
+			)
 
-		url = strings.TrimSpace(url)
+			url := strings.TrimSpace(url)
 
-		g.Go(func() error {
-			title = getWebTitle(url)
-			return nil
+			g.Go(func() (err error) {
+				title, err = getWebTitle(url)
+				return
+			})
+			g.Go(func() (err error) {
+				icon, err = getWebLogoIconBase64(url)
+				return
+			})
+			g.Go(func() (err error) {
+				desc, err = getWebDescription(url)
+				return
+			})
+
+			if err := g.Wait(); err != nil {
+				failCnt++
+				return
+			}
+
+			_, err := s.siteRepository.WithContext(ctx).Create(&model.StSite{
+				Title:       title,
+				Icon:        icon,
+				Description: desc,
+				URL:         url,
+				CategoryID:  req.CategoryID,
+			})
+			if err != nil {
+				failCnt++
+				return
+			}
+
+			successCnt++
 		})
-		g.Go(func() error {
-			icon = getWebLogoIconBase64(url)
-			return nil
-		})
-		g.Go(func() error {
-			desc = getWebDescription(url)
-			return nil
-		})
-
-		if err := g.Wait(); err != nil {
-			return nil, err
-		}
-
-		_, err := s.siteRepository.WithContext(ctx).Create(&model.StSite{
-			Title:       title,
-			Icon:        icon,
-			Description: desc,
-			URL:         url,
-			CategoryID:  req.CategoryID,
-		})
-		if err != nil {
-			failCnt++
-			continue
-		}
-
-		successCnt++
 	}
+
+	workerPool.Wait()
 
 	return &v1.SiteCreateResp{
 		FailCount:    failCnt,
