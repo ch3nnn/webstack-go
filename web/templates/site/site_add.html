@@ -72,35 +72,7 @@
 <script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
 
 <script type="text/javascript">
-    /**
-     * 递归渲染树形结构到 <select>
-     * @param {Array} data - 树形结构数据
-     * @param {HTMLElement} parent - 父元素
-     * @param {number} level - 当前层级（用于缩进）
-     */
-    function renderTreeToSelect(data, parent, level = 0) {
-        data.forEach(item => {
-            if (item.children && item.children.length > 0) {
-                // 如果是分组，创建 <optgroup>
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = item.name;
-                parent.appendChild(optgroup);
-
-                // 递归渲染子节点
-                renderTreeToSelect(item.children, optgroup, level + 1);
-            } else {
-                // 如果是选项，创建 <option>
-                const option = document.createElement('option');
-                option.value = item.id;
-                option.text = ' '.repeat(level * 4) + item.name; // 缩进显示
-                parent.appendChild(option);
-            }
-        });
-    }
-
-
     $(document).ready(function () {
-
         AjaxFormNoAsync(
             "GET",
             "/api/admin/category",
@@ -113,7 +85,7 @@
                 // 获取 <select> 元素
                 const selectElement = document.getElementById('category_id');
                 // 渲染树形结构到 <select>
-                renderTreeToSelect(treeData, selectElement);
+                renderTreeToSelect(treeData, selectElement, 0, []);
                 // 初始化 Bootstrap Select
                 $('#tree-select').selectpicker();
             },

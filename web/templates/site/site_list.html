@@ -76,6 +76,7 @@
 <!-- 引入 bootstrap-fileinput JS 和 引入语言包-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/js/fileinput.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/js/locales/zh.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
 
 
 <script type="text/javascript">
@@ -393,7 +394,7 @@
                     '<div class="input-group-prepend">' +
                     '<span class="input-group-text">分类</span>' +
                     '</div>' +
-                    '<select class="form-control select-picker col-lg-5" data-width="auto" data-live-search="true" id="category_id"></select>' +
+                    '<select class="form-control selectpicker col-lg-5" id="category_id" data-width="auto" data-live-search="true"></select>\n' +
                     '</div>' +
                     '<div>' +
                     '<input  style="display:none"  autofocus="" class="form-control" type="text"  maxLength="200" id="id" value="' + id + '">' +
@@ -437,17 +438,13 @@
                         function () {
                         },
                         function (data) {
-                            $("#category_id").append("<option value='-1'>一级目录</option>");
-                            $.each(data.list, function (index, value) {
-                                if (String(value.id) === category_id) {
-                                    $("#category_id").append('<option selected="selected" value="' + value.id + '" >' + value.name + '</option>');
-
-                                } else {
-                                    $("#category_id").append("<option value='" + value.id + "' >" + value.name + "</option>");
-
-                                }
-                            });
-                            // $("#category_id option:eq(0)").attr('selected', 'selected'); //选中第一个
+                            // 将扁平化数据转换为树形结构
+                            const treeData = buildTree(data.list);
+                            // 获取 <select> 元素
+                            const selectElement = document.getElementById('category_id');
+                            // 渲染树形结构到 <select>
+                            renderTreeToSelect(treeData, selectElement, 0, [parseInt(category_id)]);
+                            // 初始化 Bootstrap Select
                             $("#category_id").selectpicker('refresh');
                         },
                         function (response) {
