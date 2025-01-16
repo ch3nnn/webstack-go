@@ -1,27 +1,33 @@
 package config
 
 import (
-	"fmt"
+	"log"
 	"os"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
 func NewConfig(p string) *viper.Viper {
-	envConf := os.Getenv("APP_CONF")
-	if envConf == "" {
-		envConf = p
-	}
-	fmt.Println("load conf file:", envConf)
-	return getConfig(envConf)
-}
-
-func getConfig(path string) *viper.Viper {
 	conf := viper.New()
-	conf.SetConfigFile(path)
-	err := conf.ReadInConfig()
-	if err != nil {
-		panic(err)
+	conf.AutomaticEnv()
+
+	envConf := conf.GetString("APP_CONF")
+	if envConf != "" {
+		p = envConf
 	}
+
+	if _, err := os.Stat(p); os.IsNotExist(err) {
+		panic(errors.Errorf("config file not found: %s", p))
+	}
+
+	log.Printf("load conf file: %s", p)
+
+	conf.SetConfigFile(p)
+
+	if err := conf.ReadInConfig(); err != nil {
+		panic(errors.Errorf("failed to read config file: %s", err))
+	}
+
 	return conf
 }

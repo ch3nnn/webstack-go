@@ -11,6 +11,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/wire v0.6.0
 	github.com/mat/besticon v0.0.0-20230308222644-ee1fe52e97c1
+	github.com/pkg/errors v0.9.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/sony/sonyflake v1.2.0
 	github.com/spf13/viper v1.18.2

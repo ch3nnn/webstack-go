@@ -38,8 +38,7 @@ func WithName(name string) Option {
 }
 
 func (a *App) Run(ctx context.Context) error {
-	var cancel context.CancelFunc
-	ctx, cancel = context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	signals := make(chan os.Signal, 1)
@@ -47,8 +46,7 @@ func (a *App) Run(ctx context.Context) error {
 
 	for _, srv := range a.servers {
 		go func(srv server.Server) {
-			err := srv.Start(ctx)
-			if err != nil {
+			if err := srv.Start(ctx); err != nil {
 				log.Printf("Server start err: %v", err)
 			}
 		}(srv)
@@ -65,8 +63,7 @@ func (a *App) Run(ctx context.Context) error {
 
 	// Gracefully stop the servers
 	for _, srv := range a.servers {
-		err := srv.Stop(ctx)
-		if err != nil {
+		if err := srv.Stop(ctx); err != nil {
 			log.Printf("Server stop err: %v", err)
 		}
 	}
