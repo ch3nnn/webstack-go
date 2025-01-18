@@ -63,3 +63,7 @@
 > **网站信息**
 
 ![](.github/image/site.png)
+
+> **网站配置**
+
+![](.github/image/config.png)
