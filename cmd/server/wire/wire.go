@@ -10,6 +10,7 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
 	"github.com/ch3nnn/webstack-go/internal/handler"
 	categoryHandler "github.com/ch3nnn/webstack-go/internal/handler/category"
+	configHandler "github.com/ch3nnn/webstack-go/internal/handler/config"
 	dashboardHandler "github.com/ch3nnn/webstack-go/internal/handler/dashboard"
 	indexHandler "github.com/ch3nnn/webstack-go/internal/handler/index"
 	siteHandler "github.com/ch3nnn/webstack-go/internal/handler/site"
@@ -17,6 +18,7 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/server"
 	"github.com/ch3nnn/webstack-go/internal/service"
 	categoryService "github.com/ch3nnn/webstack-go/internal/service/category"
+	configService "github.com/ch3nnn/webstack-go/internal/service/config"
 	indexService "github.com/ch3nnn/webstack-go/internal/service/index"
 	siteService "github.com/ch3nnn/webstack-go/internal/service/site"
 	userService "github.com/ch3nnn/webstack-go/internal/service/user"
@@ -38,6 +40,7 @@ var handlerSet = wire.NewSet(
 	siteHandler.NewHandler,
 	categoryHandler.NewHandler,
 	dashboardHandler.NewHandler,
+	configHandler.NewHandler,
 )
 
 var serviceSet = wire.NewSet(
@@ -46,6 +49,7 @@ var serviceSet = wire.NewSet(
 	indexService.NewService,
 	siteService.NewService,
 	categoryService.NewService,
+	configService.NewService,
 )
 
 var serverSet = wire.NewSet(

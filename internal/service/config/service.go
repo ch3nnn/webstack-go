@@ -1,9 +1,9 @@
 /**
  * @Author: chentong
- * @Date: 2024/05/26 上午1:48
+ * @Date: 2025/01/17 下午7:32
  */
 
-package index
+package config
 
 import (
 	"context"
@@ -19,23 +19,19 @@ var _ Service = (*service)(nil)
 
 type Service interface {
 	i()
-	Index(ctx context.Context) (*v1.IndexResp, error)
-	About(ctx *gin.Context) (*v1.AboutResp, error)
+	GetConfig(ctx context.Context) (*v1.ConfigResp, error)
+	Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.ConfigUpdateResp, err error)
 }
 
 type service struct {
-	siteRepo     repository.IStSiteDao
-	categoryRepo repository.IStCategoryDao
-	configRepo   repository.ISysConfigDao
+	configRepo repository.ISysConfigDao
 	*s.Service
 }
 
 func NewService(s *s.Service) Service {
 	return &service{
-		Service:      s,
-		siteRepo:     repository.NewStSiteDao(),
-		categoryRepo: repository.NewStCategoryDao(),
-		configRepo:   repository.NewSysConfigDao(),
+		Service:    s,
+		configRepo: repository.NewSysConfigDao(),
 	}
 }
 

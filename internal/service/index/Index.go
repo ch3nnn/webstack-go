@@ -70,9 +70,10 @@ func categorySites(sites []*model.StSite, treeNodes []*v1.TreeNode) (data []*v1.
 }
 
 // Index 获取首页数据
-func (s *service) Index(ctx context.Context) (*v1.IndexResponseData, error) {
+func (s *service) Index(ctx context.Context) (*v1.IndexResp, error) {
 	var (
 		g          errgroup.Group
+		sysConfig  *model.SysConfig
 		sites      []*model.StSite
 		categories []*model.StCategory
 	)
@@ -84,6 +85,11 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResponseData, error) {
 
 	g.Go(func() (err error) {
 		sites, err = s.siteRepo.WithContext(ctx).FindAll(s.siteRepo.WhereByIsUsed(true))
+		return err
+	})
+
+	g.Go(func() (err error) {
+		sysConfig, err = s.configRepo.WithContext(ctx).FindOne()
 		return err
 	})
 
@@ -105,7 +111,18 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResponseData, error) {
 	categoryTree := categoryTree(buildTree(nodes, 0))
 	categorySites := categorySites(sites, categoryTree)
 
-	return &v1.IndexResponseData{
+	return &v1.IndexResp{
+		ConfigSite: &v1.ConfigSite{
+			SiteTitle:   sysConfig.SiteTitle,
+			SiteKeyword: sysConfig.SiteKeyword,
+			SiteDesc:    sysConfig.SiteDesc,
+			SiteRecord:  sysConfig.SiteRecord,
+		},
+		About: &v1.About{
+			AboutSite:   sysConfig.AboutSite,
+			AboutAuthor: sysConfig.AboutAuthor,
+			IsAbout:     sysConfig.IsAbout,
+		},
 		CategoryTree:  categoryTree,
 		CategorySites: categorySites,
 	}, nil

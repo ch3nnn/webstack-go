@@ -19,6 +19,7 @@ var (
 	Q           = new(Query)
 	StCategory  *stCategory
 	StSite      *stSite
+	SysConfig   *sysConfig
 	SysMenu     *sysMenu
 	SysUser     *sysUser
 	SysUserMenu *sysUserMenu
@@ -28,6 +29,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	StCategory = &Q.StCategory
 	StSite = &Q.StSite
+	SysConfig = &Q.SysConfig
 	SysMenu = &Q.SysMenu
 	SysUser = &Q.SysUser
 	SysUserMenu = &Q.SysUserMenu
@@ -38,6 +40,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		db:          db,
 		StCategory:  newStCategory(db, opts...),
 		StSite:      newStSite(db, opts...),
+		SysConfig:   newSysConfig(db, opts...),
 		SysMenu:     newSysMenu(db, opts...),
 		SysUser:     newSysUser(db, opts...),
 		SysUserMenu: newSysUserMenu(db, opts...),
@@ -49,6 +52,7 @@ type Query struct {
 
 	StCategory  stCategory
 	StSite      stSite
+	SysConfig   sysConfig
 	SysMenu     sysMenu
 	SysUser     sysUser
 	SysUserMenu sysUserMenu
@@ -61,6 +65,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		db:          db,
 		StCategory:  q.StCategory.clone(db),
 		StSite:      q.StSite.clone(db),
+		SysConfig:   q.SysConfig.clone(db),
 		SysMenu:     q.SysMenu.clone(db),
 		SysUser:     q.SysUser.clone(db),
 		SysUserMenu: q.SysUserMenu.clone(db),
@@ -80,6 +85,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		db:          db,
 		StCategory:  q.StCategory.replaceDB(db),
 		StSite:      q.StSite.replaceDB(db),
+		SysConfig:   q.SysConfig.replaceDB(db),
 		SysMenu:     q.SysMenu.replaceDB(db),
 		SysUser:     q.SysUser.replaceDB(db),
 		SysUserMenu: q.SysUserMenu.replaceDB(db),
@@ -89,6 +95,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 type queryCtx struct {
 	StCategory  IStCategoryDo
 	StSite      IStSiteDo
+	SysConfig   ISysConfigDo
 	SysMenu     ISysMenuDo
 	SysUser     ISysUserDo
 	SysUserMenu ISysUserMenuDo
@@ -98,6 +105,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		StCategory:  q.StCategory.WithContext(ctx),
 		StSite:      q.StSite.WithContext(ctx),
+		SysConfig:   q.SysConfig.WithContext(ctx),
 		SysMenu:     q.SysMenu.WithContext(ctx),
 		SysUser:     q.SysUser.WithContext(ctx),
 		SysUserMenu: q.SysUserMenu.WithContext(ctx),
