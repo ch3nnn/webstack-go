@@ -66,3 +66,6 @@ jobs:
           push: ${{ github.event_name == 'push' }}  # 仅在 push 事件时推送
           cache-from: type=gha  # 使用 GitHub Actions 缓存
           cache-to: type=gha,mode=max  # 缓存 Docker 层以加快构建速度
+          build-args: |
+            APP_RELATIVE_PATH=./cmd/server  # 根据你的项目结构设置正确的路径
+            APP_CONF=config/prod.yml        # 传递配置文件路径
