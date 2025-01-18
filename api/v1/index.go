@@ -21,7 +21,26 @@ type CategorySite struct {
 	SiteList []model.StSite // 站点列表
 }
 
-type IndexResponseData struct {
+type About struct {
+	AboutSite   string `json:"about_site"`
+	AboutAuthor string `json:"about_author"`
+	IsAbout     bool   `json:"is_about"`
+}
+
+type ConfigSite struct {
+	SiteTitle   string `json:"site_title"`
+	SiteKeyword string `json:"site_keyword"`
+	SiteDesc    string `json:"site_desc"`
+	SiteRecord  string `json:"site_record"`
+}
+
+type IndexResp struct {
+	About         *About          // 关于页面
+	ConfigSite    *ConfigSite     // 站点配置
 	CategoryTree  []*TreeNode     // 分类树
 	CategorySites []*CategorySite // 归类站点数据
+}
+
+type AboutResp struct {
+	About
 }

@@ -13,6 +13,7 @@ import (
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/docs"
 	categoryHandler "github.com/ch3nnn/webstack-go/internal/handler/category"
+	configHandler "github.com/ch3nnn/webstack-go/internal/handler/config"
 	dashboardHandler "github.com/ch3nnn/webstack-go/internal/handler/dashboard"
 	indexHandler "github.com/ch3nnn/webstack-go/internal/handler/index"
 	siteHandler "github.com/ch3nnn/webstack-go/internal/handler/site"
@@ -34,6 +35,7 @@ func NewHTTPServer(
 	userHandler *userHandler.Handler,
 	siteHandler *siteHandler.Handler,
 	categoryHandler *categoryHandler.Handler,
+	configHandler *configHandler.Handler,
 ) *httpx.Server {
 	gin.SetMode(gin.DebugMode)
 	s := httpx.NewServer(
@@ -94,6 +96,9 @@ func NewHTTPServer(
 		render.GET("site/add", func(ctx *gin.Context) {
 			ctx.HTML(http.StatusOK, "site_add.html", nil)
 		})
+		render.GET("config", func(ctx *gin.Context) {
+			ctx.HTML(http.StatusOK, "conf_web.html", nil)
+		})
 	}
 
 	v1 := s.Group("/api")
@@ -102,6 +107,7 @@ func NewHTTPServer(
 		noAuthRouter := v1.Group("")
 		{
 			noAuthRouter.POST("/login", userHandler.Login)
+			noAuthRouter.GET("/about", indexHandler.About)
 		}
 		// Strict permission routing group
 		strictAuthRouter := v1.Group("/admin").Use(middleware.StrictAuth(jwt, logger))
@@ -122,6 +128,10 @@ func NewHTTPServer(
 			strictAuthRouter.POST("/site", siteHandler.Create)
 			strictAuthRouter.DELETE("/site/:id", siteHandler.Delete)
 			strictAuthRouter.PUT("/site/:id", siteHandler.Update)
+			// Config
+			strictAuthRouter.GET("/config", configHandler.Config)
+			strictAuthRouter.PUT("/config", configHandler.Update)
+
 		}
 	}
 
