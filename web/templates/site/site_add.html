@@ -133,18 +133,42 @@
                 "/api/admin/site",
                 postData,
                 function () {
-                    $(this).hide();
+                    $("#btnOk").hide();
                     $("#btnLoading").show();
                 },
                 function (data) {
-                    $("#btnLoading").hide();
-                    $("#btnOk").show();
+                    // 动态生成失败 URL 的 HTML 内容
+                    let failURLsHTML = '';
+                    if (data.failURLs && data.failURLs.length > 0) {
+                        failURLsHTML += '<div class="card-title">以下 URL 创建失败：</div>';
+                        data.failURLs.forEach(function (url) {
+                            failURLsHTML += `
+                                <div class="alert alert-warning" role="alert">
+                                    <a href="#!" class="alert-link">${url}</a>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        failURLsHTML = '<div class="alert alert-info" role="alert">无失败 URL。</div>';
+                    }
+
+                    // 弹窗内容
+                    const content = `
+                        <div class="card">
+                            <header class="card-header">
+                                <div class="card-title">成功创建：${data.successCount} 条, 失败创建：${data.failCount} 条</div>
+                            </header>
+                            <div class="card-body">
+                                ${failURLsHTML}
+                            </div>
+                        </div>
+                    `;
 
                     $.alert({
                         title: '操作成功',
                         icon: 'mdi mdi-check-decagram',
                         type: 'green',
-                        content: '成功创建：' + data.successCount + '条。失败创建：' + data.failCount + '条。',
+                        content: content,
                         buttons: {
                             okay: {
                                 text: '关闭',
