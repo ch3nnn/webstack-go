@@ -11,6 +11,7 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly"
@@ -58,14 +59,15 @@ const defaultIcon = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAA+VBMVEUAAAC
 
 func getWebLogoIconBase64(url string) (string, error) {
 	client := &http.Client{
+		Timeout: 3 * time.Second,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
 	}
 
 	b := besticon.New(
-		besticon.WithLogger(besticon.NewDefaultLogger(io.Discard)), // disable verbose logging
 		besticon.WithHTTPClient(client),
+		besticon.WithLogger(besticon.NewDefaultLogger(io.Discard)), // disable verbose logging
 	)
 
 	icons, err := b.NewIconFinder().FetchIcons(url)
@@ -73,18 +75,7 @@ func getWebLogoIconBase64(url string) (string, error) {
 		return defaultIcon, err
 	}
 
-	resp, err := client.Get(icons[0].URL)
-	if err != nil {
-		return defaultIcon, err
-	}
-	defer resp.Body.Close()
-
-	imgData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return defaultIcon, err
-	}
-
-	return base64.StdEncoding.EncodeToString(imgData), nil
+	return base64.StdEncoding.EncodeToString(icons[0].ImageData), nil
 }
 
 func getWebTitle(url string) (title string, err error) {
