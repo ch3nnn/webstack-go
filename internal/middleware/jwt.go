@@ -56,25 +56,38 @@ func StrictAuth(j *jwt.JWT, logger *log.Logger) gin.HandlerFunc {
 
 func NoStrictAuth(j *jwt.JWT, logger *log.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		tokenString := ctx.Request.Header.Get("Authorization")
+		tokenString := ctx.Request.Header.Get("Token")
 		if tokenString == "" {
-			tokenString, _ = ctx.Cookie("Token")
+			tokenString, _ = ctx.Cookie("_login_token_")
 		}
 		if tokenString == "" {
 			tokenString = ctx.Query("Token")
 		}
 		if tokenString == "" {
-			ctx.Next()
+			logger.WithContext(ctx).Warn("No token", zap.Any("data", map[string]interface{}{
+				"url":    ctx.Request.URL,
+				"params": ctx.Params,
+			}))
+			ctx.Redirect(http.StatusFound, "/login")
+			ctx.Abort()
 			return
 		}
 
 		claims, err := j.ParseToken(tokenString)
 		if err != nil {
-			ctx.Next()
+			logger.WithContext(ctx).Error("token error", zap.Any("data", map[string]interface{}{
+				"url":    ctx.Request.URL,
+				"params": ctx.Params,
+			}), zap.Error(err))
+
+			ctx.Redirect(http.StatusFound, "/login")
+			ctx.Abort()
 			return
 		}
 
-		ctx.Set("claims", claims)
+		ctx.Set(UserID, claims.UserID)
+		ctx.Set(Claims, claims)
+
 		recoveryLoggerFunc(ctx, logger)
 		ctx.Next()
 	}

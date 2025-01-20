@@ -76,7 +76,7 @@ func NewHTTPServer(
 		ctx.HTML(http.StatusOK, "admin_login.html", nil)
 	})
 	// Render HTML
-	render := s.Group("/admin").Use(middleware.StrictAuth(jwt, logger))
+	render := s.Group("/admin").Use(middleware.NoStrictAuth(jwt, logger))
 	{
 		render.GET("", func(ctx *gin.Context) {
 			ctx.HTML(http.StatusOK, "admin_index.html", nil)
