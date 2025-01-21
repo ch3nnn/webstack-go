@@ -29,7 +29,7 @@ jobs:
 
       # 创建 Release 并发布到 GitHub
       - name: Create release on GitHub
-        run: goreleaser release
+        run: goreleaser release --config .goreleaser.yml
         env:
           # 使用 GitHub 自动生成的令牌
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
