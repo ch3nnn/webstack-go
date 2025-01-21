@@ -3,37 +3,32 @@ name: Release
 on:
   push:
     tags:
-      # 匹配以 "v" 开头的标签（如 v1.0.0）
       - v*
 
 jobs:
   release:
     name: Release on GitHub
     runs-on: ubuntu-latest
+
     steps:
       # 检出代码
       - name: Check out code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 获取完整的 Git 历史，这对于 GoReleaser 很重要
 
       # 设置 Go 环境
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.22
+          cache: true  # 启用 Go 模块缓存
 
-      # 安装 GoReleaser
-      - name: Install GoReleaser
+      # 运行 GoReleaser
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
-          version: latest  # 使用最新版本的 GoReleaser
-
-      # 创建 Release 并发布到 GitHub
-      - name: Create release on GitHub
-        run: goreleaser release --config .goreleaser.yml
+          version: latest
+          args: release --clean --config .goreleaser.yml
         env:
-          # 使用 GitHub 自动生成的令牌
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 仓库拥有者
-          GITHUB_OWNER: ${{ github.repository_owner }}
-          # 仓库名称
-          GITHUB_REPO: ${{ github.repository }}
