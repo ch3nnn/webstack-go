@@ -1,0 +1,42 @@
+version: 2
+
+project_name: "webstack-go"
+
+builds:
+  - id: default
+    dir: .  # 根目录
+    main: ./cmd/server  # 指定 main 包的路径
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - src: "config/*"
+        dst: "config"
+    wrap_in_directory: true
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+release:
+  draft: false
+  prerelease: false
+  mode: replace
+
+git:
+  ignore_tags:
+    - alpha
+    - beta

@@ -1,43 +1,34 @@
 name: Release
 
 on:
-  create:
+  push:
     tags:
-    - v*
-
+      - v*
 
 jobs:
-
   release:
-
     name: Release on GitHub
-
     runs-on: ubuntu-latest
 
     steps:
+      # 检出代码
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 获取完整的 Git 历史
 
-    - name: Check out code
+      # 设置 Go 环境
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22
+          cache: true  # 启用 Go 模块缓存
 
-      uses: actions/checkout@v1
-
-
-    - name: Validates GO releaser config
-
-      uses: docker://goreleaser/goreleaser:latest
-
-      with:
-
-        args: check
-
-
-    - name: Create release on GitHub
-
-      uses: docker://goreleaser/goreleaser:latest
-
-      with:
-
-        args: release
-
-      env:
-
-        GITHUB_TOKEN: ${{secrets.TOKEN}}
+      # 运行 GoReleaser
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          version: latest
+          args: release --clean --skip=validate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
