@@ -1,24 +1,52 @@
 name: Release
 
 on:
-  create:
+  push:
     tags:
-    - v*
-    
+      # 匹配以 "v" 开头的标签（如 v1.0.0）
+      - v*
+
 jobs:
   release:
     name: Release on GitHub
     runs-on: ubuntu-latest
+    env:
+      GO_VERSION: 1.22 # Go 版本
+      # 目标操作系统
+      GOOS: "linux,darwin,windows"
+      # 目标架构
+      GOARCH: "amd64,arm64"
+      # 仓库拥有者
+      GITHUB_OWNER: ${{ github.repository_owner }}
+      # 仓库名称
+      GITHUB_REPO: ${{ github.repository }}
     steps:
-    - name: Check out code
-      uses: actions/checkout@v1
-    - name: Validates GO releaser config
-      uses: docker://goreleaser/goreleaser:latest
-      with:
-        args: check
-    - name: Create release on GitHub
-      uses: docker://goreleaser/goreleaser:latest
-      with:
-        args: release
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      # 检出代码
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # 设置 Go 环境
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      # 创建 Release 并发布到 GitHub
+      - name: Create release on GitHub
+        uses: docker://goreleaser/goreleaser:latest
+        with:
+          args: >
+            release
+            --skip-validate
+            --builds="goos: [${{ env.GOOS }}]"
+            --builds="goarch: [${{ env.GOARCH }}]"
+            --builds="env: [CGO_ENABLED=0]"
+            --builds="flags: [-trimpath]"
+            --builds="ldflags: [-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}]"
+            --archives="format: tar.gz"
+            --archives="name_template: {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+            --checksum="name_template: {{ .ProjectName }}_{{ .Version }}_checksums.txt"
+            --release="github: owner: ${{ env.GITHUB_OWNER }}, name: ${{ env.GITHUB_REPO }}"
+        env:
+          # 使用 GitHub 自动生成的令牌
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
