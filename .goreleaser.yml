@@ -21,15 +21,40 @@ builds:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
 
 archives:
-  - format: tar.gz
+  - id: default
+    format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - src: "config/*"
         dst: "config"
     wrap_in_directory: true
+    format_overrides:
+      - goos: windows
+        format: zip
 
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+changelog:
+  use: git
+  format: "{{.SHA}}: {{.Message}} (@{{.AuthorUsername}})"
+  sort: asc
+  filters:
+    exclude:
+      - '^docs(\(.*\))?:'  # 排除以 "docs:" 或 "docs(readme):" 开头的提交
+      - '^chore(\(.*\))?:'  # 排除以 "chore:" 或 "chore(ci):" 开头的提交
+      - '^test(\(.*\))?:'  # 排除以 "test:" 或 "test(unit):" 开头的提交
+  groups:
+    - title: "New Features"
+      regexp: '^feat(\(.*\))?:'  # 匹配 "feat:" 或 "feat(flow):"
+    - title: "Bug Fixes"
+      regexp: '^fix(\(.*\))?:'  # 匹配 "fix:" 或 "fix(bug):"
+    - title: "Performance Improvements"
+      regexp: '^perf(\(.*\))?:'  # 匹配 "perf:" 或 "perf(optimize):"
+    - title: "Code Refactoring"
+      regexp: '^refactor(\(.*\))?:'
+    - title: "Other Changes"
+      regexp: '^.*$'  # 匹配所有其他提交
 
 release:
   draft: false
