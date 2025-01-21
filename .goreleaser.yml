@@ -27,14 +27,81 @@ archives:
       - src: "config/*"
         dst: "config"
     wrap_in_directory: true
+    # 为 Windows 平台单独配置 zip 格式
+    replacements:
+      windows: "zip"
 
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+changelog:
+  use: git
+  filters:
+    exclude:
+      - '^docs:'  # 排除以 "docs:" 开头的提交
+      - '^chore:'  # 排除以 "chore:" 开头的提交
+      - '^test:'   # 排除以 "test:" 开头的提交
+  sort: asc  # 按时间顺序排序（asc 为升序，desc 为降序）
+  groups:
+    - title: "New Features"
+      regexp: "^feat:"  # 匹配以 "feat:" 开头的提交
+    - title: "Bug Fixes"
+      regexp: "^fix:"   # 匹配以 "fix:" 开头的提交
+    - title: "Performance Improvements"
+      regexp: "^perf:"  # 匹配以 "perf:" 开头的提交
+    - title: "Other Changes"
+      regexp: "^.*$"    # 匹配所有其他提交
 
 release:
   draft: false
   prerelease: false
   mode: replace
+  footer: |
+    ## Contributors
+
+    Thank you to all the contributors who helped make this release possible!
+
+    {{ range .Contributors }}
+    - [{{ .Login }}]({{ .HTMLURL }})
+    {{ end }}
+
+  header: |
+    # {{ .ProjectName }} {{ .Version }}
+
+    **Release Date:** {{ .Date }}
+
+    ## What's Changed
+
+    {{ if .Changelog }}
+    {{ .Changelog }}
+    {{ else }}
+    No significant changes in this release.
+    {{ end }}
+
+    ## Installation
+
+    Download the pre-built binaries for your platform:
+
+    ```bash
+    # Linux (amd64)
+    curl -L -o webstack-go.tar.gz https://github.com/{{ .Repo.Owner }}/{{ .Repo.Name }}/releases/download/v{{ .Version }}/webstack-go_{{ .Version }}_linux_amd64.tar.gz
+
+    # macOS (arm64)
+    curl -L -o webstack-go.tar.gz https://github.com/{{ .Repo.Owner }}/{{ .Repo.Name }}/releases/download/v{{ .Version }}/webstack-go_{{ .Version }}_darwin_arm64.tar.gz
+
+    # Windows (amd64)
+    curl -L -o webstack-go.zip https://github.com/{{ .Repo.Owner }}/{{ .Repo.Name }}/releases/download/v{{ .Version }}/webstack-go_{{ .Version }}_windows_amd64.zip
+    ```
+
+    ## Documentation
+
+    For more details, please refer to the [documentation](https://github.com/{{ .Repo.Owner }}/{{ .Repo.Name }}/wiki).
+
+    ## Support
+
+    If you encounter any issues, please [open an issue](https://github.com/{{ .Repo.Owner }}/{{ .Repo.Name }}/issues).
+
+    ---
 
 git:
   ignore_tags:
