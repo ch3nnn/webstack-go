@@ -37,7 +37,3 @@ git:
   ignore_tags:
     - alpha
     - beta
-
-# 验证设置
-builds_skip:
-  validate: true
