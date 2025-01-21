@@ -5,10 +5,20 @@ on:
     branches:
       - main
     tags:
-      - v*  # 匹配以 "v" 开头的标签
+      - v*
+    paths-ignore:
+      - '.*'
+      - '.*/workflows/**'
+      - 'README*'
+      - '**/README*'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '.*'
+      - '.*/workflows/**'
+      - 'README*'
+      - '**/README*'
 
 env:
   DOCKER_IMAGE_NAME: ${{ vars.DOCKER_IMAGE_NAME }}  # 可配置的镜像名称
