@@ -9,6 +9,7 @@ import (
 	"github.com/duke-git/lancet/v2/cryptor"
 	"github.com/glebarez/sqlite"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -55,11 +56,11 @@ func NewDB(conf *viper.Viper, l *log.Logger) *gorm.DB {
 	case "postgres":
 		dialector = postgres.Open(dsn)
 	case "sqlite":
-
 		dialector = sqlite.Open(dsn)
 	default:
 		panic("unknown db driver")
 	}
+	l.Info("db driver", zap.String("driver", dialector.Name()))
 
 	db, err = gorm.Open(dialector, &gorm.Config{
 		QueryFields:    true,
@@ -246,7 +247,6 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 				SiteKeyword: "网址导航",
 				SiteDesc:    "WebStack-Go - 基于 Golang 开源的网址导航网站",
 			})
-
 		if err != nil {
 			os.Exit(0)
 		}
