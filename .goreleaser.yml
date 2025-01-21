@@ -4,7 +4,7 @@ project_name: "webstack-go"
 
 builds:
   - id: default
-    dir: ./cmd/server  # 指定 main 包所在的目录
+    dir: .  # 根目录
     main: ./cmd/server  # 指定 main 包的路径
     goos:
       - linux
