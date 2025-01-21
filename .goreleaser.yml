@@ -23,6 +23,10 @@ builds:
 archives:
   - format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - src: "config/*"
+        dst: "config"
+    wrap_in_directory: true
 
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
