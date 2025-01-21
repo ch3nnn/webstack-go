@@ -4,19 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css"/>
-    <link href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css">
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css">
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css">
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
     <!-- 引入 bootstrap-fileinput CSS-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/css/fileinput.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-fileinput/css/fileinput.min.css">
 </head>
 
 <body>
 <div class="container-fluid p-t-15">
     <div class="row">
-
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-toolbar d-flex flex-column flex-md-row">
@@ -27,7 +25,7 @@
                         <input class="form-control" type="text" id="search-keyword" name="search-keyword" placeholder="请输入网址标题...">
                     </div>
                     <div class="form-group">
-                        <button class="btn btn-default btn-search" type="submit">搜索</button>
+                        <button class="btn btn-outline-success my-2 my-sm-0 btn-search" type="submit">搜索</button>
                     </div>
 
                 </div>
@@ -74,8 +72,8 @@
 <script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/jquery.pagination.js"></script>
 <!-- 引入 bootstrap-fileinput JS 和 引入语言包-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/js/fileinput.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/js/locales/zh.min.js"></script>
+<script src="/assets/static/plugin/bootstrap-fileinput/js/fileinput.min.js"></script>
+<script src="/assets/static/plugin/bootstrap-fileinput/js/locales/zh.min.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
 
 
@@ -194,7 +192,7 @@
             const business_title = $(this).attr('data-title');
             $.confirm({
                 title: '谨慎操作',
-                content: '确认要 <strong style="color: red">一键同步 </strong>：'+ business_title + ' 吗？',
+                content: '确认要 <strong style="color: red">一键同步 </strong>：' + business_title + ' 吗？',
                 icon: 'mdi mdi-alert',
                 animation: 'scale',
                 closeAnimation: 'zoom',
@@ -262,11 +260,11 @@
 
             var tipMessage = "";
             var wantUsed = false;
-            if (isUsed === "true" ) { // true=当前为启用状态，需要改成禁用
+            if (isUsed === "true") { // true=当前为启用状态，需要改成禁用
                 tipMessage = "禁用";
                 wantUsed = false;
             }
-            if (isUsed === "false" )  {
+            if (isUsed === "false") {
                 tipMessage = "启用";
                 wantUsed = true;
             }

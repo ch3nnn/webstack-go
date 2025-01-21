@@ -28,7 +28,8 @@ func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.S
 	workerPool := tools.NewWorkerPool(5, 20)
 	workerPool.Start()
 
-	var failCnt, successCnt int
+	var successCnt int
+	var failURLs []string
 	for _, url := range s.parseURL(req.Url) {
 		workerPool.AddJob(func() {
 			var (
@@ -52,7 +53,7 @@ func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.S
 			})
 
 			if err := g.Wait(); err != nil {
-				failCnt++
+				failURLs = append(failURLs, url)
 				return
 			}
 
@@ -65,7 +66,7 @@ func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.S
 				IsUsed:      req.IsUsed,
 			})
 			if err != nil {
-				failCnt++
+				failURLs = append(failURLs, url)
 				return
 			}
 
@@ -76,7 +77,8 @@ func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.S
 	workerPool.Wait()
 
 	return &v1.SiteCreateResp{
-		FailCount:    failCnt,
+		FailCount:    len(failURLs),
 		SuccessCount: successCnt,
+		FailURLs:     failURLs,
 	}, nil
 }

@@ -57,8 +57,9 @@ type (
 	}
 
 	SiteCreateResp struct {
-		SuccessCount int `json:"successCount"` // 成功计数
-		FailCount    int `json:"failCount"`    // 失败计数
+		SuccessCount int      `json:"successCount"` // 成功计数
+		FailCount    int      `json:"failCount"`    // 失败计数
+		FailURLs     []string `json:"failURLs"`     // 失败URL
 	}
 )
 
