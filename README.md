@@ -23,16 +23,27 @@
 
 ### 二、启动服务
 
-> 两种方式运行 1. 源码启动服务 2. Docker启动服务
+**1、二进制文件**
 
-**一、源码运行服务**
+你可以直接从[ Releases ](https://github.com/ch3nnn/webstack-go/releases)下载预先编译好的二进制文件，解压后执行:
 
+```bash
+./webstack-go -conf config/prod.yml 
+```
+
+> [!NOTE]
+> MacOS 在执行二进制文件时会提示：未打开“webstack-go”，因为 Apple 无法检查其是否包含恶意软件。
+> 
+> 可在“系统设置 > 隐私与安全性 > 安全性”中点击“仍然允许”，然后再次尝试执行二进制文件。
+
+
+**2、源码运行服务 (需要 Golang 环境)**
 1. 目录下执行 `go mod tidy` 拉取项目依赖库
 2. 执行 `go build -o ./bin/server ./cmd/server` 编译项目，生成可执行文件 server 
 3. 编译完执行 `./bin/server -conf=config/prod.yml` 首次启动程序之后，会生成 SQLite 数据库，并自动创建表结构
 
 
-**二、Docker运行服务**
+**3、Docker 运行服务**
 
 
 1. 目录下执行 `make docker` 等待启动
