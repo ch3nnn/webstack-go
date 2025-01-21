@@ -1,9 +1,9 @@
+# 添加版本声明
+version: 2
 project_name: webstack-go
-
 before:
   hooks:
     - go mod tidy
-
 builds:
   - id: default
     goos:
@@ -19,17 +19,14 @@ builds:
       - -trimpath
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
-
 archives:
   - format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - README*
       - LICENSE*
-
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
-
 changelog:
   sort: asc
   filters:
@@ -37,7 +34,6 @@ changelog:
       - '^docs:'
       - '^test:'
       - '^ci:'
-
 release:
   github:
     token: "{{ .Env.GITHUB_TOKEN }}"
