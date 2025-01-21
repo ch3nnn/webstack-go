@@ -4,6 +4,8 @@ project_name: "webstack-go"
 
 builds:
   - id: default
+    dir: ./cmd/server  # 指定 main 包所在的目录
+    main: ./cmd/server  # 指定 main 包的路径
     goos:
       - linux
       - darwin
@@ -25,14 +27,11 @@ archives:
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
 
-# 修改 release 配置结构
 release:
-  # GitHub release 配置
   draft: false
   prerelease: false
   mode: replace
 
-# 全局设置
 git:
   ignore_tags:
     - alpha
