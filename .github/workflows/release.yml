@@ -10,16 +10,6 @@ jobs:
   release:
     name: Release on GitHub
     runs-on: ubuntu-latest
-    env:
-      GO_VERSION: 1.22 # Go 版本
-      # 目标操作系统
-      GOOS: "linux,darwin,windows"
-      # 目标架构
-      GOARCH: "amd64,arm64"
-      # 仓库拥有者
-      GITHUB_OWNER: ${{ github.repository_owner }}
-      # 仓库名称
-      GITHUB_REPO: ${{ github.repository }}
     steps:
       # 检出代码
       - name: Check out code
@@ -29,24 +19,21 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version: 1.22
+
+      # 安装 GoReleaser
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          version: latest  # 使用最新版本的 GoReleaser
 
       # 创建 Release 并发布到 GitHub
       - name: Create release on GitHub
-        uses: docker://goreleaser/goreleaser:latest
-        with:
-          args: >
-            release
-            --skip-validate
-            --builds="goos: [${{ env.GOOS }}]"
-            --builds="goarch: [${{ env.GOARCH }}]"
-            --builds="env: [CGO_ENABLED=0]"
-            --builds="flags: [-trimpath]"
-            --builds="ldflags: [-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}]"
-            --archives="format: tar.gz"
-            --archives="name_template: {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-            --checksum="name_template: {{ .ProjectName }}_{{ .Version }}_checksums.txt"
-            --release="github: owner: ${{ env.GITHUB_OWNER }}, name: ${{ env.GITHUB_REPO }}"
+        run: goreleaser release
         env:
           # 使用 GitHub 自动生成的令牌
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 仓库拥有者
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          # 仓库名称
+          GITHUB_REPO: ${{ github.repository }}
