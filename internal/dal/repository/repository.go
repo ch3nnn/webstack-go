@@ -29,7 +29,7 @@ type Repository struct {
 
 func NewRepository(
 	logger *log.Logger,
-// cache *cache.Cache,
+	// cache *cache.Cache,
 	db *gorm.DB,
 ) *Repository {
 	return &Repository{
