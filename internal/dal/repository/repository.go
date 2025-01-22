@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/Pacific73/gorm-cache/cache"
+	"github.com/Pacific73/gorm-cache/config"
 	"github.com/duke-git/lancet/v2/cryptor"
 	"github.com/glebarez/sqlite"
 	"github.com/spf13/viper"
@@ -23,25 +25,18 @@ import (
 
 type Repository struct {
 	logger *log.Logger
-	// cache  *cache.Cache
-	db *gorm.DB
+	db     *gorm.DB
 }
 
 func NewRepository(
 	logger *log.Logger,
-	// cache *cache.Cache,
 	db *gorm.DB,
 ) *Repository {
 	return &Repository{
 		logger: logger,
-		// cache:  cache,
-		db: db,
+		db:     db,
 	}
 }
-
-// func NewCache() *cache.Cache {
-//	return cache.New(5*time.Minute, 10*time.Minute)
-// }
 
 func NewDB(conf *viper.Viper, l *log.Logger) *gorm.DB {
 	var (
@@ -69,6 +64,17 @@ func NewDB(conf *viper.Viper, l *log.Logger) *gorm.DB {
 		Logger:         zapgorm2.New(l.Logger),
 	})
 	if err != nil {
+		panic(err)
+	}
+
+	cachePlugin, _ := cache.NewGorm2Cache(&config.CacheConfig{
+		CacheLevel:           config.CacheLevelAll,
+		CacheStorage:         config.CacheStorageMemory,
+		InvalidateWhenUpdate: true,         // when you create/update/delete objects, invalidate cache
+		CacheTTL:             3600000 * 24, // 1 day
+		CacheSize:            10000,        // max items
+	})
+	if err := db.Use(cachePlugin); err != nil {
 		panic(err)
 	}
 
@@ -123,8 +129,8 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		).
 		Attrs(
 			field.Attrs(&model.SysUser{
-				Password: cryptor.Md5String(DefaultUPassword)},
-			),
+				Password: cryptor.Md5String(DefaultUPassword),
+			}),
 		).
 		FirstOrCreate()
 	if err != nil {
@@ -226,7 +232,6 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 			}),
 		).
 		FirstOrCreate()
-
 	if err != nil {
 		fmt.Println("config migrate error")
 		os.Exit(0)
