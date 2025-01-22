@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
 </head>
 
 <body>
@@ -19,8 +19,7 @@
                     <div class="card-title">新增网站</div>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述,
-                        对内容不满可以点击编辑修改呦!
+                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述, 对内容不满可以点击编辑修改呦!
                     </div>
                     <form>
                         <div class="input-group mb-3">
@@ -32,20 +31,18 @@
                         <div class="form-group">
                             <label>网站地址</label>
                             <small class="help-block">(支持多 URL 添加)</small>
-                            <textarea type="text" class="form-control" id="url"
-                                      placeholder="必须包含 http:// 或 https://且至少含有1个路径。例如: http://www.test.com/test.html 一行一个呦!"></textarea>
+                            <textarea type="text" class="form-control" id="url" placeholder="必须包含 http:// 或 https://且至少含有1个路径。例如: http://www.test.com/test.html 一行一个呦!"></textarea>
                         </div>
                         <div class="form-group">
                             <label>网站启用</label>
                             <small class="help-block">(网站关闭后将不能展示!)</small>
                             <div class="clearfix">
                                 <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0"
-                                           checked="">
+                                    <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0" checked=""/>
                                     <label class="custom-control-label" for="statusOne">禁用</label>
                                 </div>
                                 <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1">
+                                    <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1"/>
                                     <label class="custom-control-label" for="statusTwo">启用</label>
                                 </div>
                             </div>
@@ -71,15 +68,13 @@
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-multitabs/multitabs.min.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
-
 <script type="text/javascript">
     $(document).ready(function () {
         AjaxFormNoAsync(
             "GET",
             "/api/admin/category",
             "",
-            function () {
-            },
+            function () {},
             function (data) {
                 // 将扁平化数据转换为树形结构
                 const treeData = buildTree(data.list);
@@ -111,7 +106,6 @@
                 });
                 return false;
             }
-
             // 获取所有 name 为 customRadioInline 的单选按钮
             const radios = document.querySelectorAll('input[name="customRadioInline"]');
             // 遍历单选按钮，找到选中的值
@@ -128,7 +122,6 @@
                 is_used: selectedValue === "1",
             };
 
-
             AjaxForm(
                 "POST",
                 "/api/admin/site",
@@ -144,27 +137,25 @@
                         failURLsHTML += '<div class="card-title">以下 URL 创建失败：</div>';
                         data.failURLs.forEach(function (url) {
                             failURLsHTML += `
-                                <div class="alert alert-warning" role="alert">
-                                    <a href="#!" class="alert-link">${url}</a>
-                                </div>
-                            `;
+			                            <div class="alert alert-warning" role="alert">
+			                                <a href="#!" class="alert-link">${url}</a>
+			                            </div>
+			                        `;
                         });
                     } else {
                         failURLsHTML = '<div class="alert alert-info" role="alert">无失败 URL。</div>';
                     }
-
                     // 弹窗内容
                     const content = `
-                        <div class="card">
-                            <header class="card-header">
-                                <div class="card-title">成功创建：${data.successCount} 条, 失败创建：${data.failCount} 条</div>
-                            </header>
-                            <div class="card-body">
-                                ${failURLsHTML}
-                            </div>
-                        </div>
-                    `;
-
+			                    <div class="card">
+			                        <header class="card-header">
+			                            <div class="card-title">成功创建：${data.successCount} 条, 失败创建：${data.failCount} 条</div>
+			                        </header>
+			                        <div class="card-body">
+			                            ${failURLsHTML}
+			                        </div>
+			                    </div>
+			                `;
                     $.alert({
                         title: '操作成功',
                         icon: 'mdi mdi-check-decagram',
@@ -183,7 +174,6 @@
                 function (response) {
                     $("#btnLoading").hide();
                     $("#btnOk").show();
-
                     AjaxError(response);
                 }
             );

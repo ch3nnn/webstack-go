@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-treegrid/jquery.treegrid.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-table/bootstrap-table.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-treegrid/jquery.treegrid.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-table/bootstrap-table.min.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/index/css/fonts/linecons/css/linecons.css"/>
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
-
-
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
 </head>
 
 <body>
@@ -23,55 +21,45 @@
                     <div class="card-title">配置分类栏</div>
                 </div>
                 <div class="card-body">
-
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text">上级分类</span>
                         </div>
-                        <select class="form-control select-picker col-lg-3" data-width="auto"
-                                data-live-search="true" id="level">
-                        </select>
+                        <select class="form-control select-picker col-lg-3" data-width="auto" data-live-search="true" id="level"> </select>
                     </div>
-
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text">分类名称</span>
                         </div>
-                        <input type="text" class="form-control" id="name" placeholder="请输入分类名称">
+                        <input type="text" class="form-control" id="name" placeholder="请输入分类名称"/>
                     </div>
-
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text">分类图标</span>
                         </div>
-                        <select id="icon" class="selectpicker" multiple data-max-options="1">
-                        </select>
+                        <select id="icon" class="selectpicker" multiple data-max-options="1"> </select>
                         <!--                        <input type="text" class="form-control" id="icon" placeholder="请输入分类图标">-->
                     </div>
-
                     <div class="form-group">
                         <label>是否启用</label>
                         <div class="clearfix">
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0"
-                                       checked="">
+                                       checked=""/>
                                 <label class="custom-control-label" for="statusOne">禁用</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1">
+                                <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1"/>
                                 <label class="custom-control-label" for="statusTwo">启用</label>
                             </div>
                         </div>
                     </div>
-
-                    <input type="hidden" id="id">
-
+                    <input type="hidden" id="id"/>
                     <button type="button" id="btnOk" class="btn btn-primary">提交</button>
                     <button type="button" id="btnLoading" class="btn btn-primary" disabled style="display: none">
                         <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
                         提交中...
                     </button>
-
                 </div>
             </div>
         </div>
@@ -408,7 +396,6 @@
         $(document).on('click', '.customSwitch', function () {
             let state = $(this).attr("state");
             const id = $(this).attr("id");
-
             const is_used = (state !== 'true');
             const is_used_msg = (state === 'true') ? "禁用" : "启用";
 
@@ -504,7 +491,6 @@
                 is_used: selectedValue === "1",
             };
 
-
             if (id !== '') {
                 msg = '分类：' + name + ' 修改完成。'
                 method = "PUT"
@@ -526,7 +512,6 @@
                 function () {
                     $("#btnLoading").hide();
                     $("#btnOk").show();
-
                     $.alert({
                         title: '操作成功',
                         icon: 'mdi mdi-check-decagram',
@@ -545,7 +530,6 @@
                 function (response) {
                     $("#btnLoading").hide();
                     $("#btnOk").show();
-
                     AjaxError(response);
                 }
             );

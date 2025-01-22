@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-multitabs/multitabs.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
     <!-- 引入 bootstrap-fileinput CSS-->
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-fileinput/css/fileinput.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-fileinput/css/fileinput.min.css"/>
 </head>
 
 <body>
@@ -22,14 +22,12 @@
                         <a class="btn btn-primary m-r-5" href="/admin/site/add"><i class="mdi mdi-plus"></i> 新增</a>
                     </div>
                     <div class="form-group">
-                        <input class="form-control" type="text" id="search-keyword" name="search-keyword" placeholder="请输入网址标题...">
+                        <input class="form-control" type="text" id="search-keyword" name="search-keyword" placeholder="请输入网址标题..."/>
                     </div>
                     <div class="form-group">
                         <button class="btn btn-outline-success my-2 my-sm-0 btn-search" type="submit">搜索</button>
                     </div>
-
                 </div>
-
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
@@ -46,20 +44,15 @@
                                 <th style="text-align: center; ">操作</th>
                             </tr>
                             </thead>
-                            <tbody class="tbody">
-
-                            </tbody>
+                            <tbody class="tbody"></tbody>
                         </table>
                     </div>
                     <ul class="pagination">
-                        <ul class="pagination" id="paginationDiv">
-
-                        </ul>
+                        <ul class="pagination" id="paginationDiv"></ul>
                     </ul>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
@@ -75,34 +68,27 @@
 <script src="/assets/static/plugin/bootstrap-fileinput/js/fileinput.min.js"></script>
 <script src="/assets/static/plugin/bootstrap-fileinput/js/locales/zh.min.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
-
-
 <script type="text/javascript">
     $(document).ready(function () {
         // 加载列表页数据
         getPageListData();
 
         function getPageListData(page = 0, page_size = 0, search = null, url = "/api/admin/site") {
-
             if (parseInt(page) < 1) {
                 page = 1;
             }
-
             if (parseInt(page_size) < 1) {
                 page_size = 10;
             }
-
             AjaxForm(
                 "GET",
                 url,
                 {page: page, page_size: page_size, search: search},
-                function () {
-                },
+                function () {},
                 function (data) {
                     if (data.list.length > 0) {
                         var totalNum = data.pagination.total; //总条数
                         var pageNum = Math.ceil(totalNum / data.pagination.per_page_count); //分页的总页数
-
                         $("#paginationDiv").pagination({
                             current: data.pagination.current_page,
                             pageCount: pageNum,
@@ -124,15 +110,13 @@
                         $.each(data.list, function (index, value) {
                             var showUsedBadge = "";
                             var optionUsedName = "";
-
                             if (value.is_used) {
                                 optionUsedName = '禁用';
                                 showUsedBadge = '<span class="badge badge-success">启用</span></td>'
-                            }else{
+                            } else {
                                 optionUsedName = '启用';
                                 showUsedBadge = '<span class="badge badge-danger">禁用</span></td>'
                             }
-
                             const tr = '<tr>\n' +
                                 '<td>' + value.id + '</td>\n' +
                                 '<td><img class="lozad img-circle" width="30" src="data:image/png;base64,' + value.thumb + '" data-loaded="true"></td>\n' +
@@ -171,7 +155,6 @@
                                 '</div>\n' +
                                 '</td>\n' +
                                 '</tr>';
-
                             $(".tbody").append(tr);
                         })
                     } else {
@@ -185,7 +168,6 @@
                 }
             );
         }
-
         // 一键同步
         $(document).on('click', '.btn-sync', function () {
             const id = $(this).attr('data-id');
@@ -206,8 +188,7 @@
                                 "GET",
                                 '/api/admin/site/sync/' + id,
                                 "",
-                                function () {
-                                },
+                                function () {},
                                 function (data) {
                                     $.alert({
                                         title: '操作成功',
@@ -237,7 +218,6 @@
                 }
             });
         });
-
         // 详情
         $(document).on('click', '.btn-detail', function () {
             const business_title = $(this).attr('data-title');
@@ -252,12 +232,10 @@
                 draggable: true,
             });
         });
-
         // 启用/禁用
         $(document).on('click', '.btn-option', function () {
             const id = $(this).attr('data-id');
             const isUsed = $(this).attr('data-is-used');
-
             var tipMessage = "";
             var wantUsed = false;
             if (isUsed === "true") { // true=当前为启用状态，需要改成禁用
@@ -268,12 +246,10 @@
                 tipMessage = "启用";
                 wantUsed = true;
             }
-
             const patchData = {
                 id: id,
                 is_used: wantUsed,
             };
-
             $.confirm({
                 title: '谨慎操作',
                 content: '确认要 <strong style="color: red">' + tipMessage + '</strong> 吗？',
@@ -321,11 +297,9 @@
                 }
             });
         });
-
         // 删除
         $(document).on('click', '.btn-confirm', function () {
             const id = $(this).attr('data-id');
-
             $.confirm({
                 title: '谨慎操作',
                 content: '确认要 <strong style="color: red">删除</strong> 吗？',
@@ -373,17 +347,14 @@
                 }
             });
         });
-
         // 编辑
         $(document).on('click', '.btn-update', function () {
-
             const id = $(this).attr('data-id');
             const thumb = $(this).attr('data-thumb');
             const title = $(this).attr('data-title');
             const url = $(this).attr('data-url');
             const description = $(this).attr('data-description');
             const category_id = $(this).attr('data-category_id');
-
             $.confirm({
                 title: '编辑网站',
                 //content: 'url:form.html',  // 也可以采用url形式
@@ -454,11 +425,9 @@
                     sayMyName: {
                         text: '确认',
                         btnClass: 'btn-orange',
-
                         action: function () {
                             const thumb = $("#thumb").val();
                             const title = $("#title").val();
-
                             if (title === "") {
                                 $.alert({
                                     title: '温馨提示',
@@ -468,7 +437,6 @@
                                 });
                                 return false;
                             }
-
                             const url = $("#url").val();
                             if (url === "") {
                                 $.alert({
@@ -479,7 +447,6 @@
                                 });
                                 return false;
                             }
-
                             const description = $("#description").val();
                             if (description === "") {
                                 $.alert({
@@ -490,7 +457,6 @@
                                 });
                                 return false;
                             }
-
                             var formData = new FormData();
                             formData.append('id', id);
                             formData.append('thumb', thumb);
@@ -530,26 +496,21 @@
                                 function (response) {
                                     $("#btnLoading").hide();
                                     $("#btnOk").show();
-
                                     AjaxError(response);
                                 }
                             );
-
                         }
                     },
                     '取消': function () {
                     }
                 }
             });
-
         });
-
         // 搜索
         $(document).on('click', '.btn-search', function () {
             getPageListData(0, 0, $("#search-keyword").val())
         })
     })
 </script>
-
 </body>
 </html>

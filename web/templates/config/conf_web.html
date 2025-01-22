@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
     <!-- marked md 插件 -->
-    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/materialdesignicons.min.css">
-    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-markdown-editor/css/bootstrap-markdown-editor.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/materialdesignicons.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-markdown-editor/css/bootstrap-markdown-editor.min.css"/>
 </head>
 
 <body>
@@ -25,25 +25,20 @@
                             <form>
                                 <div class="form-group">
                                     <label>网站标题</label>
-                                    <input type="text" class="form-control" maxlength="20" id="siteTitle"
-                                           placeholder="输入网站标题">
+                                    <input type="text" class="form-control" maxlength="20" id="siteTitle" placeholder="输入网站标题"/>
                                 </div>
                                 <div class="form-group">
                                     <label>站点关键词</label>
-                                    <input type="text" class="form-control" maxlength="20" id="siteKeyword"
-                                           placeholder="输入站点关键词">
+                                    <input type="text" class="form-control" maxlength="20" id="siteKeyword" placeholder="输入站点关键词"/>
                                 </div>
                                 <div class="form-group">
                                     <label>站点描述</label>
-                                    <textarea class="form-control" id="siteDesc" rows="5" name="siteDesc"
-                                              placeholder="请输入站点描述"></textarea>
+                                    <textarea class="form-control" id="siteDesc" rows="5" name="siteDesc" placeholder="请输入站点描述"></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="siteRecord">备案信息</label>
-                                    <input class="form-control" type="text" id="siteRecord" name="siteRecord" value=""
-                                           placeholder="请输入备案信息">
+                                    <input class="form-control" type="text" id="siteRecord" name="siteRecord" value="" placeholder="请输入备案信息"/>
                                 </div>
-
                                 <button type="button" id="btnSite" class="btn btn-primary">确认</button>
                                 <button type="button" id="btnSiteLoading" class="btn btn-primary" disabled style="display: none">
                                     <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
@@ -74,24 +69,19 @@
                                     <label>关于站长</label>
                                     <textarea class="form-control" name="aboutAuthor" id="aboutAuthor"></textarea>
                                 </div>
-
                                 <div class="form-group">
                                     <label>是否启用</label>
                                     <div class="clearfix">
                                         <div class="custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input"
-                                                   value="0"
-                                                   checked="">
+                                            <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0" checked=""/>
                                             <label class="custom-control-label" for="statusOne">禁用</label>
                                         </div>
                                         <div class="custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input"
-                                                   value="1">
+                                            <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1"/>
                                             <label class="custom-control-label" for="statusTwo">启用</label>
                                         </div>
                                     </div>
                                 </div>
-
                                 <button type="button" id="btnAbout" class="btn btn-primary">确认</button>
                                 <button type="button" id="btnAboutLoading" class="btn btn-primary" disabled style="display: none">
                                     <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
@@ -106,7 +96,6 @@
     </div>
 </div>
 
-
 <script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
@@ -118,16 +107,13 @@
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/bootstrap-markdown-editor.min.js"></script>
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/marked.min.js"></script>
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/ace/ace.js"></script>
-
-
 <script type="text/javascript">
     $(document).ready(function () {
         AjaxForm(
             "GET",
             "/api/admin/config",
             "",
-            function () {
-            },
+            function () {},
             function (data) {
                 if (data.site_title) {
                     document.getElementById('siteTitle').value = data.site_title; // 网站标题
@@ -156,7 +142,6 @@
                         document.getElementById('statusOne').checked = true;
                     }
                 }
-
                 // 配置编辑器
                 $('#aboutWebsite').markdownEditor({
                     height: "75px",
@@ -177,8 +162,6 @@
                 AjaxError(response);
             }
         )
-
-
     })
 
     $('#btnSite').on('click', function () {
@@ -186,7 +169,6 @@
         const siteKeyword = document.getElementById('siteKeyword').value; // 站点关键词
         const siteDesc = document.getElementById('siteDesc').value; // 站点描述
         const siteRecord = document.getElementById('siteRecord').value; // 备案信息
-
         AjaxForm(
             "PUT",
             "/api/admin/config/",
@@ -202,7 +184,6 @@
                 // 隐藏加载状态
                 $('#btnSite').show();
                 $('#btnSiteLoading').hide();
-
                 $.alert({
                     title: '操作成功',
                     icon: 'mdi mdi-check-decagram',
@@ -222,7 +203,6 @@
                 // 隐藏加载状态
                 $('#btnSite').show();
                 $('#btnSiteLoading').hide();
-
                 AjaxError(response);
             }
         );
@@ -231,13 +211,10 @@
 
     // 提交关于页面设置
     $('#btnAbout').on('click', function () {
-
         const siteTextarea = document.getElementById('aboutWebsite');
         const siteContent = siteTextarea.value;
-
         const authorTextarea = document.getElementById('aboutAuthor');
         const authorContent = authorTextarea.value;
-
         const isEnabled = document.getElementById('statusTwo');
 
         AjaxForm(
@@ -248,8 +225,7 @@
                 about_site: siteContent,
                 is_about: isEnabled.checked,
             },
-            function () {
-            },
+            function () {},
             function (data) {
                 $.alert({
                     title: '操作成功',
@@ -270,7 +246,6 @@
                 AjaxError(response);
             }
         );
-
     });
 </script>
 </body>
