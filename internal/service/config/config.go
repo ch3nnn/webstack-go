@@ -12,7 +12,7 @@ import (
 )
 
 func (s *service) GetConfig(ctx context.Context) (*v1.ConfigResp, error) {
-	conf, err := s.configRepo.WithContext(ctx).FindOne(s.configRepo.WhereByID(1))
+	conf, err := s.configRepo.WithContext(ctx).FindOne()
 	if err != nil {
 		return nil, err
 	}

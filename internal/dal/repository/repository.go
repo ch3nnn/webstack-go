@@ -12,6 +12,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
+	"gorm.io/gen/field"
 	"gorm.io/gorm"
 
 	"github.com/ch3nnn/webstack-go/internal/dal/model"
@@ -28,7 +29,7 @@ type Repository struct {
 
 func NewRepository(
 	logger *log.Logger,
-	// cache *cache.Cache,
+// cache *cache.Cache,
 	db *gorm.DB,
 ) *Repository {
 	return &Repository{
@@ -91,7 +92,18 @@ func NewDB(conf *viper.Viper, l *log.Logger) *gorm.DB {
 }
 
 func autoMigrateAndInitialize(db *gorm.DB) {
-	err := db.AutoMigrate(
+	ctx := context.Background()
+
+	err := db.Migrator().DropTable(
+		&model.SysUserMenu{},
+		&model.SysMenu{},
+	)
+	if err != nil {
+		fmt.Println("migrate drop table error")
+		os.Exit(0)
+	}
+
+	err = db.AutoMigrate(
 		&model.SysConfig{},
 		&model.SysUser{},
 		&model.SysUserMenu{},
@@ -104,34 +116,24 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		os.Exit(0)
 	}
 
-	ctx := context.Background()
-
-	umCtn, err := query.SysUserMenu.WithContext(ctx).Count()
+	_, err = query.SysUser.WithContext(ctx).
+		Where(
+			query.SysUser.ID.Eq(1),
+			query.SysUser.Username.Eq(DefaultUname),
+		).
+		Attrs(
+			field.Attrs(&model.SysUser{
+				Password: cryptor.Md5String(DefaultUPassword)},
+			),
+		).
+		FirstOrCreate()
 	if err != nil {
+		fmt.Println("user migrate error")
 		os.Exit(0)
 	}
 
-	uCtn, err := query.SysUser.WithContext(ctx).Count()
-	if err != nil {
-		os.Exit(0)
-	}
-
-	mCtn, err := query.SysMenu.WithContext(ctx).Count()
-	if err != nil {
-		os.Exit(0)
-	}
-
-	if umCtn == 0 && uCtn == 0 && mCtn == 0 {
-		err := query.SysUser.WithContext(ctx).Create(&model.SysUser{
-			ID:       1,
-			Username: "admin",
-			Password: cryptor.Md5String("admin"),
-		})
-		if err != nil {
-			os.Exit(0)
-		}
-
-		err = query.SysMenu.WithContext(ctx).Create(
+	err = query.SysMenu.WithContext(ctx).
+		Create(
 			&model.SysMenu{
 				ID:     1,
 				Pid:    0,
@@ -177,11 +179,13 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 				IsUsed: true,
 			},
 		)
-		if err != nil {
-			os.Exit(0)
-		}
+	if err != nil {
+		fmt.Println("menu migrate error")
+		os.Exit(0)
+	}
 
-		err = query.SysUserMenu.WithContext(ctx).Create(
+	err = query.SysUserMenu.WithContext(ctx).
+		Create(
 			&model.SysUserMenu{
 				UserID: 1,
 				MenuID: 1,
@@ -203,54 +207,30 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 				MenuID: 5,
 			},
 		)
-		if err != nil {
-			os.Exit(0)
-		}
-
-		err = query.SysConfig.WithContext(ctx).Create(
-			&model.SysConfig{
-				ID:        1,
-				AboutSite: "> ❤️ 基于 Golang 开源的网址导航网站项目，具备完整的前后台，您可以拿来制作自己平日收藏的网址导航。\n\n\n> 如果你也是开发者，如果你也正好喜欢折腾，那希望这个网站能给你带来一些作用。",
-				AboutAuthor: `
-<div class="col-sm-4">
-    <div class="xe-widget xe-conversations box2 label-info" onclick="window.open('https://blog.ch3nnn.cn/about/', '_blank')" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="https://blog.ch3nnn.cn/about/">
-        <div class="xe-comment-entry">
-            <a class="xe-user-img">
-                <img src="https://s2.loli.net/2023/02/20/H1k52mlXNYKWDrU.png" class="img-circle" width="40">
-            </a>
-            <div class="xe-comment">
-                <a href="#" class="xe-user-name overflowClip_1">
-                    <strong>Developer. Ch3nnn.</strong>
-                </a>
-                <p class="overflowClip_2"> 折腾不息 · 乐此不疲.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="col-md-8">
-    <div class="row">
-        <div class="col-sm-12">
-            <br>
-            <blockquote>
-                <p>
-                    这是一个公益项目，而且是<a href="https://github.com/ch3nnn/webstack-go"> 开源 </a>的。你也可以拿来制作自己的网址导航。如果你有更好的想法，可以通过个人网站<a href="https://ch3nnn.cn/about/">ch3nnn.cn</a>中的联系方式找到我，欢迎与我交流分享。
-                </p>
-            </blockquote>
-        </div>
-    </div>
-    <br>
-</div>
-`,
-				IsAbout:     false,
-				SiteTitle:   "WebStack-Go - 网址导航",
-				SiteKeyword: "网址导航",
-				SiteDesc:    "WebStack-Go - 基于 Golang 开源的网址导航网站",
-			})
-		if err != nil {
-			os.Exit(0)
-		}
-
-		fmt.Println("success initialize")
+	if err != nil {
+		fmt.Println("user menu migrate error")
+		os.Exit(0)
 	}
+
+	_, err = query.SysConfig.WithContext(ctx).
+		Where(
+			query.SysConfig.ID.Eq(1),
+		).
+		Attrs(
+			field.Attrs(&model.SysConfig{
+				AboutSite:   DefaultAboutSite,
+				AboutAuthor: DefaultAuthor,
+				SiteTitle:   DefaultSiteTitle,
+				SiteKeyword: DefaultSiteKeyword,
+				SiteDesc:    DefaultSiteDesc,
+			}),
+		).
+		FirstOrCreate()
+
+	if err != nil {
+		fmt.Println("config migrate error")
+		os.Exit(0)
+	}
+
+	fmt.Println("success initialize")
 }
