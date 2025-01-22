@@ -6,6 +6,11 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
 )
 
+const (
+	DefaultUname     = "admin"
+	DefaultUPassword = "admin"
+)
+
 var _ iCustomGenSysUserFunc = (*customSysUserDao)(nil)
 
 type (

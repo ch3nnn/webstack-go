@@ -20,7 +20,6 @@ func (s *service) UpdatePassword(ctx *gin.Context, req *v1.UpdatePasswordReq) (*
 	user, err := s.userRepo.WithContext(ctx).
 		FindOne(
 			s.userRepo.WhereByID(ctx.GetInt(middleware.UserID)),
-			s.userRepo.WhereByPassword(req.OldPassword),
 		)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -29,10 +28,14 @@ func (s *service) UpdatePassword(ctx *gin.Context, req *v1.UpdatePasswordReq) (*
 		return nil, err
 	}
 
+	if user.Password != req.OldPassword {
+		return nil, v1.ErrorUserOldPassword
+	}
+
 	_, err = s.userRepo.WithContext(ctx).Update(&model.SysUser{Password: req.NewPassword}, s.userRepo.WhereByID(user.ID))
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.UpdatePasswordResp{}, nil
+	return nil, nil
 }

@@ -10,5 +10,6 @@ var (
 
 var (
 	ErrorUserNameAndPassword = newError(100, "用户名和密码错误")
+	ErrorUserOldPassword     = newError(100, "原密码错误")
 	ErrorTokenGeneration     = newError(101, "令牌生成错误")
 )
