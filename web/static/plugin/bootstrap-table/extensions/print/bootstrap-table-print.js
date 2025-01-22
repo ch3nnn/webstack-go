@@ -1,11 +1,4 @@
-/**
- * @update zhixin wen <wenzhixin2010@gmail.com>
- */
-
-const Utils = $.fn.bootstrapTable.utils
-
-function printPageBuilderDefault (table) {
-  return `
+const Utils=$.fn.bootstrapTable.utils;function printPageBuilderDefault(s){return`
   <html>
   <head>
   <style type="text/css" media="print">
@@ -43,139 +36,12 @@ function printPageBuilderDefault (table) {
   <title>Print Table</title>
   <body>
   <p>Printed on: ${new Date} </p>
-  <div class="bs-table-print">${table}</div>
+  <div class="bs-table-print">${s}</div>
   </body>
-  </html>`
-}
-
-$.extend($.fn.bootstrapTable.defaults, {
-  showPrint: false,
-  printAsFilteredAndSortedOnUI: true,
-  printSortColumn: undefined,
-  printSortOrder: 'asc',
-  printPageBuilder (table) {
-    return printPageBuilderDefault(table)
-  }
-})
-
-$.extend($.fn.bootstrapTable.COLUMN_DEFAULTS, {
-  printFilter: undefined,
-  printIgnore: false,
-  printFormatter: undefined
-})
-
-$.extend($.fn.bootstrapTable.defaults.icons, {
-  print: {
-    bootstrap3: 'glyphicon-print icon-share'
-  }[$.fn.bootstrapTable.theme] || 'fa-print'
-})
-
-$.BootstrapTable = class extends $.BootstrapTable {
-  initToolbar (...args) {
-    this.showToolbar = this.showToolbar || this.options.showPrint
-
-    super.initToolbar(...args)
-
-    if (!this.options.showPrint) {
-      return
-    }
-
-    const $btnGroup = this.$toolbar.find('>.columns')
-    let $print = $btnGroup.find('button.bs-print')
-
-    if (!$print.length) {
-      $print = $(`
+  </html>`}$.extend($.fn.bootstrapTable.defaults,{showPrint:!1,printAsFilteredAndSortedOnUI:!0,printSortColumn:void 0,printSortOrder:"asc",printPageBuilder(s){return printPageBuilderDefault(s)}}),$.extend($.fn.bootstrapTable.COLUMN_DEFAULTS,{printFilter:void 0,printIgnore:!1,printFormatter:void 0}),$.extend($.fn.bootstrapTable.defaults.icons,{print:{bootstrap3:"glyphicon-print icon-share"}[$.fn.bootstrapTable.theme]||"fa-print"}),$.BootstrapTable=class extends $.BootstrapTable{initToolbar(...s){if(this.showToolbar=this.showToolbar||this.options.showPrint,super.initToolbar(...s),!this.options.showPrint)return;const d=this.$toolbar.find(">.columns");let l=d.find("button.bs-print");l.length||(l=$(`
         <button class="${this.constants.buttonsClass} bs-print" type="button">
         <i class="${this.options.iconsPrefix} ${this.options.icons.print}"></i>
-        </button>`
-      ).appendTo($btnGroup)
-    }
-
-    $print.off('click').on('click', () => {
-      this.doPrint(this.options.printAsFilteredAndSortedOnUI ?
-        this.getData() : this.options.data.slice(0))
-    })
-  }
-
-  doPrint (data) {
-    const formatValue = (row, i, column ) => {
-      const value = Utils.calculateObjectValue(column, column.printFormatter,
-        [row[column.field], row, i], row[column.field])
-
-      return typeof value === 'undefined' || value === null
-        ? this.options.undefinedText : value
-    }
-
-    const buildTable = (data, columnsArray) => {
-      const dir = this.$el.attr('dir') || 'ltr'
-      const html = [`<table dir="${dir}"><thead>`]
-
-      for (const columns of columnsArray) {
-        html.push('<tr>')
-        for (let h = 0; h < columns.length; h++) {
-          if (!columns[h].printIgnore) {
-            html.push(
-              `<th
-              ${Utils.sprintf(' rowspan="%s"', columns[h].rowspan)}
-              ${Utils.sprintf(' colspan="%s"', columns[h].colspan)}
-              >${columns[h].title}</th>`)
-          }
-        }
-        html.push('</tr>')
-      }
-
-      html.push('</thead><tbody>')
-
-      for (let i = 0; i < data.length; i++) {
-        html.push('<tr>')
-
-        for (const columns of columnsArray) {
-          for (let j = 0; j < columns.length; j++) {
-            if (!columns[j].printIgnore && columns[j].field) {
-              html.push('<td>', formatValue(data[i], i, columns[j]), '</td>')
-            }
-          }
-        }
-
-        html.push('</tr>')
-      }
-      html.push('</tbody></table>')
-      return html.join('')
-    }
-
-    const sortRows = (data, colName, sortOrder) => {
-      if (!colName) {
-        return data
-      }
-      let reverse = sortOrder !== 'asc'
-      reverse = -((+reverse) || -1)
-      return data.sort((a, b) => reverse * (a[colName].localeCompare(b[colName])))
-    }
-
-    const filterRow = (row, filters) => {
-      for (let index = 0; index < filters.length; ++index) {
-        if (row[filters[index].colName] !== filters[index].value) {
-          return false
-        }
-      }
-      return true
-    }
-
-    const filterRows = (data, filters) => data.filter(row => filterRow(row,filters))
-
-    const getColumnFilters = columns => !columns || !columns[0] ? [] : columns[0].filter(col => col.printFilter).map(col => ({
-      colName: col.field,
-      value: col.printFilter
-    }))
-
-    data = filterRows(data,getColumnFilters(this.options.columns))
-    data = sortRows(data, this.options.printSortColumn, this.options.printSortOrder)
-    const table = buildTable(data, this.options.columns)
-    const newWin = window.open('')
-    newWin.document.write(this.options.printPageBuilder.call(this, table))
-    newWin.document.close()
-    newWin.focus()
-    newWin.print()
-    newWin.close()
-  }
-}
+        </button>`).appendTo(d)),l.off("click").on("click",()=>{this.doPrint(this.options.printAsFilteredAndSortedOnUI?this.getData():this.options.data.slice(0))})}doPrint(s){const d=(e,t,i)=>{const n=Utils.calculateObjectValue(i,i.printFormatter,[e[i.field],e,t],e[i.field]);return typeof n>"u"||n===null?this.options.undefinedText:n},l=(e,t)=>{const n=[`<table dir="${this.$el.attr("dir")||"ltr"}"><thead>`];for(const r of t){n.push("<tr>");for(let o=0;o<r.length;o++)r[o].printIgnore||n.push(`<th
+              ${Utils.sprintf(' rowspan="%s"',r[o].rowspan)}
+              ${Utils.sprintf(' colspan="%s"',r[o].colspan)}
+              >${r[o].title}</th>`);n.push("</tr>")}n.push("</thead><tbody>");for(let r=0;r<e.length;r++){n.push("<tr>");for(const o of t)for(let a=0;a<o.length;a++)!o[a].printIgnore&&o[a].field&&n.push("<td>",d(e[r],r,o[a]),"</td>");n.push("</tr>")}return n.push("</tbody></table>"),n.join("")},h=(e,t,i)=>{if(!t)return e;let n=i!=="asc";return n=-(+n||-1),e.sort((r,o)=>n*r[t].localeCompare(o[t]))},u=(e,t)=>{for(let i=0;i<t.length;++i)if(e[t[i].colName]!==t[i].value)return!1;return!0};s=((e,t)=>e.filter(i=>u(i,t)))(s,(e=>!e||!e[0]?[]:e[0].filter(t=>t.printFilter).map(t=>({colName:t.field,value:t.printFilter})))(this.options.columns)),s=h(s,this.options.printSortColumn,this.options.printSortOrder);const f=l(s,this.options.columns),p=window.open("");p.document.write(this.options.printPageBuilder.call(this,f)),p.document.close(),p.focus(),p.print(),p.close()}};

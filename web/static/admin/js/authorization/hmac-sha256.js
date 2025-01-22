@@ -1,18 +1,1 @@
-;(function (root, factory, undef) {
-	if (typeof exports === "object") {
-		// CommonJS
-		module.exports = exports = factory(require("./core"), require("./sha256"), require("./hmac"));
-	}
-	else if (typeof define === "function" && define.amd) {
-		// AMD
-		define(["./core", "./sha256", "./hmac"], factory);
-	}
-	else {
-		// Global (browser)
-		factory(root.CryptoJS);
-	}
-}(this, function (CryptoJS) {
-
-	return CryptoJS.HmacSHA256;
-
-}));
+(function(e,i,r){typeof exports=="object"?module.exports=exports=i(require("./core"),require("./sha256"),require("./hmac")):typeof define=="function"&&define.amd?define(["./core","./sha256","./hmac"],i):i(e.CryptoJS)})(this,function(e){return e.HmacSHA256});
