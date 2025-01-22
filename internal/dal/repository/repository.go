@@ -70,9 +70,9 @@ func NewDB(conf *viper.Viper, l *log.Logger) *gorm.DB {
 	cachePlugin, _ := cache.NewGorm2Cache(&config.CacheConfig{
 		CacheLevel:           config.CacheLevelAll,
 		CacheStorage:         config.CacheStorageMemory,
-		InvalidateWhenUpdate: true,         // when you create/update/delete objects, invalidate cache
-		CacheTTL:             3600000 * 24, // 1 day
-		CacheSize:            10000,        // max items
+		InvalidateWhenUpdate: true,  // when you create/update/delete objects, invalidate cache
+		CacheTTL:             30000, // 30 s
+		CacheSize:            10000, // max items
 	})
 	if err := db.Use(cachePlugin); err != nil {
 		panic(err)
