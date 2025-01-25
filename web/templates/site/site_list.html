@@ -8,7 +8,6 @@
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-select/bootstrap-select.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
-    <!-- 引入 bootstrap-fileinput CSS-->
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-fileinput/css/fileinput.min.css"/>
 </head>
 
@@ -64,7 +63,6 @@
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-multitabs/multitabs.min.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/jquery.pagination.js"></script>
-<!-- 引入 bootstrap-fileinput JS 和 引入语言包-->
 <script src="/assets/static/plugin/bootstrap-fileinput/js/fileinput.min.js"></script>
 <script src="/assets/static/plugin/bootstrap-fileinput/js/locales/zh.min.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
@@ -199,7 +197,8 @@
                                             okay: {
                                                 text: '关闭',
                                                 action: function () {
-                                                    location.reload();
+                                                    const currentPage = document.querySelector('.page-link.pageActive').textContent;
+                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value);
                                                 }
                                             }
                                         }
@@ -278,7 +277,8 @@
                                             okay: {
                                                 text: '关闭',
                                                 action: function () {
-                                                    location.reload();
+                                                    const currentPage = document.querySelector('.page-link.pageActive').textContent;
+                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value);
                                                 }
                                             }
                                         }
@@ -328,7 +328,8 @@
                                             okay: {
                                                 text: '关闭',
                                                 action: function () {
-                                                    location.reload();
+                                                    const currentPage = document.querySelector('.page-link.pageActive').textContent;
+                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value);
                                                 }
                                             }
                                         }
@@ -398,23 +399,16 @@
                         removeLabel: '删除', // 自定义删除按钮标签
                         showUpload: false // 隐藏上传按钮
                     });
-
-
                     AjaxFormNoAsync(
                         "GET",
                         "/api/admin/category",
                         "",
-                        function () {
-                        },
+                        function () {},
                         function (data) {
-                            // 将扁平化数据转换为树形结构
-                            const treeData = buildTree(data.list);
-                            // 获取 <select> 元素
-                            const selectElement = document.getElementById('category_id');
-                            // 渲染树形结构到 <select>
-                            renderTreeToSelect(treeData, selectElement, 0, [parseInt(category_id)]);
-                            // 初始化 Bootstrap Select
-                            $("#category_id").selectpicker('refresh');
+                            const treeData = buildTree(data.list);// 将扁平化数据转换为树形结构
+                            const selectElement = document.getElementById('category_id');// 获取 <select> 元素
+                            renderTreeToSelect(treeData, selectElement, 0, [parseInt(category_id)]);  // 渲染树形结构到 <select>
+                            $("#category_id").selectpicker('refresh');// 初始化 Bootstrap Select
                         },
                         function (response) {
                             AjaxError(response);
@@ -457,7 +451,7 @@
                                 });
                                 return false;
                             }
-                            var formData = new FormData();
+                            const formData = new FormData();
                             formData.append('id', id);
                             formData.append('thumb', thumb);
                             formData.append('title', title);
@@ -465,7 +459,6 @@
                             formData.append('description', description);
                             formData.append('file', $("#file")[0].files[0]);
                             formData.append('category_id', $("#category_id").val());
-
                             AjaxMultipartForm(
                                 "PUT",
                                 "/api/admin/site/" + id,
@@ -487,7 +480,8 @@
                                             okay: {
                                                 text: '关闭',
                                                 action: function () {
-                                                    location.href = "/admin/site";
+                                                    const currentPage = $(".page-link.pageActive").text(); // 获取当前页码
+                                                    getPageListData(currentPage, 10, $("#search-keyword").val()); // 重新加载当前页数据
                                                 }
                                             }
                                         }
