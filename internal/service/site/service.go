@@ -29,10 +29,15 @@ var _ Service = (*service)(nil)
 type Service interface {
 	i()
 
+	// List 站点列表
 	List(ctx context.Context, req *v1.SiteListReq) (resp *v1.SiteListResp, err error)
+	// Delete 删除站点
 	Delete(ctx context.Context, req *v1.SiteDeleteReq) (resp *v1.SiteDeleteResp, err error)
+	// Update 更新站点
 	Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.SiteUpdateResp, err error)
+	// BatchCreate 批量创建站点
 	BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (resp *v1.SiteCreateResp, err error)
+	// Sync 同步站点信息
 	Sync(ctx *gin.Context, req *v1.SiteSyncReq) (resp *v1.SiteSyncResp, err error)
 }
 

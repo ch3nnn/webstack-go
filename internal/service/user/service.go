@@ -20,8 +20,11 @@ var _ Service = (*service)(nil)
 type Service interface {
 	i()
 
+	// Info 获取用户信息
 	Info(ctx *gin.Context, req *v1.InfoReq) (*v1.InfoResp, error)
+	// Login 登录
 	Login(ctx context.Context, req *v1.LoginReq) (resp *v1.LoginResp, err error)
+	// UpdatePassword 修改密码
 	UpdatePassword(ctx *gin.Context, req *v1.UpdatePasswordReq) (*v1.UpdatePasswordResp, error)
 }
 

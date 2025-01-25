@@ -19,7 +19,10 @@ var _ Service = (*service)(nil)
 
 type Service interface {
 	i()
+
+	// Index 首页
 	Index(ctx context.Context) (*v1.IndexResp, error)
+	// About 关于我
 	About(ctx *gin.Context) (*v1.AboutResp, error)
 }
 

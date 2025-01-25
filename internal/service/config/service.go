@@ -19,7 +19,10 @@ var _ Service = (*service)(nil)
 
 type Service interface {
 	i()
+
+	// GetConfig 获取配置信息
 	GetConfig(ctx context.Context) (*v1.ConfigResp, error)
+	// Update 更新配置信息
 	Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.ConfigUpdateResp, err error)
 }
 

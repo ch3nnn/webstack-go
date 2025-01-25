@@ -18,10 +18,15 @@ var _ Service = (*service)(nil)
 type Service interface {
 	i()
 
+	// Update 更新分类
 	Update(ctx context.Context, req *v1.CategoryUpdateReq) (resp *v1.CategoryUpdateResp, err error)
+	// Detail 获取分类详情
 	Detail(ctx context.Context, req *v1.CategoryDetailReq) (resp *v1.CategoryDetailResp, err error)
+	// List 获取分类列表
 	List(ctx context.Context, req *v1.CategoryListReq) (resp *v1.CategoryListResp, err error)
+	// Create 创建分类
 	Create(ctx context.Context, req *v1.CategoryCreateReq) (resp *v1.CategoryCreateResp, err error)
+	// Delete 删除分类
 	Delete(ctx context.Context, req *v1.CategoryDeleteReq) (resp *v1.CategoryDeleteResp, err error)
 }
 
