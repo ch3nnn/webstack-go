@@ -113,7 +113,9 @@
             select.append(option);
         });
 
-        $("#level").selectpicker();
+        $('#icon').selectpicker('refresh');
+        $("#level").selectpicker('refresh');
+
         let menuData = "";
 
         AjaxFormNoAsync(
