@@ -31,7 +31,6 @@ type (
 		SiteRecord  *string               `json:"site_record" form:"site_record"`
 		LogFile     *multipart.FileHeader `json:"log"`     // 上传 logo 图片
 		FaviconFile *multipart.FileHeader `json:"favicon"` // 上传 favicon 图片
-
 	}
 
 	ConfigUpdateResp struct {

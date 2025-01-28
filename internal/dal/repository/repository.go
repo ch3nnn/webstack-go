@@ -229,6 +229,8 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 				SiteTitle:   DefaultSiteTitle,
 				SiteKeyword: DefaultSiteKeyword,
 				SiteDesc:    DefaultSiteDesc,
+				SiteFavicon: DefaultFaviconBase64,
+				SiteLogo:    DefaultLogoBase64,
 			}),
 		).
 		FirstOrCreate()
