@@ -117,6 +117,8 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResp, error) {
 			SiteKeyword: sysConfig.SiteKeyword,
 			SiteDesc:    sysConfig.SiteDesc,
 			SiteRecord:  sysConfig.SiteRecord,
+			SiteLogo:    sysConfig.SiteLogo,
+			SiteFavicon: sysConfig.SiteFavicon,
 		},
 		About: &v1.About{
 			AboutSite:   sysConfig.AboutSite,

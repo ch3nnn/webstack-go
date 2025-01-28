@@ -20,6 +20,14 @@ func (h *Handler) Update(ctx *gin.Context) {
 		return
 	}
 
+	if file, _ := ctx.FormFile("log"); file != nil {
+		req.LogFile = file
+	}
+
+	if file, _ := ctx.FormFile("favicon"); file != nil {
+		req.FaviconFile = file
+	}
+
 	resp, err := h.configService.Update(ctx, &req)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)

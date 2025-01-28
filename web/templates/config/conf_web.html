@@ -6,7 +6,6 @@
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
-    <!-- marked md 插件 -->
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/materialdesignicons.min.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-markdown-editor/css/bootstrap-markdown-editor.min.css"/>
 </head>
@@ -36,14 +35,23 @@
                                     <textarea class="form-control" id="siteDesc" rows="5" name="siteDesc" placeholder="请输入站点描述"></textarea>
                                 </div>
                                 <div class="form-group">
+                                    <label>网站Logo</label>
+                                    <small class="form-text text-muted">建议尺寸：200x50像素</small>
+                                    <input type="file" name="file" class="file1" id="siteLogo" accept="image/*"/>
+                                    <img id="siteLogoPreview" src="" alt="Logo预览" style="max-width: 200px; margin-top: 10px;"/>
+                                </div>
+                                <div class="form-group">
+                                    <label>网站Favicon</label>
+                                    <small class="form-text text-muted">建议尺寸：32x32像素</small>
+                                    <input type="file" class="file2" id="siteFavicon" accept="image/*"/>
+                                    <img id="siteFaviconPreview" src="" alt="Favicon预览" style="max-width: 32px; margin-top: 10px;"/>
+                                </div>
+                                <div class="form-group">
                                     <label for="siteRecord">备案信息</label>
-                                    <input class="form-control" type="text" id="siteRecord" name="siteRecord" value="" placeholder="请输入备案信息"/>
+                                    <input class="form-control" type="text" id="siteRecord" name="siteRecord" value=""
+                                           placeholder="请输入备案信息"/>
                                 </div>
                                 <button type="button" id="btnSite" class="btn btn-primary">确认</button>
-                                <button type="button" id="btnSiteLoading" class="btn btn-primary" disabled style="display: none">
-                                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                                    执行中...
-                                </button>
                             </form>
                         </div>
                     </div>
@@ -83,10 +91,6 @@
                                     </div>
                                 </div>
                                 <button type="button" id="btnAbout" class="btn btn-primary">确认</button>
-                                <button type="button" id="btnAboutLoading" class="btn btn-primary" disabled style="display: none">
-                                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                                    执行中...
-                                </button>
                             </form>
                         </div>
                     </div>
@@ -103,17 +107,18 @@
 <script type="text/javascript" src="/assets/bootstrap/js/bootstrap-multitabs/multitabs.min.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
 <script type="text/javascript" src="/assets/static/admin/js/authorization/md5.min.js"></script>
-<!-- marked md 插件 -->
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/bootstrap-markdown-editor.min.js"></script>
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/marked.min.js"></script>
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/ace/ace.js"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
+    // 加载表单数据
+    function loadFormData() {
         AjaxForm(
             "GET",
             "/api/admin/config",
             "",
-            function () {},
+            function () {
+            },
             function (data) {
                 if (data.site_title) {
                     document.getElementById('siteTitle').value = data.site_title; // 网站标题
@@ -127,7 +132,16 @@
                 if (data.site_record) {
                     document.getElementById('siteRecord').value = data.site_record; // 备案信息
                 }
-
+                if (data.site_logo) {// 回显Logo（Base64）
+                    document.getElementById('siteLogoPreview').src = `data:image/png;base64,${data.site_logo}`;
+                } else {
+                    document.getElementById('siteLogoPreview').remove()
+                }
+                if (data.site_favicon) { // 回显Favicon（Base64）
+                    document.getElementById('siteFaviconPreview').src = `data:image/png;base64,${data.site_favicon}`;
+                } else {
+                    document.getElementById('siteFaviconPreview').remove()
+                }
                 if (data.about_site) {
                     document.getElementById('aboutWebsite').value = data.about_site;
                 }
@@ -144,14 +158,14 @@
                 }
                 // 配置编辑器
                 $('#aboutWebsite').markdownEditor({
-                    height: "75px",
+                    height: "235px",
                     preview: true,
                     onPreview: function (content, callback) {
                         callback(marked(content));
                     }
                 });
                 $('#aboutAuthor').markdownEditor({
-                    height: "75px",
+                    height: "235px",
                     preview: true,
                     onPreview: function (content, callback) {
                         callback(marked(content));
@@ -161,29 +175,41 @@
             function (response) {
                 AjaxError(response);
             }
-        )
+        );
+    }
+
+    $(document).ready(function () {
+        loadFormData();
     })
 
+    // 提交网站设置表单
     $('#btnSite').on('click', function () {
         const siteTitle = document.getElementById('siteTitle').value; // 网站标题
         const siteKeyword = document.getElementById('siteKeyword').value; // 站点关键词
         const siteDesc = document.getElementById('siteDesc').value; // 站点描述
         const siteRecord = document.getElementById('siteRecord').value; // 备案信息
-        AjaxForm(
+        const siteLogo = document.getElementById('siteLogo').files[0]; // 网站Logo
+        const siteFavicon = document.getElementById('siteFavicon').files[0]; // 网站Favicon
+
+        const formData = new FormData();
+        formData.append('site_title', siteTitle);
+        formData.append('site_keyword', siteKeyword);
+        formData.append('site_desc', siteDesc);
+        formData.append('site_record', siteRecord);
+        if (siteLogo) {
+            formData.append('log', siteLogo);
+        }
+        if (siteFavicon) {
+            formData.append('favicon', siteFavicon);
+        }
+
+        AjaxMultipartForm(
             "PUT",
             "/api/admin/config/",
-            {
-                site_title: siteTitle,
-                site_keyword: siteKeyword,
-                site_desc: siteDesc,
-                site_record: siteRecord
-            },
+            formData,
             function () {
             },
             function (data) {
-                // 隐藏加载状态
-                $('#btnSite').show();
-                $('#btnSiteLoading').hide();
                 $.alert({
                     title: '操作成功',
                     icon: 'mdi mdi-check-decagram',
@@ -200,9 +226,6 @@
                 });
             },
             function (response) {
-                // 隐藏加载状态
-                $('#btnSite').show();
-                $('#btnSiteLoading').hide();
                 AjaxError(response);
             }
         );
@@ -225,7 +248,8 @@
                 about_site: siteContent,
                 is_about: isEnabled.checked,
             },
-            function () {},
+            function () {
+            },
             function (data) {
                 $.alert({
                     title: '操作成功',

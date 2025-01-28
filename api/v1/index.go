@@ -22,16 +22,18 @@ type CategorySite struct {
 }
 
 type About struct {
-	AboutSite   string `json:"about_site"`
-	AboutAuthor string `json:"about_author"`
-	IsAbout     bool   `json:"is_about"`
+	AboutSite   string `json:"about_site"`   // 关于站点
+	AboutAuthor string `json:"about_author"` // 关于作者
+	IsAbout     bool   `json:"is_about"`     // 是否开启关于
 }
 
 type ConfigSite struct {
-	SiteTitle   string `json:"site_title"`
-	SiteKeyword string `json:"site_keyword"`
-	SiteDesc    string `json:"site_desc"`
-	SiteRecord  string `json:"site_record"`
+	SiteTitle   string `json:"site_title"`   // 站点标题
+	SiteKeyword string `json:"site_keyword"` // 站点关键字
+	SiteDesc    string `json:"site_desc"`    // 站点描述
+	SiteRecord  string `json:"site_record"`  // 站点备案
+	SiteLogo    string `json:"site_logo"`    // 站点logo
+	SiteFavicon string `json:"site_favicon"` // 站点favicon
 }
 
 type IndexResp struct {

@@ -10,7 +10,12 @@
     <meta name="keywords" content="{{ .ConfigSite.SiteKeyword }}">
     <meta name="description" content="{{ .ConfigSite.SiteDesc }}">
 
-    <link rel="shortcut icon" href="/assets/static/index/images/favicon.png">
+    {{ if .ConfigSite.SiteFavicon }}
+        <link rel="shortcut icon" href="data:image/png;base64,{{ .ConfigSite.SiteFavicon }}">
+    {{ else }}
+        <link rel="shortcut icon" href="/assets/static/index/images/favicon.png">
+    {{ end }}
+
     <link rel="stylesheet" href="/assets/static/index/css/fonts/linecons/css/linecons.css">
     <link rel="stylesheet" href="/assets/static/index/css/fonts/fontawesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/static/index/css/bootstrap.css">
@@ -41,7 +46,11 @@
                 <!-- logo -->
                 <div class="logo">
                     <a href="/" class="logo-expanded">
-                        <img src="assets/static/index/images/logo@2x.png" width="100%" alt=""/>
+                        {{ if .ConfigSite.SiteLogo }}
+                            <img src="data:image/png;base64,{{ .ConfigSite.SiteLogo }}" width="100%" alt=""/>
+                        {{ else }}
+                            <img src="assets/static/index/images/logo@2x.png" width="100%" alt=""/>
+                        {{ end }}
                     </a>
                     <a href="index.html" class="logo-collapsed">
                         <img src="assets/static/index/images/logo-collapsed@2x.png" width="40" alt=""/>

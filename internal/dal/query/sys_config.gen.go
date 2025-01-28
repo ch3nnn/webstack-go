@@ -35,6 +35,8 @@ func newSysConfig(db *gorm.DB, opts ...gen.DOOption) sysConfig {
 	_sysConfig.SiteKeyword = field.NewString(tableName, "site_keyword")
 	_sysConfig.SiteDesc = field.NewString(tableName, "site_desc")
 	_sysConfig.SiteRecord = field.NewString(tableName, "site_record")
+	_sysConfig.SiteLogo = field.NewString(tableName, "site_logo")
+	_sysConfig.SiteFavicon = field.NewString(tableName, "site_favicon")
 
 	_sysConfig.fillFieldMap()
 
@@ -53,6 +55,8 @@ type sysConfig struct {
 	SiteKeyword field.String
 	SiteDesc    field.String
 	SiteRecord  field.String
+	SiteLogo    field.String
+	SiteFavicon field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -77,6 +81,8 @@ func (s *sysConfig) updateTableName(table string) *sysConfig {
 	s.SiteKeyword = field.NewString(table, "site_keyword")
 	s.SiteDesc = field.NewString(table, "site_desc")
 	s.SiteRecord = field.NewString(table, "site_record")
+	s.SiteLogo = field.NewString(table, "site_logo")
+	s.SiteFavicon = field.NewString(table, "site_favicon")
 
 	s.fillFieldMap()
 
@@ -103,7 +109,7 @@ func (s *sysConfig) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *sysConfig) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 8)
+	s.fieldMap = make(map[string]field.Expr, 10)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["about_site"] = s.AboutSite
 	s.fieldMap["about_author"] = s.AboutAuthor
@@ -112,6 +118,8 @@ func (s *sysConfig) fillFieldMap() {
 	s.fieldMap["site_keyword"] = s.SiteKeyword
 	s.fieldMap["site_desc"] = s.SiteDesc
 	s.fieldMap["site_record"] = s.SiteRecord
+	s.fieldMap["site_logo"] = s.SiteLogo
+	s.fieldMap["site_favicon"] = s.SiteFavicon
 }
 
 func (s sysConfig) clone(db *gorm.DB) sysConfig {

@@ -12,4 +12,7 @@ var (
 	ErrorUserNameAndPassword = newError(100, "用户名和密码错误")
 	ErrorUserOldPassword     = newError(100, "原密码错误")
 	ErrorTokenGeneration     = newError(101, "令牌生成错误")
+
+	ErrorUnableToGetFile      = newError(200, "无法获取文件")
+	ErrorFileSizeExceedsLimit = newError(201, "文件大小超过限制")
 )

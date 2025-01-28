@@ -8,7 +8,7 @@ const TableNameSysConfig = "sys_config"
 
 // SysConfig mapped from table <sys_config>
 type SysConfig struct {
-	ID          int    `gorm:"column:id;type:INTEGER" json:"id"`
+	ID          int    `gorm:"column:id;type:INTEGER;primaryKey" json:"id"`
 	AboutSite   string `gorm:"column:about_site;type:text" json:"about_site"`
 	AboutAuthor string `gorm:"column:about_author;type:text" json:"about_author"`
 	IsAbout     bool   `gorm:"column:is_about;type:bool;default:false" json:"is_about"`
@@ -16,6 +16,8 @@ type SysConfig struct {
 	SiteKeyword string `gorm:"column:site_keyword;type:text" json:"site_keyword"`
 	SiteDesc    string `gorm:"column:site_desc;type:text" json:"site_desc"`
 	SiteRecord  string `gorm:"column:site_record;type:varchar(500)" json:"site_record"`
+	SiteLogo    string `gorm:"column:site_logo;type:text" json:"site_logo"`
+	SiteFavicon string `gorm:"column:site_favicon;type:text" json:"site_favicon"`
 }
 
 // TableName SysConfig's table name
