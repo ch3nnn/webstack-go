@@ -128,6 +128,7 @@ func NewHTTPServer(
 			strictAuthRouter.POST("/site", siteHandler.Create)
 			strictAuthRouter.DELETE("/site/:id", siteHandler.Delete)
 			strictAuthRouter.PUT("/site/:id", siteHandler.Update)
+			strictAuthRouter.GET("/site/export", siteHandler.Export)
 			// Config
 			strictAuthRouter.GET("/config", configHandler.Config)
 			strictAuthRouter.PUT("/config", configHandler.Update)

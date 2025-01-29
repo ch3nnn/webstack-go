@@ -5,7 +5,11 @@
 
 package v1
 
-import "mime/multipart"
+import (
+	"mime/multipart"
+
+	excelize "github.com/xuri/excelize/v2"
+)
 
 type Site struct {
 	Id          int    `json:"id"`          // ID
@@ -86,5 +90,15 @@ type (
 	}
 	SiteSyncResp struct {
 		ID int `json:"id"` // 主键ID
+	}
+)
+
+type (
+	SiteExportReq struct {
+		Search string `json:"search" form:"search"`
+	}
+
+	SiteExportResp struct {
+		File *excelize.File
 	}
 )

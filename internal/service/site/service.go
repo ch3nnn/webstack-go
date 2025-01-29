@@ -39,6 +39,8 @@ type Service interface {
 	BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (resp *v1.SiteCreateResp, err error)
 	// Sync 同步站点信息
 	Sync(ctx *gin.Context, req *v1.SiteSyncReq) (resp *v1.SiteSyncResp, err error)
+	// Export 导出站点信息
+	Export(ctx *gin.Context, req *v1.SiteExportReq) (resp *v1.SiteExportResp, err error)
 }
 
 type service struct {
