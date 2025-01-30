@@ -16,16 +16,19 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-toolbar d-flex flex-column flex-md-row">
+                <div class="card-toolbar d-flex flex-column flex-md-row justify-content-between">
                     <div class="toolbar-btn-action">
                         <a class="btn btn-primary m-r-5" href="/admin/site/add"><i class="mdi mdi-plus"></i> 新增</a>
                         <button class="btn btn-success m-r-5" id="exportBtn"><i class="mdi mdi-download"></i> 导出</button>
                     </div>
-                    <div class="form-group">
-                        <input class="form-control" type="text" id="search-keyword" name="search-keyword" placeholder="请输入网址标题..."/>
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-outline-success my-2 my-sm-0 btn-search" type="submit">搜索</button>
+                    <div class="d-flex align-items-center">
+                        <div class="form-group m-b-0">
+                            <input class="form-control" type="text" id="search-keyword" name="search-keyword"
+                                   placeholder="请输入网址标题..."/>
+                        </div>
+                        <div class="form-group m-b-0 m-l-10">
+                            <button class="btn btn-outline-success btn-search" type="submit">搜索</button>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
