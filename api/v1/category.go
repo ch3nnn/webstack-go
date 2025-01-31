@@ -83,7 +83,7 @@ type (
 		Name   *string `form:"name"`                  // 菜单名称
 		Icon   *string `form:"icon"`                  // 图标
 		IsUsed *bool   `form:"used"`                  // 是否启用
-		Sort   *int    `form:"sort"`                  // 排序
+		SortID *int    `form:"sort_id"`               // 排序 ID
 	}
 
 	CategoryUpdateResp struct {

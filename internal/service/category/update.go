@@ -26,8 +26,8 @@ func (s *service) Update(ctx context.Context, req *v1.CategoryUpdateReq) (*v1.Ca
 	if req.Icon != nil {
 		update["icon"] = req.Icon
 	}
-	if req.Sort != nil {
-		update["sort"] = req.Sort
+	if req.SortID != nil {
+		update["sort"] = req.SortID
 	}
 	if req.IsUsed != nil {
 		update["is_used"] = req.IsUsed
