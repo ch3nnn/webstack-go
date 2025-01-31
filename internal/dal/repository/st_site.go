@@ -8,6 +8,7 @@ import (
 
 	"github.com/ch3nnn/webstack-go/internal/dal/model"
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
+	"github.com/ch3nnn/webstack-go/pkg/gormx"
 )
 
 var _ iCustomGenStSiteFunc = (*customStSiteDao)(nil)
@@ -61,24 +62,34 @@ func (d *customStSiteDao) WithContext(ctx context.Context) iCustomGenStSiteFunc 
 
 func (d *customStSiteDao) LikeInByTitleOrDescOrURL(search string) func(dao gen.Dao) gen.Dao {
 	return func(dao gen.Dao) gen.Dao {
-		return dao.
-			Where(query.StSite.Title.Like("%" + search + "%")).
-			Or(query.StSite.Description.Like("%" + search + "%")).
-			Or(query.StSite.URL.Like("%" + search + "%"))
+		return dao.Where(
+			d.stSiteDo.
+				Where(
+					query.StSite.Title.Like(gormx.LikeInner(search)),
+				).
+				Or(
+					query.StSite.Description.Like(gormx.LikeInner(search)),
+				).
+				Or(
+					query.StSite.URL.Like(gormx.LikeInner(search)),
+				),
+		)
 	}
 }
 
 func (d *customStSiteDao) FindSiteCategoryWithPage(page, pageSize int, result any, whereFunc ...func(dao gen.Dao) gen.Dao) (count int64, err error) {
 	return d.stSiteDo.
 		Select(
-			field.NewField(query.StSite.TableName(), "*"),
-			field.NewField(query.StCategory.TableName(), "*"),
+			field.NewAsterisk(query.StSite.TableName()),
+			field.NewAsterisk(query.StCategory.TableName()),
 		).
 		LeftJoin(
 			query.StCategory,
 			query.StCategory.ID.EqCol(query.StSite.CategoryID),
 		).
-		Order(query.StSite.CreatedAt.Desc()).
+		Order(
+			query.StSite.CreatedAt.Desc(),
+		).
 		Scopes(whereFunc...).
 		ScanByPage(result, (page-1)*pageSize, pageSize)
 }

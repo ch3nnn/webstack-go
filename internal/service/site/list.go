@@ -11,11 +11,21 @@ import (
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
+	"gorm.io/gen"
 )
 
 func (s *service) List(ctx context.Context, req *v1.SiteListReq) (resp *v1.SiteListResp, err error) {
+
+	var whereFunc []func(dao gen.Dao) gen.Dao
+	if req.Search != "" {
+		whereFunc = append(whereFunc, s.siteRepository.LikeInByTitleOrDescOrURL(req.Search))
+	}
+	if req.CategoryID != 0 {
+		whereFunc = append(whereFunc, s.siteRepository.WhereByCategoryID(req.CategoryID))
+	}
+
 	var siteCategories []repository.SiteCategory
-	count, err := s.siteRepository.WithContext(ctx).FindSiteCategoryWithPage(req.Page, req.PageSize, &siteCategories, s.siteRepository.LikeInByTitleOrDescOrURL(req.Search))
+	count, err := s.siteRepository.WithContext(ctx).FindSiteCategoryWithPage(req.Page, req.PageSize, &siteCategories, whereFunc...)
 	if err != nil {
 		return nil, err
 	}

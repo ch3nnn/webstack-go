@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	excelize "github.com/xuri/excelize/v2"
+	"gorm.io/gen"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
@@ -21,8 +22,17 @@ var (
 )
 
 func (s *service) Export(ctx *gin.Context, req *v1.SiteExportReq) (resp *v1.SiteExportResp, err error) {
+
+	var whereFunc []func(dao gen.Dao) gen.Dao
+	if req.Search != "" {
+		whereFunc = append(whereFunc, s.siteRepository.LikeInByTitleOrDescOrURL(req.Search))
+	}
+	if req.CategoryID != 0 {
+		whereFunc = append(whereFunc, s.siteRepository.WhereByCategoryID(req.CategoryID))
+	}
+
 	var siteCategories []repository.SiteCategory
-	_, err = s.siteRepository.WithContext(ctx).FindSiteCategoryWithPage(1, 10000, &siteCategories, s.siteRepository.LikeInByTitleOrDescOrURL(req.Search))
+	_, err = s.siteRepository.WithContext(ctx).FindSiteCategoryWithPage(1, 10000, &siteCategories, whereFunc...)
 	if err != nil {
 		return nil, err
 	}

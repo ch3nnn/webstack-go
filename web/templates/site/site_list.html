@@ -23,8 +23,13 @@
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="form-group m-b-0">
-                            <input class="form-control" type="text" id="search-keyword" name="search-keyword"
-                                   placeholder="请输入网址标题..."/>
+                            <input class="form-control" type="text" id="search-keyword" name="search-keyword" placeholder="请输入网址标题..."/>
+                        </div>
+                        <div class="form-group m-b-0 m-l-10">
+                            <select class="form-control selectpicker" id="category-filter" data-live-search="true">
+                                <option value="">全部分类</option>
+                                <!-- 分类选项将通过 JavaScript 动态加载 -->
+                            </select>
                         </div>
                         <div class="form-group m-b-0 m-l-10">
                             <button class="btn btn-outline-success btn-search" type="submit">搜索</button>
@@ -72,10 +77,44 @@
 <script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        // 加载分类选项
+        loadCategories();
+
+        // 监听分类选择器的变化
+        $(document).on('change', '#category-filter', function () {
+            const categoryId = $(this).val(); // 获取选中的分类ID
+            const searchKeyword = $("#search-keyword").val(); // 获取搜索关键字
+            getPageListData(1, 10, searchKeyword, categoryId); // 重新加载数据
+        });
+
         // 加载列表页数据
         getPageListData();
 
-        function getPageListData(page = 0, page_size = 0, search = null, url = "/api/admin/site") {
+        // 加载分类选项的函数
+        function loadCategories() {
+            AjaxForm(
+                "GET",
+                "/api/admin/category",
+                {},
+                function () {
+                },
+                function (data) {
+                    const categoryFilter = $("#category-filter");
+                    categoryFilter.empty();
+                    categoryFilter.append('<option value="">全部分类</option>');
+                    $.each(data.list, function (index, category) {
+                        categoryFilter.append('<option value="' + category.id + '">' + category.name + '</option>');
+                    });
+                    categoryFilter.selectpicker('refresh');
+                },
+                function (response) {
+                    AjaxError(response);
+                }
+            );
+        }
+
+        // 获取分页数据的函数
+        function getPageListData(page = 1, page_size = 10, search = null, category_id = null, url = "/api/admin/site") {
             if (parseInt(page) < 1) {
                 page = 1;
             }
@@ -85,12 +124,12 @@
             AjaxForm(
                 "GET",
                 url,
-                {page: page, page_size: page_size, search: search},
+                {page: page, page_size: page_size, search: search, category_id: category_id},
                 function () {},
                 function (data) {
                     if (data.list.length > 0) {
-                        var totalNum = data.pagination.total; //总条数
-                        var pageNum = Math.ceil(totalNum / data.pagination.per_page_count); //分页的总页数
+                        var totalNum = data.pagination.total; // 总条数
+                        var pageNum = Math.ceil(totalNum / data.pagination.per_page_count); // 分页的总页数
                         $("#paginationDiv").pagination({
                             current: data.pagination.current_page,
                             pageCount: pageNum,
@@ -105,7 +144,7 @@
                             nextCls: 'pageNext',
                             callback: function (api) {
                                 $(".tbody").html("");
-                                getPageListData(api.getCurrent(), 10, $("#search-keyword").val());
+                                getPageListData(api.getCurrent(), 10, $("#search-keyword").val(), $("#category-filter").val());
                             }
                         });
                         $(".tbody").html("");
@@ -119,33 +158,33 @@
                                 optionUsedName = '启用';
                                 showUsedBadge = '<span class="badge badge-danger">禁用</span></td>'
                             }
-                            const tr = '<tr>\n' +
-                                '<td>' + value.id + '</td>\n' +
-                                '<td><img class="lozad img-circle" width="30" src="data:image/png;base64,' + value.thumb + '" data-loaded="true"></td>\n' +
-                                '<td>' + value.title + '</td>\n' +
-                                '<td><a href="' + value.url + '" target="_blank">' + value.url + '</a></td>\n' +
-                                '<td>' + value.category + '</td>\n' +
-                                '<td>' + value.created_at + '</td>\n' +
-                                '<td>' + value.updated_at + '</td>\n' +
-                                '<td style="text-align: center; ">' + showUsedBadge + '</td>\n' +
-                                '<td style="text-align: center; ">\n' +
-                                '<div class="btn-group">\n' +
-                                '    <a class="btn btn-xs btn-default btn-sync" href="#!" title=""\n' +
+                            const tr = '<tr>' +
+                                '<td>' + value.id + '</td>' +
+                                '<td><img class="lozad img-circle" width="30" src="data:image/png;base64,' + value.thumb + '" data-loaded="true"></td>' +
+                                '<td>' + value.title + '</td>' +
+                                '<td><a href="' + value.url + '" target="_blank">' + value.url + '</a></td>' +
+                                '<td>' + value.category + '</td>' +
+                                '<td>' + value.created_at + '</td>' +
+                                '<td>' + value.updated_at + '</td>' +
+                                '<td style="text-align: center; ">' + showUsedBadge + '</td>' +
+                                '<td style="text-align: center; ">' +
+                                '<div class="btn-group">' +
+                                '    <a class="btn btn-xs btn-default btn-sync" href="#!" title=""' +
                                 '                                           data-id="' + value.id + '"' +
                                 '                                           data-title="' + value.title + '"' +
-                                '                                           data-toggle="tooltip" data-original-title="一键同步">一键同步</a>\n' +
-                                '    <a class="btn btn-xs btn-default btn-detail" href="#!" title=""\n' +
+                                '                                           data-toggle="tooltip" data-original-title="一键同步">一键同步</a>' +
+                                '    <a class="btn btn-xs btn-default btn-detail" href="#!" title=""' +
                                 '                                           data-title="' + value.title + '"' +
                                 '                                           data-description="' + value.description + '"' +
-                                '                                           data-toggle="tooltip" data-original-title="详情">详情</a>\n' +
-                                '    <a class="btn btn-xs btn-default btn-option" href="#!" title=""\n' +
+                                '                                           data-toggle="tooltip" data-original-title="详情">详情</a>' +
+                                '    <a class="btn btn-xs btn-default btn-option" href="#!" title=""' +
                                 '                                           data-id="' + value.id + '"' +
                                 '                                           data-is-used="' + value.is_used + '"' +
-                                '                                           data-toggle="tooltip" data-original-title="' + optionUsedName + '">' + optionUsedName + '</a>\n' +
-                                '    <a class="btn btn-xs btn-default btn-confirm" href="#!" title=""\n' +
+                                '                                           data-toggle="tooltip" data-original-title="' + optionUsedName + '">' + optionUsedName + '</a>' +
+                                '    <a class="btn btn-xs btn-default btn-confirm" href="#!" title=""' +
                                 '                                           data-id="' + value.id + '"' +
-                                '                                           data-toggle="tooltip" data-original-title="删除">删除</a>\n' +
-                                '    <a class="btn btn-xs btn-default btn-update" href="#!" title=""\n' +
+                                '                                           data-toggle="tooltip" data-original-title="删除">删除</a>' +
+                                '    <a class="btn btn-xs btn-default btn-update" href="#!" title=""' +
                                 '                                           data-id="' + value.id + '"' +
                                 '                                           data-thumb="' + value.thumb + '"' +
                                 '                                           data-url="' + value.url + '"' +
@@ -153,12 +192,12 @@
                                 '                                           data-title="' + value.title + '"' +
                                 '                                           data-description="' + value.description + '"' +
                                 '                                           data-category_id="' + value.category_id + '"' +
-                                '                                           data-toggle="tooltip" data-original-title="编辑">编辑</a>\n' +
-                                '</div>\n' +
-                                '</td>\n' +
+                                '                                           data-toggle="tooltip" data-original-title="编辑">编辑</a>' +
+                                '</div>' +
+                                '</td>' +
                                 '</tr>';
                             $(".tbody").append(tr);
-                        })
+                        });
                     } else {
                         // 数据为空
                         $(".tbody").html("");
@@ -506,7 +545,7 @@
         });
         // 搜索
         $(document).on('click', '.btn-search', function () {
-            getPageListData(0, 0, $("#search-keyword").val())
+            getPageListData(0, 0, $("#search-keyword").val(), $("#category-filter").val())
         })
     })
 </script>

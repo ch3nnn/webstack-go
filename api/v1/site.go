@@ -42,9 +42,10 @@ type (
 	}
 
 	SiteListReq struct {
-		Page     int    `form:"page,default=1"`        // 第几页
-		PageSize int    `form:"page_size,default=10" ` // 每页显示条数
-		Search   string `form:"search"`                // 搜索关键字
+		Page       int    `form:"page,default=1"`        // 第几页
+		PageSize   int    `form:"page_size,default=10" ` // 每页显示条数
+		Search     string `form:"search"`                // 搜索关键字
+		CategoryID int    `form:"category_id"`           // 分类ID
 	}
 
 	SiteListResp struct {
@@ -95,7 +96,8 @@ type (
 
 type (
 	SiteExportReq struct {
-		Search string `json:"search" form:"search"`
+		Search     string `json:"search" form:"search"`           // 搜索关键字
+		CategoryID int    `json:"category_id" form:"category_id"` // 分类ID
 	}
 
 	SiteExportResp struct {
