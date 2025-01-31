@@ -12,16 +12,17 @@ import (
 )
 
 type Site struct {
-	Id          int    `json:"id"`          // ID
-	Thumb       string `json:"thumb"`       // 网站 logo
-	Title       string `json:"title"`       // 名称简介
-	Url         string `json:"url"`         // 链接
-	Category    string `json:"category"`    // 分类
-	CategoryId  int    `json:"category_id"` // 分类id
-	Description string `json:"description"` // 描述
-	IsUsed      bool   `json:"is_used"`     // 是否启用
-	CreatedAt   string `json:"created_at"`  // 创建时间
-	UpdatedAt   string `json:"updated_at"`  // 更新时间
+	Id          int    `json:"id"`               // ID
+	Thumb       string `json:"thumb"`            // 网站 logo
+	Title       string `json:"title"`            // 名称简介
+	Url         string `json:"url"`              // 链接
+	Category    string `json:"category"`         // 分类
+	CategoryId  int    `json:"category_id"`      // 分类id
+	Description string `json:"description"`      // 描述
+	IsUsed      bool   `json:"is_used"`          // 是否启用
+	Sort        int    `json:"sort" form:"sort"` // 排序
+	CreatedAt   string `json:"created_at"`       // 创建时间
+	UpdatedAt   string `json:"updated_at"`       // 更新时间
 }
 
 type (
@@ -78,6 +79,7 @@ type (
 		Description string                `json:"description" form:"description"` // 描述
 		IsUsed      *bool                 `json:"is_used" form:"is_used"`         // 是否启用
 		File        *multipart.FileHeader `json:"file"`                           // 上传 logo 图片
+		Sort        int                   `json:"sort" form:"sort"`               // 排序
 	}
 
 	SiteUpdateResp struct {

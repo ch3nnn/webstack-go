@@ -37,6 +37,7 @@ func newStSite(db *gorm.DB, opts ...gen.DOOption) stSite {
 	_stSite.CreatedAt = field.NewTime(tableName, "created_at")
 	_stSite.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_stSite.DeletedAt = field.NewTime(tableName, "deleted_at")
+	_stSite.Sort = field.NewInt(tableName, "sort")
 
 	_stSite.fillFieldMap()
 
@@ -57,6 +58,7 @@ type stSite struct {
 	CreatedAt   field.Time
 	UpdatedAt   field.Time
 	DeletedAt   field.Time
+	Sort        field.Int
 
 	fieldMap map[string]field.Expr
 }
@@ -83,6 +85,7 @@ func (s *stSite) updateTableName(table string) *stSite {
 	s.CreatedAt = field.NewTime(table, "created_at")
 	s.UpdatedAt = field.NewTime(table, "updated_at")
 	s.DeletedAt = field.NewTime(table, "deleted_at")
+	s.Sort = field.NewInt(table, "sort")
 
 	s.fillFieldMap()
 
@@ -107,7 +110,7 @@ func (s *stSite) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *stSite) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 10)
+	s.fieldMap = make(map[string]field.Expr, 11)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["category_id"] = s.CategoryID
 	s.fieldMap["title"] = s.Title
@@ -118,6 +121,7 @@ func (s *stSite) fillFieldMap() {
 	s.fieldMap["created_at"] = s.CreatedAt
 	s.fieldMap["updated_at"] = s.UpdatedAt
 	s.fieldMap["deleted_at"] = s.DeletedAt
+	s.fieldMap["sort"] = s.Sort
 }
 
 func (s stSite) clone(db *gorm.DB) stSite {

@@ -10,11 +10,15 @@ import (
 	"time"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
+	"github.com/ch3nnn/webstack-go/internal/dal/query"
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
 	"gorm.io/gen"
+	"gorm.io/gen/field"
 )
 
 func (s *service) List(ctx context.Context, req *v1.SiteListReq) (resp *v1.SiteListResp, err error) {
+	var orderColumns []field.Expr
+	orderColumns = append(orderColumns, query.StSite.CreatedAt.Desc())
 
 	var whereFunc []func(dao gen.Dao) gen.Dao
 	if req.Search != "" {
@@ -22,10 +26,11 @@ func (s *service) List(ctx context.Context, req *v1.SiteListReq) (resp *v1.SiteL
 	}
 	if req.CategoryID != 0 {
 		whereFunc = append(whereFunc, s.siteRepository.WhereByCategoryID(req.CategoryID))
+		orderColumns = []field.Expr{query.StSite.Sort.Asc()} // 同分类网址按排序升序
 	}
 
 	var siteCategories []repository.SiteCategory
-	count, err := s.siteRepository.WithContext(ctx).FindSiteCategoryWithPage(req.Page, req.PageSize, &siteCategories, whereFunc...)
+	count, err := s.siteRepository.WithContext(ctx).FindSiteCategoryWithPage(req.Page, req.PageSize, &siteCategories, orderColumns, whereFunc...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,6 +46,7 @@ func (s *service) List(ctx context.Context, req *v1.SiteListReq) (resp *v1.SiteL
 			CategoryId:  siteCategory.StSite.CategoryID,
 			Description: siteCategory.StSite.Description,
 			IsUsed:      siteCategory.StSite.IsUsed,
+			Sort:        siteCategory.StSite.Sort,
 			CreatedAt:   siteCategory.StSite.CreatedAt.Format(time.DateTime),
 			UpdatedAt:   siteCategory.StSite.UpdatedAt.Format(time.DateTime),
 		}

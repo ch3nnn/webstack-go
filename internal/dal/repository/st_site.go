@@ -31,7 +31,7 @@ type (
 		// TODO Custom DaoFunc ....
 		// ...
 
-		FindSiteCategoryWithPage(page, pageSize int, result any, whereFunc ...func(dao gen.Dao) gen.Dao) (count int64, err error)
+		FindSiteCategoryWithPage(page, pageSize int, result any, orderColumns []field.Expr, whereFunc ...func(dao gen.Dao) gen.Dao) (count int64, err error)
 	}
 
 	// not edit interface name
@@ -77,7 +77,7 @@ func (d *customStSiteDao) LikeInByTitleOrDescOrURL(search string) func(dao gen.D
 	}
 }
 
-func (d *customStSiteDao) FindSiteCategoryWithPage(page, pageSize int, result any, whereFunc ...func(dao gen.Dao) gen.Dao) (count int64, err error) {
+func (d *customStSiteDao) FindSiteCategoryWithPage(page, pageSize int, result any, orderColumns []field.Expr, whereFunc ...func(dao gen.Dao) gen.Dao) (count int64, err error) {
 	return d.stSiteDo.
 		Select(
 			field.NewAsterisk(query.StSite.TableName()),
@@ -88,7 +88,7 @@ func (d *customStSiteDao) FindSiteCategoryWithPage(page, pageSize int, result an
 			query.StCategory.ID.EqCol(query.StSite.CategoryID),
 		).
 		Order(
-			query.StSite.CreatedAt.Desc(),
+			orderColumns...,
 		).
 		Scopes(whereFunc...).
 		ScanByPage(result, (page-1)*pageSize, pageSize)

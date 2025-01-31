@@ -64,6 +64,7 @@ func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.S
 				URL:         url,
 				CategoryID:  req.CategoryID,
 				IsUsed:      req.IsUsed,
+				Sort:        0,
 			})
 			if err != nil {
 				failURLs = append(failURLs, url)

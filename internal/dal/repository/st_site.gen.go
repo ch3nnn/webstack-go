@@ -30,6 +30,7 @@ type iWhereStSiteFunc interface {
 	WhereByCreatedAt(createdAt time.Time) func(dao gen.Dao) gen.Dao
 	WhereByUpdatedAt(updatedAt time.Time) func(dao gen.Dao) gen.Dao
 	WhereByDeletedAt(deletedAt time.Time) func(dao gen.Dao) gen.Dao
+	WhereBySort(sort int) func(dao gen.Dao) gen.Dao
 }
 
 // ------------------------------------
@@ -114,6 +115,12 @@ func (s *stSiteDao) WhereByUpdatedAt(updatedAt time.Time) func(dao gen.Dao) gen.
 func (s *stSiteDao) WhereByDeletedAt(deletedAt time.Time) func(dao gen.Dao) gen.Dao {
 	return func(dao gen.Dao) gen.Dao {
 		return dao.Where(query.StSite.DeletedAt.Eq(deletedAt))
+	}
+}
+
+func (s *stSiteDao) WhereBySort(sort int) func(dao gen.Dao) gen.Dao {
+	return func(dao gen.Dao) gen.Dao {
+		return dao.Where(query.StSite.Sort.Eq(sort))
 	}
 }
 

@@ -12,7 +12,7 @@ const TableNameStSite = "st_site"
 
 // StSite mapped from table <st_site>
 type StSite struct {
-	ID          int        `gorm:"column:id;type:INTEGER" json:"id"`
+	ID          int        `gorm:"column:id;type:INTEGER;primaryKey" json:"id"`
 	CategoryID  int        `gorm:"column:category_id;type:int(11)" json:"category_id"`
 	Title       string     `gorm:"column:title;type:varchar(50)" json:"title"`
 	Icon        string     `gorm:"column:icon;type:text" json:"icon"`
@@ -22,6 +22,7 @@ type StSite struct {
 	CreatedAt   *time.Time `gorm:"column:created_at;type:datetime;not null;default:CURRENT_TIMESTAMP not null" json:"created_at"`
 	UpdatedAt   *time.Time `gorm:"column:updated_at;type:datetime;not null;default:CURRENT_TIMESTAMP not null" json:"updated_at"`
 	DeletedAt   *time.Time `gorm:"column:deleted_at;type:datetime" json:"deleted_at"`
+	Sort        int        `gorm:"column:sort;type:int(11)" json:"sort"`
 }
 
 // TableName StSite's table name

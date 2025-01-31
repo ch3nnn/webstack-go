@@ -55,6 +55,10 @@ func categorySites(sites []*model.StSite, treeNodes []*v1.TreeNode) (data []*v1.
 				categorySite.SiteList = append(categorySite.SiteList, *site)
 			}
 		}
+		//  Sort 字段进行升序排序
+		sort.Slice(categorySite.SiteList, func(i, j int) bool {
+			return categorySite.SiteList[i].Sort < categorySite.SiteList[j].Sort
+		})
 
 		if len(categorySite.SiteList) > 0 {
 			data = append(data, categorySite)

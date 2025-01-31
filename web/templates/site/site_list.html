@@ -49,6 +49,7 @@
                                 <th>创建日期</th>
                                 <th>更新日期</th>
                                 <th style="text-align: center; ">状态</th>
+                                <th style="text-align: center;">排序</th> <!-- 新增排序列 -->
                                 <th style="text-align: center; ">操作</th>
                             </tr>
                             </thead>
@@ -166,8 +167,9 @@
                                 '<td>' + value.category + '</td>' +
                                 '<td>' + value.created_at + '</td>' +
                                 '<td>' + value.updated_at + '</td>' +
-                                '<td style="text-align: center; ">' + showUsedBadge + '</td>' +
-                                '<td style="text-align: center; ">' +
+                                '<td style="text-align: center;">' + showUsedBadge + '</td>' +
+                                '<td style="text-align: center;">' + value.sort + '</td>' + <!-- 新增排序列 -->
+                                '<td style="text-align: center;">' +
                                 '<div class="btn-group">' +
                                 '    <a class="btn btn-xs btn-default btn-sync" href="#!" title=""' +
                                 '                                           data-id="' + value.id + '"' +
@@ -192,6 +194,7 @@
                                 '                                           data-title="' + value.title + '"' +
                                 '                                           data-description="' + value.description + '"' +
                                 '                                           data-category_id="' + value.category_id + '"' +
+                                '                                           data-sort_order="' + value.sort + '"' + <!-- 新增排序数据 -->
                                 '                                           data-toggle="tooltip" data-original-title="编辑">编辑</a>' +
                                 '</div>' +
                                 '</td>' +
@@ -241,7 +244,7 @@
                                                 text: '关闭',
                                                 action: function () {
                                                     const currentPage = document.querySelector('.page-link.pageActive').textContent;
-                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value);
+                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value, $("#category-filter").val());
                                                 }
                                             }
                                         }
@@ -263,9 +266,7 @@
         // 详情
         $(document).on('click', '.btn-detail', function () {
             const business_title = $(this).attr('data-title');
-            const business_thumb = $(this).attr('data-thumb');
             const business_description = $(this).attr('data-description');
-
             $.alert({
                 title: '详情',
                 content: '名称简介 ：' + business_title + '<br/>描述：' + business_description,
@@ -321,7 +322,7 @@
                                                 text: '关闭',
                                                 action: function () {
                                                     const currentPage = document.querySelector('.page-link.pageActive').textContent;
-                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value);
+                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value, $("#category-filter").val());
                                                 }
                                             }
                                         }
@@ -372,7 +373,7 @@
                                                 text: '关闭',
                                                 action: function () {
                                                     const currentPage = document.querySelector('.page-link.pageActive').textContent;
-                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value);
+                                                    getPageListData(parseInt(currentPage), 10, document.getElementById('search-keyword').value, $("#category-filter").val());
                                                 }
                                             }
                                         }
@@ -399,6 +400,8 @@
             const url = $(this).attr('data-url');
             const description = $(this).attr('data-description');
             const category_id = $(this).attr('data-category_id');
+            const sort = $(this).attr('data-sort_order'); // 获取排序数据
+
             $.confirm({
                 title: '编辑网站',
                 //content: 'url:form.html',  // 也可以采用url形式
@@ -428,6 +431,11 @@
                     '<div>' +
                     '  <label class="control-label">网站描述</label>' +
                     '  <textarea class="form-control" maxlength="225" rows="2" id="description" placeholder="网站描述"  id="title">' + description + '</textarea>' +
+                    '</div>' +
+                    '<div>' +
+                    '  <label>排序</label>' +
+                    '  <small class="help-block">(相同分类下网站排序)</small>'+
+                    '  <input autofocus="" type="number"  placeholder="请输入排序值" class="form-control"  id="sort_order" value="' + sort + '">' + <!-- 新增排序输入框 -->
                     '</div>',
                 onOpen: function () {
                     // bootstrap-fileinput 初始化引导文件输入插件
@@ -502,18 +510,15 @@
                             formData.append('description', description);
                             formData.append('file', $("#file")[0].files[0]);
                             formData.append('category_id', $("#category_id").val());
+                            formData.append('sort', $("#sort_order").val()); // 添加排序值
+
                             AjaxMultipartForm(
                                 "PUT",
                                 "/api/admin/site/" + id,
                                 formData,
                                 function () {
-                                    $(this).hide();
-                                    $("#btnLoading").show();
                                 },
                                 function (data) {
-                                    $("#btnLoading").hide();
-                                    $("#btnOk").show();
-
                                     $.alert({
                                         title: '操作成功',
                                         icon: 'mdi mdi-check-decagram',
@@ -524,15 +529,13 @@
                                                 text: '关闭',
                                                 action: function () {
                                                     const currentPage = $(".page-link.pageActive").text(); // 获取当前页码
-                                                    getPageListData(currentPage, 10, $("#search-keyword").val()); // 重新加载当前页数据
+                                                    getPageListData(currentPage, 10, $("#search-keyword").val(), $("#category-filter").val()); // 重新加载当前页数据
                                                 }
                                             }
                                         }
                                     });
                                 },
                                 function (response) {
-                                    $("#btnLoading").hide();
-                                    $("#btnOk").show();
                                     AjaxError(response);
                                 }
                             );
