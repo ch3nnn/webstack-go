@@ -38,7 +38,12 @@
                             <span class="input-group-text">分类图标</span>
                         </div>
                         <select id="icon" class="selectpicker" multiple data-max-options="1"> </select>
-                        <!--                        <input type="text" class="form-control" id="icon" placeholder="请输入分类图标">-->
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">分类排序 ID</span>
+                        </div>
+                        <input type="number" class="form-control" id="sortId" placeholder="请输入分类排序 ID"/>
                     </div>
                     <div class="form-group">
                         <label>是否启用</label>
@@ -334,6 +339,8 @@
                         $("#name").val(data.name);
                         $("#icon").val(data.icon);
                         $("#link").val(data.link);
+                        $("#sortId").val(data.sort_id); // 回显 sort_id
+
                     }
                 },
                 function (response) {
@@ -453,7 +460,8 @@
             const level = $("#level").val();
             const name = $("#name").val();
             const icon = $("#icon").val();
-            const id = $("#id").val();
+            const id = $("#id").val()
+            const sortId = $("#sortId").val(); // 获取排序 ID
 
             // 获取所有 name 为 customRadioInline 的单选按钮
             const radios = document.querySelectorAll('input[name="customRadioInline"]');
@@ -489,6 +497,7 @@
                 parent_id: level,
                 name: name,
                 icon: icon[0],
+                sort_id: sortId, // 添加排序 ID
                 id: id,
                 is_used: selectedValue === "1",
             };

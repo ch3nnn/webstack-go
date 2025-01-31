@@ -26,6 +26,7 @@ type (
 		Name     string `form:"name"`      // 菜单名称
 		Icon     string `form:"icon"`      // 图标
 		IsUsed   bool   `form:"is_used"`   // 是否启用 1:是 0:否
+		SortID   int    `form:"sort_id"`   // 排序 ID
 	}
 
 	CategoryCreateResp struct {
@@ -66,11 +67,12 @@ type (
 	}
 
 	CategoryDetailResp struct {
-		Id    int    `json:"id"`     // 主键ID
-		Pid   int    `json:"pid"`    // 父类ID
-		Name  string `json:"name"`   // 分类名称
-		Icon  string `json:"icon"`   // 图标
-		IsAdd bool   `json:"is_add"` // 是否新增子分类
+		Id     int    `json:"id"`      // 主键ID
+		Pid    int    `json:"pid"`     // 父类ID
+		Name   string `json:"name"`    // 分类名称
+		Icon   string `json:"icon"`    // 图标
+		IsAdd  bool   `json:"is_add"`  // 是否新增子分类
+		SortID int    `json:"sort_id"` // 排序 ID
 	}
 )
 
