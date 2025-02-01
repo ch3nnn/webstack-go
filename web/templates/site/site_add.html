@@ -176,6 +176,14 @@
                         buttons: {
                             okay: {
                                 text: '关闭',
+                                action: function () {
+                                    if (data.failCount > 0) { // 如果有失败的 URL，则显示执行中按钮
+                                        $("#btnLoading").hide();
+                                        $("#btnOk").show();
+                                    } else { // 如果没有失败的 URL，则直接跳转到网站列表页
+                                        location.href = "/admin/site";
+                                    }
+                                }
                             }
                         }
                     });
