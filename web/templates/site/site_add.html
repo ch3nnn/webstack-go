@@ -19,8 +19,7 @@
                     <div class="card-title">新增网站</div>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述, 对内容不满可以点击编辑修改呦!
-                    </div>
+                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述, 对内容不满可以点击编辑修改呦!</div>
                     <form>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -31,20 +30,30 @@
                         <div class="form-group">
                             <label>网站地址</label>
                             <small class="help-block">(支持多 URL 添加)</small>
-                            <textarea type="text" class="form-control" id="url" placeholder="必须包含 http:// 或 https://且至少含有1个路径。例如: http://www.test.com/test.html 一行一个呦!"></textarea>
+                            <textarea type="text" class="form-control" id="url"
+                                      placeholder="必须包含 http:// 或 https://且至少含有1个路径。例如: http://www.test.com/test.html 一行一个呦!"></textarea>
                         </div>
                         <div class="form-group">
                             <label>网站启用</label>
                             <small class="help-block">(网站关闭后将不能展示!)</small>
                             <div class="clearfix">
                                 <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0" checked=""/>
+                                    <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0"
+                                           checked=""/>
                                     <label class="custom-control-label" for="statusOne">禁用</label>
                                 </div>
                                 <div class="custom-control custom-radio custom-control-inline">
                                     <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1"/>
                                     <label class="custom-control-label" for="statusTwo">启用</label>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>拉取失败时仅保存网址</label>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="allowSaveUrlOnFailure">
+                                <label class="custom-control-label" for="allowSaveUrlOnFailure">启用</label>
                             </div>
                         </div>
 
@@ -74,7 +83,8 @@
             "GET",
             "/api/admin/category",
             "",
-            function () {},
+            function () {
+            },
             function (data) {
                 // 将扁平化数据转换为树形结构
                 const treeData = buildTree(data.list);
@@ -106,6 +116,7 @@
                 });
                 return false;
             }
+            const failSwitch = $("#allowSaveUrlOnFailure").is(":checked");
             // 获取所有 name 为 customRadioInline 的单选按钮
             const radios = document.querySelectorAll('input[name="customRadioInline"]');
             // 遍历单选按钮，找到选中的值
@@ -120,6 +131,7 @@
                 category_id: $("#category_id").val(),
                 url: url,
                 is_used: selectedValue === "1",
+                fail_switch: failSwitch,
             };
 
             AjaxForm(

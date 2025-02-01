@@ -13,7 +13,7 @@ import (
 
 type Site struct {
 	Id          int    `json:"id"`               // ID
-	Thumb       string `json:"thumb"`            // 网站 logo
+	Icon        string `json:"icon"`             // 网站 logo
 	Title       string `json:"title"`            // 名称简介
 	Url         string `json:"url"`              // 链接
 	Category    string `json:"category"`         // 分类
@@ -60,6 +60,7 @@ type (
 		CategoryID int    `form:"category_id"` // 类别ID
 		Url        string `form:"url"`         // 网址地址
 		IsUsed     bool   `form:"is_used"`     // 是否启用
+		FailSwitch bool   `form:"fail_switch"` // 失败开关
 	}
 
 	SiteCreateResp struct {

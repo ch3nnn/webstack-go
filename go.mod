@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/Pacific73/gorm-cache v1.1.1
 	github.com/disintegration/imaging v1.6.2
-	github.com/duke-git/lancet/v2 v2.3.1
+	github.com/duke-git/lancet/v2 v2.3.4
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/glebarez/sqlite v1.11.0

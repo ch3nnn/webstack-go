@@ -39,7 +39,7 @@ func (s *service) List(ctx context.Context, req *v1.SiteListReq) (resp *v1.SiteL
 	for i, siteCategory := range siteCategories {
 		list[i] = v1.Site{
 			Id:          siteCategory.StSite.ID,
-			Thumb:       siteCategory.StSite.Icon,
+			Icon:        siteCategory.StSite.Icon,
 			Title:       siteCategory.StSite.Title,
 			Url:         siteCategory.StSite.URL,
 			Category:    siteCategory.StCategory.Title,

@@ -37,8 +37,9 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-info" role="alert">注📢: 勾选"拉取失败时仅保存网址"功能对应行背景色高亮, 记得点击编辑修改呦!</div>
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered" id="siteTable">
                             <thead>
                             <tr>
                                 <th>ID</th>
@@ -56,9 +57,7 @@
                             <tbody class="tbody"></tbody>
                         </table>
                     </div>
-                    <ul class="pagination">
-                        <ul class="pagination" id="paginationDiv"></ul>
-                    </ul>
+                    <ul class="pagination" id="paginationDiv"></ul>
                 </div>
             </div>
         </div>
@@ -80,14 +79,12 @@
     $(document).ready(function () {
         // 加载分类选项
         loadCategories();
-
         // 监听分类选择器的变化
         $(document).on('change', '#category-filter', function () {
             const categoryId = $(this).val(); // 获取选中的分类ID
             const searchKeyword = $("#search-keyword").val(); // 获取搜索关键字
             getPageListData(1, 10, searchKeyword, categoryId); // 重新加载数据
         });
-
         // 加载列表页数据
         getPageListData();
 
@@ -126,7 +123,8 @@
                 "GET",
                 url,
                 {page: page, page_size: page_size, search: search, category_id: category_id},
-                function () {},
+                function () {
+                },
                 function (data) {
                     if (data.list.length > 0) {
                         var totalNum = data.pagination.total; // 总条数
@@ -150,8 +148,8 @@
                         });
                         $(".tbody").html("");
                         $.each(data.list, function (index, value) {
-                            var showUsedBadge = "";
-                            var optionUsedName = "";
+                            let showUsedBadge;
+                            let optionUsedName;
                             if (value.is_used) {
                                 optionUsedName = '禁用';
                                 showUsedBadge = '<span class="badge badge-success">启用</span></td>'
@@ -159,9 +157,15 @@
                                 optionUsedName = '启用';
                                 showUsedBadge = '<span class="badge badge-danger">禁用</span></td>'
                             }
-                            const tr = '<tr>' +
+
+                            let trHtml = '<tr>';
+                            if (value.url === value.title) { // 如果url和title相同，则显示警告样式
+                                trHtml = '<tr class="table-warning">'
+                            }
+
+                            const tr = trHtml +
                                 '<td>' + value.id + '</td>' +
-                                '<td><img class="lozad img-circle" width="30" src="data:image/png;base64,' + value.thumb + '" data-loaded="true"></td>' +
+                                '<td><img class="lozad img-circle" width="30" src="data:image/png;base64,' + value.icon + '" data-loaded="true"></td>' +
                                 '<td>' + value.title + '</td>' +
                                 '<td><a href="' + value.url + '" target="_blank">' + value.url + '</a></td>' +
                                 '<td>' + value.category + '</td>' +
@@ -212,6 +216,7 @@
                 }
             );
         }
+
         // 一键同步
         $(document).on('click', '.btn-sync', function () {
             const id = $(this).attr('data-id');
@@ -232,7 +237,8 @@
                                 "GET",
                                 '/api/admin/site/sync/' + id,
                                 "",
-                                function () {},
+                                function () {
+                                },
                                 function (data) {
                                     $.alert({
                                         title: '操作成功',
@@ -434,7 +440,7 @@
                     '</div>' +
                     '<div>' +
                     '  <label>排序</label>' +
-                    '  <small class="help-block">(相同分类下网站排序)</small>'+
+                    '  <small class="help-block">(相同分类下网站排序)</small>' +
                     '  <input autofocus="" type="number"  placeholder="请输入排序值" class="form-control"  id="sort_order" value="' + sort + '">' + <!-- 新增排序输入框 -->
                     '</div>',
                 onOpen: function () {
@@ -454,7 +460,8 @@
                         "GET",
                         "/api/admin/category",
                         "",
-                        function () {},
+                        function () {
+                        },
                         function (data) {
                             const treeData = buildTree(data.list);// 将扁平化数据转换为树形结构
                             const selectElement = document.getElementById('category_id');// 获取 <select> 元素
@@ -554,16 +561,12 @@
 </script>
 <script>
     $(document).ready(function () {
-        // 导出按钮点击事件
         $(document).on('click', '#exportBtn', function () {
-            // 获取搜索关键字
             const searchKeyword = $("#search-keyword").val();
-            // 发起导出请求
-            exportData(searchKeyword);
+            exportData(searchKeyword);            // 发起导出请求
         });
-        // 导出数据函数
+
         function exportData(searchKeyword) {
-            // 构造请求 URL
             let url = "/api/admin/site/export";
             if (searchKeyword) {
                 url += "?search=" + encodeURIComponent(searchKeyword);
@@ -576,13 +579,11 @@
                     responseType: 'blob' // 重要：告诉 jQuery 返回的是一个二进制文件
                 },
                 success: function (data, status, xhr) {
-                    // 获取文件名（从响应头中提取）
-                    const contentDisposition = xhr.getResponseHeader('Content-Disposition');
+                    const contentDisposition = xhr.getResponseHeader('Content-Disposition');// 获取文件名（从响应头中提取）
                     let fileName = "sites.xlsx"; // 默认文件名
                     if (contentDisposition && contentDisposition.includes('filename=')) {
                         fileName = contentDisposition.split('filename=')[1].trim();
                     }
-                    // 创建一个链接元素
                     const link = document.createElement('a');
                     link.href = window.URL.createObjectURL(data); // 将文件流转换为 URL
                     link.download = fileName; // 设置下载文件名

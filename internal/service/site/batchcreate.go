@@ -9,6 +9,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/duke-git/lancet/v2/condition"
 	"golang.org/x/sync/errgroup"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
@@ -53,12 +54,14 @@ func (s *service) BatchCreate(ctx context.Context, req *v1.SiteCreateReq) (*v1.S
 			})
 
 			if err := g.Wait(); err != nil {
-				failURLs = append(failURLs, url)
-				return
+				if !req.FailSwitch {
+					failURLs = append(failURLs, url)
+					return
+				}
 			}
 
 			_, err := s.siteRepository.WithContext(ctx).Create(&model.StSite{
-				Title:       title,
+				Title:       condition.Ternary(title != "", title, url),
 				Icon:        icon,
 				Description: desc,
 				URL:         url,
