@@ -8,11 +8,13 @@
 
 功能：
 - [x] 新增 webstack - 导航首页
-- [x] 新增 系统管理员 - 网站分类
-- [x] 新增 系统管理员 - 网站列表
-- [x] 新增 网站新增支持自动获取标题、Logo、网站描述、一键同步
-- [x] 新增 批量添加网址
+- [x] 新增 网站管理 - 网站分类
+- [x] 新增 网站管理 - 网站列表
+- [x] 新增 系统管理 - 自定义导航基本信息(Logo、favicon、备案信息等)
+- [x] 新增 支持批量添加(自动获取标题、Logo、网站描述)
+- [x] 新增 一键同步、导出功能
 - [x] 新增 由 [gorm-gen](https://github.com/go-gorm/gen) 代码生成提供支持的友好且更安全的 GORM
+- [x] 杂项 与仓库保持同步 [Docker Hub](https://hub.docker.com/repository/docker/ch3nnn/webstack-go)
 
 ## 快速开始
 
