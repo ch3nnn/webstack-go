@@ -19,6 +19,7 @@ import (
 
 	"github.com/ch3nnn/webstack-go/internal/dal/model"
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
+	"github.com/ch3nnn/webstack-go/pkg/gormx"
 	"github.com/ch3nnn/webstack-go/pkg/log"
 	"github.com/ch3nnn/webstack-go/pkg/zapgorm2"
 )
@@ -28,10 +29,7 @@ type Repository struct {
 	db     *gorm.DB
 }
 
-func NewRepository(
-	logger *log.Logger,
-	db *gorm.DB,
-) *Repository {
+func NewRepository(logger *log.Logger, db *gorm.DB) *Repository {
 	return &Repository{
 		logger: logger,
 		db:     db,
@@ -47,11 +45,11 @@ func NewDB(conf *viper.Viper, l *log.Logger) *gorm.DB {
 
 	dsn := conf.GetString("data.db.user.dsn")
 	switch conf.GetString("data.db.user.driver") {
-	case "mysql":
+	case gormx.MYSQL:
 		dialector = mysql.Open(dsn)
-	case "postgres":
+	case gormx.POSTGRES:
 		dialector = postgres.Open(dsn)
-	case "sqlite":
+	case gormx.SQLITE:
 		dialector = sqlite.Open(dsn)
 	default:
 		panic("unknown db driver")
@@ -138,82 +136,12 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		os.Exit(0)
 	}
 
-	err = query.SysMenu.WithContext(ctx).
-		Create(
-			&model.SysMenu{
-				ID:     1,
-				Pid:    0,
-				Name:   "网站管理",
-				Icon:   "users",
-				Level:  1,
-				Sort:   500,
-				IsUsed: true,
-			},
-			&model.SysMenu{
-				ID:     2,
-				Pid:    1,
-				Name:   "网站分类",
-				Link:   "/admin/category",
-				Level:  1,
-				Sort:   501,
-				IsUsed: true,
-			},
-			&model.SysMenu{
-				ID:     3,
-				Pid:    1,
-				Name:   "网站信息",
-				Link:   "/admin/site",
-				Level:  1,
-				Sort:   502,
-				IsUsed: true,
-			},
-			&model.SysMenu{
-				ID:     4,
-				Pid:    0,
-				Name:   "系统管理",
-				Level:  1,
-				Sort:   600,
-				IsUsed: true,
-			},
-			&model.SysMenu{
-				ID:     5,
-				Pid:    4,
-				Name:   "网站配置",
-				Link:   "/admin/config",
-				Level:  1,
-				Sort:   601,
-				IsUsed: true,
-			},
-		)
-	if err != nil {
+	if err = query.SysMenu.WithContext(ctx).Create(DefaultSysMenuAdmin...); err != nil {
 		fmt.Println("menu migrate error")
 		os.Exit(0)
 	}
 
-	err = query.SysUserMenu.WithContext(ctx).
-		Create(
-			&model.SysUserMenu{
-				UserID: 1,
-				MenuID: 1,
-			},
-			&model.SysUserMenu{
-				UserID: 1,
-				MenuID: 2,
-			},
-			&model.SysUserMenu{
-				UserID: 1,
-				MenuID: 3,
-			},
-			&model.SysUserMenu{
-				UserID: 1,
-				MenuID: 4,
-			},
-			&model.SysUserMenu{
-				UserID: 1,
-				MenuID: 5,
-			},
-		)
-	if err != nil {
+	if err = query.SysUserMenu.WithContext(ctx).Create(DefaultSysUserMenuAdmin...); err != nil {
 		fmt.Println("user menu migrate error")
 		os.Exit(0)
 	}

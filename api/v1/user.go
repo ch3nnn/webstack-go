@@ -2,8 +2,8 @@ package v1
 
 type (
 	LoginReq struct {
-		Username string `form:"username" json:"username" binding:"required" example:"admin"`
-		Password string `form:"password,default=value" json:"password,default=123456" example:"123456"`
+		Username string `form:"username" json:"username" binding:"required" example:"admin"`            // 用户名
+		Password string `form:"password,default=value" json:"password,default=123456" example:"123456"` // 密码
 	}
 
 	LoginResp struct {

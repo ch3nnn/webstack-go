@@ -22,20 +22,13 @@ func NewLog(conf *viper.Viper) *Logger {
 	// log address "out.log" User-defined
 	lp := conf.GetString("log.log_file_name")
 	lv := conf.GetString("log.log_level")
-	var level zapcore.Level
-	// debug<info<warn<error<fatal<panic
-	switch lv {
-	case "debug":
-		level = zap.DebugLevel
-	case "info":
-		level = zap.InfoLevel
-	case "warn":
-		level = zap.WarnLevel
-	case "error":
-		level = zap.ErrorLevel
-	default:
-		level = zap.InfoLevel
+
+	// debug < info < warn < error < fatal < panic
+	level := zap.NewAtomicLevel()
+	if err := level.UnmarshalText([]byte(lv)); err != nil {
+		panic("set config log level error. (debug info warn error fatal panic)")
 	}
+
 	hook := lumberjack.Logger{
 		Filename:   lp,                             // Log file path
 		MaxSize:    conf.GetInt("log.max_size"),    // Maximum size unit for each log file: M
