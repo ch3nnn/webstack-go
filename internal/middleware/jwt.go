@@ -24,6 +24,9 @@ func StrictAuth(j *jwt.JWT, logger *log.Logger) gin.HandlerFunc {
 		}
 		if tokenString == "" {
 			tokenString = ctx.Query("Token")
+			if tokenString == "" {
+				tokenString = ctx.Query("token")
+			}
 		}
 		if tokenString == "" {
 			logger.WithContext(ctx).Warn("No token", zap.Any("data", map[string]interface{}{
@@ -62,6 +65,9 @@ func NoStrictAuth(j *jwt.JWT, logger *log.Logger) gin.HandlerFunc {
 		}
 		if tokenString == "" {
 			tokenString = ctx.Query("Token")
+			if tokenString == "" {
+				tokenString = ctx.Query("token")
+			}
 		}
 		if tokenString == "" {
 			logger.WithContext(ctx).Warn("No token", zap.Any("data", map[string]interface{}{

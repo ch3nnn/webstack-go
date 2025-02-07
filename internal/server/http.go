@@ -81,9 +81,9 @@ func NewHTTPServer(
 		render.GET("", func(ctx *gin.Context) {
 			ctx.HTML(http.StatusOK, "admin_index.html", nil)
 		})
-
-		render.GET("dashboard", dashboardHandler.Dashboard)
-
+		render.GET("dashboard", func(ctx *gin.Context) {
+			ctx.HTML(http.StatusOK, "dashboard.html", nil)
+		})
 		render.GET("modify_password", func(ctx *gin.Context) {
 			ctx.HTML(http.StatusOK, "admin_modify_password.html", nil)
 		})
@@ -112,6 +112,8 @@ func NewHTTPServer(
 		// Strict permission routing group
 		strictAuthRouter := v1.Group("/admin").Use(middleware.StrictAuth(jwt, logger))
 		{
+			// Dashboard
+			strictAuthRouter.GET("/dashboard", dashboardHandler.Dashboard) // SSE（Server-Sent Events）
 			// User
 			strictAuthRouter.GET("/info", userHandler.Info)
 			strictAuthRouter.POST("/logout", userHandler.Logout)

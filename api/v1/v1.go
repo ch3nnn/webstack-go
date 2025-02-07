@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,27 @@ type Response struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+}
+
+func SSEStream(ctx *gin.Context, dataChan chan interface{}, eventName string) {
+	if eventName == "" {
+		eventName = "message"
+	}
+
+	// 设置响应头
+	ctx.Header("Content-Type", "text/event-stream")
+	ctx.Header("Cache-Control", "no-cache")
+	ctx.Header("Connection", "keep-alive")
+
+	// 使用 ctx.Stream 发送数据
+	ctx.Stream(func(w io.Writer) bool {
+		if data, ok := <-dataChan; ok {
+			// 将数据作为 SSE 事件发送
+			ctx.SSEvent(eventName, data)
+			return true // 继续流
+		}
+		return false // 关闭流
+	})
 }
 
 func HandleSuccess(ctx *gin.Context, data interface{}) {

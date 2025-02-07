@@ -9,11 +9,12 @@ import (
 	"context"
 	"time"
 
+	"gorm.io/gen"
+	"gorm.io/gen/field"
+
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
-	"gorm.io/gen"
-	"gorm.io/gen/field"
 )
 
 func (s *service) List(ctx context.Context, req *v1.SiteListReq) (resp *v1.SiteListResp, err error) {

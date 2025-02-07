@@ -5,11 +5,11 @@ import (
 )
 
 type Handler struct {
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 func NewHandler(logger *log.Logger) *Handler {
 	return &Handler{
-		logger: logger,
+		Logger: logger,
 	}
 }

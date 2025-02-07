@@ -1,102 +1,117 @@
 <html lang="zh">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css">
 </head>
-  
+
 <body>
 <div class="container-fluid p-t-15">
-  <div class="row">
-    <div class="col-md-6 col-lg-4">
-      <div class="card border-secondary">
-        <header class="card-header">
-          <div class="card-title">项目信息 <span class="badge badge-pill badge-warning">{{ .ProjectVersion }}</span> </div>
-        </header>
-        <div class="card-body">
-          <p>介绍：基于 Gin 框架的网址导航项目</p>
-          <p>操作系统：{{ .GoOS }}
-            <span class="badge badge-brown"> {{ .GoArch }} </span>
-            <span class="badge badge-info"> {{ .GoVersion }} </span>
-          </p>
-          <p>项目地址：{{ .ProjectPath }}</p>
+    <div class="row">
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-secondary">
+                <header class="card-header">
+                    <div class="card-title">项目信息 <span class="badge badge-pill badge-warning" id="projectVersion"></span></div>
+                </header>
+                <div class="card-body">
+                    <p>介绍：基于 Gin 框架的网址导航项目</p>
+                    <p>操作系统：<span id="goOS"></span>
+                        <span class="badge badge-brown" id="goArch"></span>
+                        <span class="badge badge-info" id="goVersion"></span>
+                    </p>
+                    <p>项目地址：<span id="projectPath"></span></p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-      <div class="card border-secondary">
-        <header class="card-header">
-          <div class="card-title">内存信息</div>
-        </header>
-        <div class="card-body">
-          <p>总量：{{ .MemTotal }}</p>
-          <p>已使用：{{ .MemUsed }}</p>
-          <p>使用率：<span class="badge
-            {{if gt .MemUsedPercent 95.0}} badge-danger
-            {{else if gt .MemUsedPercent 90.0 }} badge-warning
-            {{else}} badge-success
-            {{end}} ">{{ .MemUsedPercent }}%</span></p>
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-secondary">
+                <header class="card-header">
+                    <div class="card-title">内存信息</div>
+                </header>
+                <div class="card-body">
+                    <p>总量：<span id="memTotal"></span></p>
+                    <p>已使用：<span id="memUsed"></span></p>
+                    <p>使用率：<span class="badge badge-success" id="memUsedPercent"></span></p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-      <div class="card border-secondary">
-        <header class="card-header">
-          <div class="card-title">硬盘信息</div>
-        </header>
-        <div class="card-body">
-          <p>总量：{{ .DiskTotal }}</p>
-          <p>已使用：{{ .DiskUsed }}</p>
-          <p>使用率：<span class="badge
-            {{if gt .DiskUsedPercent 95.0}} badge-danger
-            {{else if gt .DiskUsedPercent 90.0 }} badge-warning
-            {{else}} badge-success
-            {{end}}">{{ .DiskUsedPercent }}%</span></p>
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-secondary">
+                <header class="card-header">
+                    <div class="card-title">硬盘信息</div>
+                </header>
+                <div class="card-body">
+                    <p>总量：<span id="diskTotal"></span></p>
+                    <p>已使用：<span id="diskUsed"></span></p>
+                    <p>使用率：<span class="badge badge-success" id="diskUsedPercent"></span></p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-      <div class="card border-secondary">
-        <header class="card-header">
-          <div class="card-title">CPU 信息</div>
-        </header>
-        <div class="card-body">
-          <p>CPU：{{ .CpuName }}</p>
-          <p>核数：{{ .CpuCores }}</p>
-          <p>CPU 使用率：<span class="badge
-            {{if gt .CpuUsedPercent 95.0}} badge-danger
-            {{else if gt .CpuUsedPercent 90.0 }} badge-warning
-            {{else}} badge-success
-            {{end}}">{{ .CpuUsedPercent }}%</span></p>
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-secondary">
+                <header class="card-header">
+                    <div class="card-title">CPU 信息</div>
+                </header>
+                <div class="card-body">
+                    <p>CPU：<span id="cpuName"></span></p>
+                    <p>核数：<span id="cpuCores"></span></p>
+                    <p>CPU 使用率：<span class="badge badge-success" id="cpuUsedPercent"></span></p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-      <div class="card border-secondary">
-        <header class="card-header">
-          <div class="card-title">开源信息</div>
-        </header>
-        <div class="card-body">
-          <p>GitHub 地址：<a target="_blank" href="https://github.com/ch3nnn/webstack-go">webstack-go</a></p>
-          <p>GitHub Stars：<a href="https://github.com/ch3nnn/webstack-go/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/ch3nnn/webstack-go?style=flat-square"></a></p>
-          <p>GitHub Forks：<a href="https://github.com/ch3nnn/webstack-go/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/ch3nnn/webstack-go?style=flat-square"></a></p>
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-secondary">
+                <header class="card-header">
+                    <div class="card-title">开源信息</div>
+                </header>
+                <div class="card-body">
+                    <p>GitHub 地址：<a target="_blank" href="https://github.com/ch3nnn/webstack-go">webstack-go</a></p>
+                    <p>GitHub Stars：<a href="https://github.com/ch3nnn/webstack-go/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/ch3nnn/webstack-go?style=flat-square"></a></p>
+                    <p>GitHub Forks：<a href="https://github.com/ch3nnn/webstack-go/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/ch3nnn/webstack-go?style=flat-square"></a></p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-      <div class="card border-secondary">
-        <header class="card-header">
-          <div class="card-title">欢迎交流</div>
-        </header>
-        <div class="card-body text-center">
-          <p style="height: 105px;">
-            <img style="height: 100px;" src="/assets/static/admin/image/gr-code.png"/>
-          </p>
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-secondary">
+                <header class="card-header">
+                    <div class="card-title">欢迎交流</div>
+                </header>
+                <div class="card-body text-center">
+                    <p style="height: 105px;">
+                        <img style="height: 100px;" src="/assets/static/admin/image/gr-code.png"/>
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
+<script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/jquery.cookie.min.js"></script>
+<script>
+    const eventSource = new EventSource(`/api/admin/dashboard?token=${$.cookie("_login_token_")}`);
+    eventSource.addEventListener("dashboard", (event) => {
+        const data = JSON.parse(event.data);
+        document.getElementById("projectVersion").textContent = data.ProjectVersion || "N/A";
+        document.getElementById("goOS").textContent = data.GoOS || "N/A";
+        document.getElementById("goArch").textContent = data.GoArch || "N/A";
+        document.getElementById("goVersion").textContent = data.GoVersion || "N/A";
+        document.getElementById("projectPath").textContent = data.ProjectPath || "N/A";
+        document.getElementById("memTotal").textContent = data.MemTotal || "N/A";
+        document.getElementById("memUsed").textContent = data.MemUsed || "N/A";
+        document.getElementById("memUsedPercent").textContent = (data.MemUsedPercent || "0") + "%";
+        document.getElementById("diskTotal").textContent = data.DiskTotal || "N/A";
+        document.getElementById("diskUsed").textContent = data.DiskUsed || "N/A";
+        document.getElementById("diskUsedPercent").textContent = (data.DiskUsedPercent || "0") + "%";
+        document.getElementById("cpuName").textContent = data.CpuName || "N/A";
+        document.getElementById("cpuCores").textContent = data.CpuCores || "N/A";
+        document.getElementById("cpuUsedPercent").textContent = (data.CpuUsedPercent || "0") + "%";
+    })
+    eventSource.onerror = function (event) {
+        console.error("SSE error:", event);
+        eventSource.close();
+    };
+
+</script>
 </body>
 </html>

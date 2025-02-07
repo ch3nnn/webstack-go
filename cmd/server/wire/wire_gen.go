@@ -19,6 +19,7 @@ import (
 	"github.com/ch3nnn/webstack-go/internal/service"
 	"github.com/ch3nnn/webstack-go/internal/service/category"
 	"github.com/ch3nnn/webstack-go/internal/service/config"
+	"github.com/ch3nnn/webstack-go/internal/service/dashboard"
 	index2 "github.com/ch3nnn/webstack-go/internal/service/index"
 	"github.com/ch3nnn/webstack-go/internal/service/site"
 	"github.com/ch3nnn/webstack-go/internal/service/user"
@@ -36,10 +37,11 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	engine := http.NewGinDefaultServer()
 	jwtJWT := jwt.NewJwt(viperViper)
 	handlerHandler := handler.NewHandler(logger)
-	indexHandler := index.NewHandler(handlerHandler)
 	db := repository.NewDB(viperViper, logger)
 	repositoryRepository := repository.NewRepository(logger, db)
 	serviceService := service.NewService(engine, logger, jwtJWT, repositoryRepository)
+	dashboardService := dashboard.NewService(serviceService)
+	indexHandler := index.NewHandler(handlerHandler, dashboardService)
 	indexService := index2.NewService(serviceService)
 	handler2 := index3.NewHandler(handlerHandler, indexService)
 	userService := user.NewService(serviceService)
@@ -62,7 +64,7 @@ var repositorySet = wire.NewSet(repository.NewDB, repository.NewRepository)
 
 var handlerSet = wire.NewSet(handler.NewHandler, user2.NewHandler, index3.NewHandler, site2.NewHandler, category2.NewHandler, index.NewHandler, config2.NewHandler)
 
-var serviceSet = wire.NewSet(service.NewService, user.NewService, index2.NewService, site.NewService, category.NewService, config.NewService)
+var serviceSet = wire.NewSet(service.NewService, user.NewService, index2.NewService, site.NewService, category.NewService, config.NewService, dashboard.NewService)
 
 var serverSet = wire.NewSet(server.NewHTTPServer)
 
