@@ -15,7 +15,7 @@
 - [x] 新增 支持批量添加 (自动获取标题、Logo、网站描述）
 - [x] 新增 一键同步、导出功能
 - [x] 新增 由 [gorm-gen](https://github.com/go-gorm/gen) 代码生成提供支持的友好且更安全的 GORM
-- [x] 杂项 与仓库保持同步 [Docker Hub](https://hub.docker.com/repository/docker/ch3nnn/webstack-go)
+- [x] 杂项 与仓库保持同步 [Docker Hub](https://hub.docker.com/r/ch3nnn/webstack-go/tags)
 
 ## 快速开始
 
