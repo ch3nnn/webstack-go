@@ -6,46 +6,19 @@
 package config
 
 import (
-	"bytes"
-	"encoding/base64"
-	"mime/multipart"
-
-	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
+	"github.com/ch3nnn/webstack-go/pkg/tools"
 )
 
 const (
 	LogoWidth     = 200
 	LogoHeight    = 50
-	FaviconWidth  = 32
-	FaviconHeight = 32
+	FaviconWidth  = 64
+	FaviconHeight = 64
 )
-
-func resize2Image(f *multipart.FileHeader, width, height int) (base64Str string, err error) {
-	file, err := f.Open()
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	img, err := imaging.Decode(file, imaging.AutoOrientation(true))
-	if err != nil {
-		return
-	}
-
-	var buf bytes.Buffer
-	resize := imaging.Resize(img, width, height, imaging.Lanczos)
-	if err = imaging.Encode(&buf, resize, imaging.PNG); err != nil {
-		return
-	}
-
-	base64Str = base64.StdEncoding.EncodeToString(buf.Bytes())
-
-	return
-}
 
 func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.ConfigUpdateResp, err error) {
 	update := make(map[string]any)
@@ -71,7 +44,7 @@ func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.Co
 		update["is_about"] = *req.IsAbout
 	}
 	if req.LogFile != nil {
-		base64Str, err := resize2Image(req.LogFile, LogoWidth, LogoHeight)
+		base64Str, err := tools.ResizeMultipartImgToBase64(req.LogFile, LogoWidth, LogoHeight)
 		if err != nil {
 			base64Str = repository.DefaultLogoBase64
 		}
@@ -79,7 +52,7 @@ func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.Co
 		update["site_logo"] = base64Str
 	}
 	if req.FaviconFile != nil {
-		base64Str, err := resize2Image(req.FaviconFile, FaviconWidth, FaviconHeight)
+		base64Str, err := tools.ResizeMultipartImgToBase64(req.FaviconFile, FaviconWidth, FaviconHeight)
 		if err != nil {
 			base64Str = repository.DefaultFaviconBase64
 		}

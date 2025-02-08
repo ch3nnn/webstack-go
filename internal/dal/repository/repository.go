@@ -123,10 +123,10 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 	_, err = query.SysUser.WithContext(ctx).
 		Where(
 			query.SysUser.ID.Eq(1),
-			query.SysUser.Username.Eq(DefaultUname),
 		).
 		Attrs(
 			field.Attrs(&model.SysUser{
+				Username: DefaultUname,
 				Password: cryptor.Md5String(DefaultUPassword),
 			}),
 		).

@@ -6,51 +6,17 @@
 package site
 
 import (
-	"crypto/tls"
-	"encoding/base64"
-	"io"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
+	"github.com/ch3nnn/webstack-go/internal/dal/repository"
+	"github.com/ch3nnn/webstack-go/pkg/tools"
 )
 
-func getIconBase64ByFormFile(req *v1.SiteUpdateReq) string {
-	file, err := req.File.Open()
-	if err != nil {
-		return defaultIcon
-	}
-	defer file.Close()
-
-	imgData, err := io.ReadAll(file)
-	if err != nil {
-		return defaultIcon
-	}
-
-	return base64.StdEncoding.EncodeToString(imgData)
-}
-
-func getIconBase64ByURL(req *v1.SiteUpdateReq) string {
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
-
-	resp, err := client.Get(req.Icon)
-	if err != nil {
-		return defaultIcon
-	}
-	defer resp.Body.Close()
-
-	imgData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return defaultIcon
-	}
-
-	return base64.StdEncoding.EncodeToString(imgData)
-}
+const (
+	FaviconWidth  = 64
+	FaviconHeight = 64
+)
 
 func (s *service) Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.SiteUpdateResp, err error) {
 	update := make(map[string]any)
@@ -62,10 +28,20 @@ func (s *service) Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.Site
 		update["Title"] = req.Title
 	}
 	if req.Icon != "" {
-		update["Icon"] = getIconBase64ByURL(req)
+		base64Str, err := tools.ResizeURLImgToBase64(req.Icon, FaviconWidth, FaviconHeight)
+		if err != nil {
+			base64Str = repository.DefaultFaviconBase64
+		}
+
+		update["Icon"] = base64Str
 	}
 	if req.File != nil {
-		update["Icon"] = getIconBase64ByFormFile(req)
+		base64Str, err := tools.ResizeMultipartImgToBase64(req.File, FaviconWidth, FaviconHeight)
+		if err != nil {
+			base64Str = repository.DefaultFaviconBase64
+		}
+
+		update["Icon"] = base64Str
 	}
 	if req.Description != "" {
 		update["Description"] = req.Description
