@@ -65,9 +65,9 @@ func (s *service) i() {}
 func getWebLogoIconBase64(url string) (string, error) {
 	client := &http.Client{
 		Timeout: 3 * time.Second,
-		Transport: &http.Transport{
+		Transport: tools.NewHTTPTransport(&http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
+		}),
 	}
 
 	b := besticon.New(
