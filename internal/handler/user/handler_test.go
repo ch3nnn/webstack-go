@@ -103,6 +103,23 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+func TestUserHandler_Logout(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockUserService := userservice.NewMockService(ctrl)
+	userHandler := NewHandler(hdl, mockUserService)
+	router.GET("/logout", userHandler.Logout)
+
+	obj := newHttpExcept(t, router).GET("/logout").
+		Expect().
+		Status(http.StatusOK).
+		JSON().
+		Object()
+
+	obj.IsEmpty()
+}
+
 func TestUserHandler_Login(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -153,4 +170,31 @@ func TestUserHandler_Info(t *testing.T) {
 		Object()
 
 	obj.Value("username").IsEqual(username)
+}
+
+func TestUserHandler_UpdatePassword(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	req := &v1.UpdatePasswordReq{
+		OldPassword: "admin",
+		NewPassword: "admin",
+	}
+	mockUserService := userservice.NewMockService(ctrl)
+	mockUserService.EXPECT().UpdatePassword(gomock.Any(), req).Return(&v1.UpdatePasswordResp{}, nil)
+
+	userHandler := NewHandler(hdl, mockUserService)
+	router.Use(middleware.StrictAuth(j, logger))
+	router.PUT("/update_password", userHandler.UpdatePassword)
+
+	obj := newHttpExcept(t, router).PUT("/update_password").
+		WithHeader("Token", genToken(t)).
+		WithHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8").
+		WithForm(req).
+		Expect().
+		Status(http.StatusOK).
+		JSON().
+		Object()
+
+	obj.IsEmpty()
 }
