@@ -27,14 +27,17 @@ type Service interface {
 }
 
 type service struct {
-	configRepo repository.ISysConfigDao
 	*s.Service
+	configRepo repository.ISysConfigDao
 }
 
-func NewService(s *s.Service) Service {
+func NewService(
+	s *s.Service,
+	configRepo repository.ISysConfigDao,
+) Service {
 	return &service{
 		Service:    s,
-		configRepo: repository.NewSysConfigDao(),
+		configRepo: configRepo,
 	}
 }
 

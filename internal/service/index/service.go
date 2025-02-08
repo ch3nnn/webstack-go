@@ -27,18 +27,23 @@ type Service interface {
 }
 
 type service struct {
+	*s.Service
 	siteRepo     repository.IStSiteDao
 	categoryRepo repository.IStCategoryDao
 	configRepo   repository.ISysConfigDao
-	*s.Service
 }
 
-func NewService(s *s.Service) Service {
+func NewService(
+	s *s.Service,
+	siteRepo repository.IStSiteDao,
+	categoryRepo repository.IStCategoryDao,
+	configRepo repository.ISysConfigDao,
+) Service {
 	return &service{
 		Service:      s,
-		siteRepo:     repository.NewStSiteDao(),
-		categoryRepo: repository.NewStCategoryDao(),
-		configRepo:   repository.NewSysConfigDao(),
+		siteRepo:     siteRepo,
+		categoryRepo: categoryRepo,
+		configRepo:   configRepo,
 	}
 }
 

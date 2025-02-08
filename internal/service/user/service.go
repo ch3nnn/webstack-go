@@ -37,14 +37,21 @@ type service struct {
 	adminMenuRepo repository.ISysUserMenuDao
 }
 
-func NewService(s *s.Service) Service {
+func NewService(
+	s *s.Service,
+	userRepo repository.ISysUserDao,
+	siteRepo repository.IStSiteDao,
+	categoryRepo repository.IStCategoryDao,
+	menuRepo repository.ISysMenuDao,
+	adminMenuRepo repository.ISysUserMenuDao,
+) Service {
 	return &service{
 		Service:       s,
-		userRepo:      repository.NewSysUserDao(),
-		siteRepo:      repository.NewStSiteDao(),
-		categoryRepo:  repository.NewStCategoryDao(),
-		menuRepo:      repository.NewSysMenuDao(),
-		adminMenuRepo: repository.NewSysUserMenuDao(),
+		userRepo:      userRepo,
+		siteRepo:      siteRepo,
+		categoryRepo:  categoryRepo,
+		menuRepo:      menuRepo,
+		adminMenuRepo: adminMenuRepo,
 	}
 }
 

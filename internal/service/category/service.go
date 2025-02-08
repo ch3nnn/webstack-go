@@ -35,10 +35,13 @@ type service struct {
 	categoryRepo repository.IStCategoryDao
 }
 
-func NewService(s *s.Service) Service {
+func NewService(
+	s *s.Service,
+	categoryRepo repository.IStCategoryDao,
+) Service {
 	return &service{
 		Service:      s,
-		categoryRepo: repository.NewStCategoryDao(),
+		categoryRepo: categoryRepo,
 	}
 }
 

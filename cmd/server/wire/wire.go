@@ -32,6 +32,12 @@ import (
 var repositorySet = wire.NewSet(
 	repository.NewDB,
 	repository.NewRepository,
+	repository.NewSysUserDao,
+	repository.NewStCategoryDao,
+	repository.NewStSiteDao,
+	repository.NewSysUserMenuDao,
+	repository.NewSysConfigDao,
+	repository.NewSysMenuDao,
 )
 
 var handlerSet = wire.NewSet(
