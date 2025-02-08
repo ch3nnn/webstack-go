@@ -56,10 +56,6 @@
    ```
 2. docker container 正常运行后, 在浏览器中打开界面，链接地址：http://127.0.0.1:8000
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ch3nnn/webstack-go&type=Date)](https://star-history.com/#ch3nnn/webstack-go&Date)
-
 ## 效果图
 
 > **首页**
@@ -81,3 +77,7 @@
 > **网站配置**
 
 ![](.github/image/config.png)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ch3nnn/webstack-go&type=Date)](https://star-history.com/#ch3nnn/webstack-go&Date)
