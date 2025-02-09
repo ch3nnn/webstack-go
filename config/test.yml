@@ -1,0 +1,21 @@
+env: local
+http:
+  host: 0.0.0.0
+  port: 8000
+security:
+  jwt:
+    key: test
+data:
+  db:
+    user:
+      driver: sqlite
+      dsn: storage/webstack-go.db?_busy_timeout=5000
+
+log:
+  log_level: error
+  encoding: console           # json or console
+  log_file_name: "./storage/logs/server.log"
+  max_backups: 30
+  max_age: 7
+  max_size: 1024
+  compress: true

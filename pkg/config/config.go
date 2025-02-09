@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"github.com/pkg/errors"
@@ -20,8 +19,6 @@ func NewConfig(p string) *viper.Viper {
 	if _, err := os.Stat(p); os.IsNotExist(err) {
 		panic(errors.Errorf("config file not found: %s", p))
 	}
-
-	log.Printf("load conf file: %s", p)
 
 	conf.SetConfigFile(p)
 

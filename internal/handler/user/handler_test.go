@@ -62,20 +62,18 @@ func newHttpExcept(t *testing.T, router *gin.Engine) *httpexpect.Expect {
 			Jar:       httpexpect.NewCookieJar(),
 		},
 		Reporter: httpexpect.NewAssertReporter(t),
-		Printers: []httpexpect.Printer{
-			httpexpect.NewDebugPrinter(t, true),
-		},
+		Printers: nil,
 	})
 }
 
 func TestMain(m *testing.M) {
 	fmt.Println("begin")
-	err := os.Setenv("APP_CONF", "../../../config/local.yml")
+	err := os.Setenv("APP_CONF", "../../../config/test.yml")
 	if err != nil {
 		fmt.Println("Setenv error", err)
 	}
 
-	envConf := flag.String("conf", "config/local.yml", "config path, eg: -conf ./config/local.yml")
+	envConf := flag.String("conf", "config/test.yml", "config path, eg: -conf ./config/test.yml")
 	flag.Parse()
 	conf := config.NewConfig(*envConf)
 
