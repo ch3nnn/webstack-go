@@ -6,7 +6,6 @@
 package tools
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -28,7 +27,6 @@ func NewWorkerPool(workerNum, jobQueueSize int) *WorkerPool {
 // Start 启动工作池
 func (wp *WorkerPool) Start() {
 	for i := 0; i < wp.workerNum; i++ {
-		fmt.Printf("create worker %d\n", i+1)
 		wp.wg.Add(1)
 		go func(workerID int) {
 			defer wp.wg.Done()

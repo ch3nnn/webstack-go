@@ -231,7 +231,6 @@ func TestService_UpdatePassword(t *testing.T) {
 	// 断言
 	assert.Error(t, err)
 	assert.Empty(t, resp)
-
 }
 
 func TestSysUserDao_FindOne(t *testing.T) {
