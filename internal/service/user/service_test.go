@@ -8,7 +8,6 @@ package user
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -55,8 +54,6 @@ func setupRepository(t *testing.T) (*repository.Repository, sqlmock.Sqlmock) {
 }
 
 func TestMain(m *testing.M) {
-	fmt.Println("begin")
-
 	err := os.Setenv("APP_CONF", "../../../config/local.yml")
 	if err != nil {
 		panic(err)
@@ -70,8 +67,6 @@ func TestMain(m *testing.M) {
 	j = jwt.NewJwt(conf)
 
 	code := m.Run()
-	fmt.Println("test end")
-
 	os.Exit(code)
 }
 
@@ -172,6 +167,71 @@ func TestUserService_Login(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, token, loginResp.Token)
+}
+
+func TestService_UpdatePassword(t *testing.T) {
+	user := &model.SysUser{
+		ID:        1,
+		Username:  "admin",
+		Password:  "admin",
+		CreatedAt: &time.Time{},
+		UpdatedAt: &time.Time{},
+	}
+
+	req := &v1.UpdatePasswordReq{
+		OldPassword: "admin",
+		NewPassword: "admin",
+	}
+
+	ctx := &gin.Context{}
+	ctx.Set(middleware.UserID, user.ID)
+
+	repo, _ := setupRepository(t)
+	srv := s.NewService(logger, j, repo)
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	categoryDao := repository.NewMockIStCategoryDao(ctrl)
+	userDao := repository.NewMockISysUserDao(ctrl)
+	siteDao := repository.NewMockIStSiteDao(ctrl)
+	menuDao := repository.NewMockISysMenuDao(ctrl)
+	userMenuDao := repository.NewMockISysUserMenuDao(ctrl)
+
+	// find one
+	userFunc := repository.NewMockiCustomGenSysUserFunc(ctrl)
+	userDao.EXPECT().WithContext(gomock.Any()).Return(userFunc)
+	userDao.EXPECT().WhereByID(user.ID).Return(func(dao gen.Dao) gen.Dao {
+		return dao.Where(query.SysUser.ID.Eq(user.ID))
+	})
+	userFunc.EXPECT().FindOne(gomock.Any()).Return(user, nil)
+	// update
+	userDao.EXPECT().WithContext(gomock.Any()).Return(userFunc)
+	userDao.EXPECT().WhereByID(user.ID).Return(func(dao gen.Dao) gen.Dao {
+		return dao.Where(query.SysUser.ID.Eq(user.ID))
+	})
+	userFunc.EXPECT().Update(gomock.Any(), gomock.Any()).Return(int64(1), nil)
+
+	// 调用被测试的方法
+	userService := NewService(srv, userDao, siteDao, categoryDao, menuDao, userMenuDao)
+	resp, err := userService.UpdatePassword(ctx, req)
+
+	// 断言
+	assert.NoError(t, err)
+	assert.Empty(t, resp)
+
+	// error
+	userDao.EXPECT().WithContext(gomock.Any()).Return(userFunc)
+	userDao.EXPECT().WhereByID(user.ID).Return(func(dao gen.Dao) gen.Dao {
+		return dao.Where(query.SysUser.ID.Eq(user.ID))
+	})
+	userFunc.EXPECT().FindOne(gomock.Any()).Return(nil, gorm.ErrRecordNotFound)
+
+	resp, err = userService.UpdatePassword(ctx, req)
+	// 断言
+	assert.Error(t, err)
+	assert.Empty(t, resp)
+
 }
 
 func TestSysUserDao_FindOne(t *testing.T) {
