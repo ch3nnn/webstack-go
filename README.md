@@ -47,8 +47,28 @@
 
 
 **3、Docker 运行服务**
+#### 下载镜像
+1. docker run 运行
+```bash
+docker run -i -t --restart always -p 8000:8000 --name webstack-go -v ./data/storage:/data/app/storage ch3nnn/webstack-go:latest
+```
 
+2. docker compose (推荐)
+```yaml
+services:
+  webstack-go:
+    stdin_open: true
+    tty: true
+    restart: always
+    ports:
+      - 8000:8000
+    container_name: webstack-go
+    image: ch3nnn/webstack-go:latest
+    volumes:
+      - ./data/storage:/data/app/storage
+```
 
+#### 本地编译
 1. 目录下执行 `make docker` 等待启动
    ```shell
    CONTAINER ID   IMAGE            COMMAND      CREATED         STATUS         PORTS                    NAMES
