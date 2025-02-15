@@ -9,28 +9,32 @@ import (
 	"context"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
+	"github.com/ch3nnn/webstack-go/internal/dal/query"
+	"github.com/ch3nnn/webstack-go/pkg/gormx"
 )
 
 func (s *service) Update(ctx context.Context, req *v1.CategoryUpdateReq) (*v1.CategoryUpdateResp, error) {
 	update := make(map[string]any)
 
 	if req.Pid != nil {
-		update["parent_id"] = req.Pid
+		column := gormx.ColumnName(query.StCategory.ParentID)
+		update[column] = req.Pid
 	}
 	if req.Icon != nil {
-		update["icon"] = req.Icon
+		column := gormx.ColumnName(query.StCategory.Icon)
+		update[column] = req.Icon
 	}
 	if req.Name != nil {
-		update["title"] = req.Name
-	}
-	if req.Icon != nil {
-		update["icon"] = req.Icon
+		column := gormx.ColumnName(query.StCategory.Title)
+		update[column] = req.Name
 	}
 	if req.SortID != nil {
-		update["sort"] = req.SortID
+		column := gormx.ColumnName(query.StCategory.Sort)
+		update[column] = req.SortID
 	}
 	if req.IsUsed != nil {
-		update["is_used"] = req.IsUsed
+		column := gormx.ColumnName(query.StCategory.IsUsed)
+		update[column] = req.IsUsed
 	}
 
 	_, err := s.categoryRepo.WithContext(ctx).Update(update, s.categoryRepo.WhereByID(req.ID))

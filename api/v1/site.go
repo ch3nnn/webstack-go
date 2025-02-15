@@ -79,7 +79,7 @@ type (
 		CategoryId  int                   `json:"category_id" form:"category_id"` // 分类id
 		Description string                `json:"description" form:"description"` // 描述
 		IsUsed      *bool                 `json:"is_used" form:"is_used"`         // 是否启用
-		File        *multipart.FileHeader `json:"file"`                           // 上传 logo 图片
+		File        *multipart.FileHeader `json:"file" form:"file"`               // 上传 logo 图片
 		Sort        int                   `json:"sort" form:"sort"`               // 排序
 	}
 

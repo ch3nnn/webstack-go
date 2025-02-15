@@ -31,6 +31,6 @@ func LikeRight(s string) string {
 }
 
 // ColumnName 获取 model 列名
-func ColumnName(field field.Field) string {
+func ColumnName(field field.IColumnName) string {
 	return field.ColumnName().String()
 }

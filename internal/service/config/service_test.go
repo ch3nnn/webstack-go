@@ -132,7 +132,7 @@ func TestService_Update(t *testing.T) {
 		SiteKeyword: pointer.Of("config"),
 		SiteDesc:    pointer.Of("config"),
 		SiteRecord:  pointer.Of("config"),
-		LogFile:     &multipart.FileHeader{},
+		LogoFile:    &multipart.FileHeader{},
 		FaviconFile: &multipart.FileHeader{},
 	})
 

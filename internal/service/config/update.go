@@ -9,7 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
+	"github.com/ch3nnn/webstack-go/internal/dal/query"
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
+	"github.com/ch3nnn/webstack-go/pkg/gormx"
 	"github.com/ch3nnn/webstack-go/pkg/tools"
 )
 
@@ -23,41 +25,50 @@ const (
 func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.ConfigUpdateResp, err error) {
 	update := make(map[string]any)
 	if req.SiteTitle != nil {
-		update["site_title"] = *req.SiteTitle
+		column := gormx.ColumnName(query.SysConfig.SiteTitle)
+		update[column] = *req.SiteTitle
 	}
 	if req.SiteDesc != nil {
-		update["site_desc"] = *req.SiteDesc
+		column := gormx.ColumnName(query.SysConfig.SiteDesc)
+		update[column] = *req.SiteDesc
 	}
 	if req.SiteKeyword != nil {
-		update["site_keyword"] = *req.SiteKeyword
+		column := gormx.ColumnName(query.SysConfig.SiteKeyword)
+		update[column] = *req.SiteKeyword
 	}
 	if req.SiteRecord != nil {
-		update["site_record"] = *req.SiteRecord
+		column := gormx.ColumnName(query.SysConfig.SiteRecord)
+		update[column] = *req.SiteRecord
 	}
 	if req.AboutSite != nil {
-		update["about_site"] = *req.AboutSite
+		column := gormx.ColumnName(query.SysConfig.AboutSite)
+		update[column] = *req.AboutSite
 	}
 	if req.AboutAuthor != nil {
-		update["about_author"] = *req.AboutAuthor
+		column := gormx.ColumnName(query.SysConfig.AboutAuthor)
+		update[column] = *req.AboutAuthor
 	}
 	if req.IsAbout != nil {
-		update["is_about"] = *req.IsAbout
+		column := gormx.ColumnName(query.SysConfig.IsAbout)
+		update[column] = *req.IsAbout
 	}
-	if req.LogFile != nil {
-		base64Str, err := tools.ResizeMultipartImgToBase64(req.LogFile, LogoWidth, LogoHeight)
+	if req.LogoFile != nil && req.LogoFile.Size > 0 {
+		base64Str, err := tools.ResizeMultipartImgToBase64(req.LogoFile, LogoWidth, LogoHeight)
 		if err != nil {
 			base64Str = repository.DefaultLogoBase64
 		}
 
-		update["site_logo"] = base64Str
+		column := gormx.ColumnName(query.SysConfig.SiteLogo)
+		update[column] = base64Str
 	}
-	if req.FaviconFile != nil {
+	if req.FaviconFile != nil && req.FaviconFile.Size > 0 {
 		base64Str, err := tools.ResizeMultipartImgToBase64(req.FaviconFile, FaviconWidth, FaviconHeight)
 		if err != nil {
 			base64Str = repository.DefaultFaviconBase64
 		}
 
-		update["site_favicon"] = base64Str
+		column := gormx.ColumnName(query.SysConfig.SiteFavicon)
+		update[column] = base64Str
 	}
 
 	if _, err = s.configRepo.WithContext(ctx).Update(update, s.configRepo.WhereByID(1)); err != nil {

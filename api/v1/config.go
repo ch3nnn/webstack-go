@@ -29,8 +29,8 @@ type (
 		SiteKeyword *string               `json:"site_keyword" form:"site_keyword"` // 网站关键词
 		SiteDesc    *string               `json:"site_desc" form:"site_desc"`       // 网站描述
 		SiteRecord  *string               `json:"site_record" form:"site_record"`   // 网站备案号
-		LogFile     *multipart.FileHeader `json:"log"`                              // 上传 logo 图片
-		FaviconFile *multipart.FileHeader `json:"favicon"`                          // 上传 favicon 图片
+		LogoFile    *multipart.FileHeader `json:"logo" form:"logo"`                 // 上传 logo 图片
+		FaviconFile *multipart.FileHeader `json:"favicon" form:"favicon"`           // 上传 favicon 图片
 	}
 
 	ConfigUpdateResp struct {

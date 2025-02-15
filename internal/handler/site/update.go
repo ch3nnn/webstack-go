@@ -25,10 +25,6 @@ func (h *Handler) Update(ctx *gin.Context) {
 		return
 	}
 
-	if file, _ := ctx.FormFile("file"); file != nil {
-		req.File = file
-	}
-
 	resp, err := h.siteService.Update(ctx, &req)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
