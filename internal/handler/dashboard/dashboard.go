@@ -3,7 +3,7 @@
  * @Date: 2025/02/07 19:48
  */
 
-package index
+package dashboard
 
 import (
 	"time"

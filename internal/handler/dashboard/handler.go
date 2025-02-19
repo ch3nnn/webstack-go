@@ -3,7 +3,7 @@
  * @Date: 2024/05/26 上午1:46
  */
 
-package index
+package dashboard
 
 import (
 	"github.com/ch3nnn/webstack-go/internal/handler"
