@@ -76,8 +76,14 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        // 回车触发按钮事件
-        $(document).keyup(function (event) {
+        // 用户名输入框回车事件
+        $("#username").keyup(function (event) {
+            if (event.keyCode === 13) {
+                $("#password").focus();
+            }
+        });
+        // 密码输入框回车事件
+        $("#password").keyup(function (event) {
             if (event.keyCode === 13) {
                 $("#btnOk").trigger("click");
             }
