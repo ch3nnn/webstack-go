@@ -32,19 +32,20 @@
                                 </div>
                                 <div class="form-group">
                                     <label>站点描述</label>
-                                    <textarea class="form-control" id="siteDesc" rows="5" name="siteDesc" placeholder="请输入站点描述"></textarea>
+                                    <textarea class="form-control" id="siteDesc" rows="5" name="siteDesc"
+                                              placeholder="请输入站点描述"></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label>网站Logo</label>
                                     <small class="form-text text-muted">建议尺寸：200x50像素</small>
                                     <input type="file" name="file" class="file1" id="siteLogo" accept="image/*"/>
-                                    <img id="siteLogoPreview" src="" alt="Logo预览" style="max-width: 200px; margin-top: 10px;"/>
+                                    <img id="siteLogoPreview" src="" alt="Logo预览" style="height: 50px; width: 200px;"/>
                                 </div>
                                 <div class="form-group">
                                     <label>网站Favicon</label>
                                     <small class="form-text text-muted">建议尺寸：32x32像素</small>
                                     <input type="file" class="file2" id="siteFavicon" accept="image/*"/>
-                                    <img id="siteFaviconPreview" src="" alt="Favicon预览" style="max-width: 32px; margin-top: 10px;"/>
+                                    <img id="siteFaviconPreview" src="" alt="Favicon预览" style="height: 32px; width: 32px;"/>
                                 </div>
                                 <div class="form-group">
                                     <label for="siteRecord">备案信息</label>
@@ -81,11 +82,13 @@
                                     <label>是否启用</label>
                                     <div class="clearfix">
                                         <div class="custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input" value="0" checked=""/>
+                                            <input type="radio" id="statusOne" name="customRadioInline" class="custom-control-input"
+                                                   value="0" checked=""/>
                                             <label class="custom-control-label" for="statusOne">禁用</label>
                                         </div>
                                         <div class="custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input" value="1"/>
+                                            <input type="radio" id="statusTwo" name="customRadioInline" class="custom-control-input"
+                                                   value="1"/>
                                             <label class="custom-control-label" for="statusTwo">启用</label>
                                         </div>
                                     </div>
@@ -111,6 +114,40 @@
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/marked.min.js"></script>
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/ace/ace.js"></script>
 <script type="text/javascript">
+    // 添加图片预览功能
+    document.getElementById('siteLogo').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('siteLogoPreview');
+                if (!preview) {
+                    const img = document.createElement('img');
+                    img.id = 'siteLogoPreview';
+                    e.target.parentElement.appendChild(img);
+                }
+                document.getElementById('siteLogoPreview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+    document.getElementById('siteFavicon').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('siteFaviconPreview');
+                if (!preview) {
+                    const img = document.createElement('img');
+                    img.id = 'siteFaviconPreview';
+                    e.target.parentElement.appendChild(img);
+                }
+                document.getElementById('siteFaviconPreview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
     // 加载表单数据
     function loadFormData() {
         AjaxForm(
@@ -205,7 +242,7 @@
 
         AjaxMultipartForm(
             "PUT",
-            "/api/admin/config/",
+            "/api/admin/config",
             formData,
             function () {
             },
@@ -242,7 +279,7 @@
 
         AjaxForm(
             "PUT",
-            "/api/admin/config/",
+            "/api/admin/config",
             {
                 about_author: authorContent,
                 about_site: siteContent,

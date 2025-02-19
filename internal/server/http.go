@@ -44,6 +44,8 @@ func NewHTTPServer(
 		httpx.WithServerHost(conf.GetString("http.host")),
 		httpx.WithServerPort(conf.GetInt("http.port")),
 	)
+	// 上传大小限制
+	s.MaxMultipartMemory = 32 << 20 // 32MB
 
 	s.StaticFS("/assets", http.FS(assets.Static))
 	s.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
