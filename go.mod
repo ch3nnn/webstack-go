@@ -6,7 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/Pacific73/gorm-cache v1.1.1
 	github.com/disintegration/imaging v1.6.2
-	github.com/duke-git/lancet/v2 v2.3.4
+	github.com/duke-git/lancet/v2 v2.3.5
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gavv/httpexpect/v2 v2.16.0
 	github.com/gin-gonic/gin v1.10.0
