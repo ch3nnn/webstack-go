@@ -6,6 +6,8 @@
 package dashboard
 
 import (
+	"errors"
+	"golang.org/x/sync/errgroup"
 	"math/big"
 	"os"
 	"runtime"
@@ -22,48 +24,57 @@ import (
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 )
 
-func (s *service) memory() (m mem.VirtualMemoryStat) {
-	info, err := mem.VirtualMemory()
-	if err != nil {
-		return m
-	}
-
-	return *info
-}
-
-func (s *service) disk() (d disk.UsageStat) {
-	info, err := disk.Usage("/")
-	if err != nil {
-		return d
-	}
-
-	return *info
-}
-
-func (s *service) cpu() (c cpu.InfoStat) {
-	info, err := cpu.Info()
-	if err != nil {
-		return c
-	}
-
-	if len(info) > 0 {
-		return info[0]
-	}
-
-	return c
-}
-
 func (s *service) Dashboard(ctx *gin.Context) (*v1.DashboardResp, error) {
-	memoryInfo := s.memory()
-	diskInfo := s.disk()
-	cpuInfo := s.cpu()
+	var (
+		g          errgroup.Group
+		dir        string
+		cpuPercent float64
+		memoryInfo *mem.VirtualMemoryStat
+		diskInfo   *disk.UsageStat
+		cpuInfo    *cpu.InfoStat
+	)
 
-	dir, _ := os.Getwd()
+	g.Go(func() (err error) {
+		memoryInfo, err = mem.VirtualMemoryWithContext(ctx)
+		if err != nil {
+			return err
+		}
+		return
+	})
+	g.Go(func() (err error) {
+		diskInfo, err = disk.UsageWithContext(ctx, "/")
+		if err != nil {
+			return err
+		}
+		return
+	})
+	g.Go(func() (err error) {
+		cpuInfos, err := cpu.InfoWithContext(ctx)
+		if err != nil {
+			return err
+		}
 
-	var cpuPercent float64
-	cpuPercents, _ := cpu.Percent(time.Second, false)
-	if len(cpuPercents) > 0 {
-		cpuPercent = mathutil.RoundToFloat(cpuPercents[0], 2)
+		if len(cpuInfos) > 0 {
+			cpuInfo = &cpuInfos[0]
+			return
+		}
+
+		return errors.New("no cpu info")
+	})
+	g.Go(func() (err error) {
+		cpuPercents, err := cpu.PercentWithContext(ctx, time.Second, false)
+		if len(cpuPercents) > 0 {
+			cpuPercent = mathutil.RoundToFloat(cpuPercents[0], 2)
+		}
+		return
+	})
+	g.Go(func() (err error) {
+		dir, err = os.Getwd()
+		return
+	})
+
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
 
 	resp := &v1.DashboardResp{
