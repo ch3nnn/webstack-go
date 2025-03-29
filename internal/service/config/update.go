@@ -40,6 +40,10 @@ func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.Co
 		column := gormx.ColumnName(query.SysConfig.SiteRecord)
 		update[column] = *req.SiteRecord
 	}
+	if req.SiteURL != nil {
+		column := gormx.ColumnName(query.SysConfig.SiteURL)
+		update[column] = *req.SiteURL
+	}
 	if req.AboutSite != nil {
 		column := gormx.ColumnName(query.SysConfig.AboutSite)
 		update[column] = *req.AboutSite

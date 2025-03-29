@@ -28,6 +28,7 @@ type iWhereSysConfigFunc interface {
 	WhereBySiteRecord(siteRecord string) func(dao gen.Dao) gen.Dao
 	WhereBySiteLogo(siteLogo string) func(dao gen.Dao) gen.Dao
 	WhereBySiteFavicon(siteFavicon string) func(dao gen.Dao) gen.Dao
+	WhereBySiteURL(siteUrl string) func(dao gen.Dao) gen.Dao
 }
 
 // ------------------------------------
@@ -112,6 +113,12 @@ func (s *sysConfigDao) WhereBySiteLogo(siteLogo string) func(dao gen.Dao) gen.Da
 func (s *sysConfigDao) WhereBySiteFavicon(siteFavicon string) func(dao gen.Dao) gen.Dao {
 	return func(dao gen.Dao) gen.Dao {
 		return dao.Where(query.SysConfig.SiteFavicon.Eq(siteFavicon))
+	}
+}
+
+func (s *sysConfigDao) WhereBySiteURL(siteUrl string) func(dao gen.Dao) gen.Dao {
+	return func(dao gen.Dao) gen.Dao {
+		return dao.Where(query.SysConfig.SiteURL.Eq(siteUrl))
 	}
 }
 

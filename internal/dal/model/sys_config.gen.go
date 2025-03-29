@@ -18,6 +18,7 @@ type SysConfig struct {
 	SiteRecord  string `gorm:"column:site_record;type:varchar(500)" json:"site_record"`
 	SiteLogo    string `gorm:"column:site_logo;type:text" json:"site_logo"`
 	SiteFavicon string `gorm:"column:site_favicon;type:text" json:"site_favicon"`
+	SiteURL     string `gorm:"column:site_url;type:varchar(500)" json:"site_url"`
 }
 
 // TableName SysConfig's table name

@@ -32,6 +32,7 @@ type ConfigSite struct {
 	SiteKeyword string `json:"site_keyword"` // 站点关键字
 	SiteDesc    string `json:"site_desc"`    // 站点描述
 	SiteRecord  string `json:"site_record"`  // 站点备案
+	SiteURL     string `json:"site_url"`     // 备案url
 	SiteLogo    string `json:"site_logo"`    // 站点logo
 	SiteFavicon string `json:"site_favicon"` // 站点favicon
 }

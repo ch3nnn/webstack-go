@@ -195,16 +195,18 @@
                 <!-- Add your copyright text here -->
                 {{ if .ConfigSite.SiteRecord }}
                 <div class="footer-text">
-                    <strong>{{ .ConfigSite.SiteRecord }}</strong>
+                   <a href="{{ .ConfigSite.SiteURL }}" target="_blank" rel="noopener noreferrer">
+                       <strong>{{ .ConfigSite.SiteRecord }}</strong>
+                   </a>
                 </div>
                 {{ else }}
                 <div class="footer-text">
-                    &copy; 2022-2023
-                    <a href="/about">
+                    &copy; 2022-2025
+                    <a href="https://github.com/ch3nnn/webstack-go">
                         <strong>WebStack-Go</strong>
                     </a>
                     design by
-                    <a href="https://ch3nnn.cn" target="_blank">
+                    <a href="https://blog.ch3nnn.cn/about/about/" target="_blank">
                         <strong>Ch3nnn</strong>
                     </a>
                 </div>

@@ -48,9 +48,22 @@
                                     <img id="siteFaviconPreview" src="" alt="Favicon预览" style="height: 32px; width: 32px;"/>
                                 </div>
                                 <div class="form-group">
-                                    <label for="siteRecord">备案信息</label>
-                                    <input class="form-control" type="text" id="siteRecord" name="siteRecord" value=""
-                                           placeholder="请输入备案信息"/>
+                                    <form class="input-group">
+                                        <label for="siteRecord">备案信息</label>
+                                        <div class="input-group mb-2 mr-sm-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">备案号</div>
+                                            </div>
+                                            <input type="text" class="form-control" id="siteRecord" name="siteRecord" value="" placeholder="请输入备案号">
+                                        </div>
+
+                                        <div class="input-group mb-2 mr-sm-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">备案管理URL</div>
+                                            </div>
+                                            <input type="text" class="form-control" id="siteURL" name="siteURL" value="" placeholder="请输入备案管理URL">
+                                        </div>
+                                    </form>
                                 </div>
                                 <button type="button" id="btnSite" class="btn btn-primary">确认</button>
                             </form>
@@ -169,6 +182,9 @@
                 if (data.site_record) {
                     document.getElementById('siteRecord').value = data.site_record; // 备案信息
                 }
+                if (data.site_url) {
+                    document.getElementById('siteURL').value = data.site_url;
+                }
                 if (data.site_logo) {// 回显Logo（Base64）
                     document.getElementById('siteLogoPreview').src = `data:image/png;base64,${data.site_logo}`;
                 } else {
@@ -225,6 +241,7 @@
         const siteKeyword = document.getElementById('siteKeyword').value; // 站点关键词
         const siteDesc = document.getElementById('siteDesc').value; // 站点描述
         const siteRecord = document.getElementById('siteRecord').value; // 备案信息
+        const siteURL = document.getElementById('siteURL').value; // 备案信息
         const siteLogo = document.getElementById('siteLogo').files[0]; // 网站Logo
         const siteFavicon = document.getElementById('siteFavicon').files[0]; // 网站Favicon
 
@@ -233,6 +250,7 @@
         formData.append('site_keyword', siteKeyword);
         formData.append('site_desc', siteDesc);
         formData.append('site_record', siteRecord);
+        formData.append('site_url', siteURL);
         if (siteLogo) {
             formData.append('logo', siteLogo);
         }
