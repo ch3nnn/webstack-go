@@ -9,6 +9,25 @@
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/static/plugin/bootstrap-fileinput/css/fileinput.min.css"/>
+    <style>
+        /* 控制文本截断 */
+        .truncate-text {
+            max-width: 200px; /* 设置最大宽度 */
+            white-space: nowrap; /* 不换行 */
+            overflow: hidden; /* 超出部分隐藏 */
+            text-overflow: ellipsis; /* 显示省略号 */
+        }
+
+        /* 固定最后一列（操作列） */
+        #siteTable th:last-child,
+        #siteTable td:last-child {
+            position: sticky;
+            right: 0;
+            background-color: white;
+            z-index: 2;
+            box-shadow: -2px 0 3px -2px rgba(0, 0, 0, 0.1); /* 可选：加个阴影更明显 */
+        }
+    </style>
 </head>
 
 <body>
@@ -19,11 +38,13 @@
                 <div class="card-toolbar d-flex flex-column flex-md-row justify-content-between">
                     <div class="toolbar-btn-action">
                         <a class="btn btn-primary m-r-5" href="/admin/site/add"><i class="mdi mdi-plus"></i> 新增</a>
-                        <button class="btn btn-success m-r-5" id="exportBtn"><i class="mdi mdi-download"></i> 导出</button>
+                        <button class="btn btn-success m-r-5" id="exportBtn"><i class="mdi mdi-download"></i> 导出
+                        </button>
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="form-group m-b-0">
-                            <input class="form-control" type="text" id="search-keyword" name="search-keyword" placeholder="请输入网址标题..."/>
+                            <input class="form-control" type="text" id="search-keyword" name="search-keyword"
+                                   placeholder="请输入网址标题..."/>
                         </div>
                         <div class="form-group m-b-0 m-l-10">
                             <select class="form-control selectpicker" id="category-filter" data-live-search="true">
@@ -37,7 +58,9 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info" role="alert">注📢: 勾选"拉取失败时仅保存网址"功能对应行背景色高亮, 记得点击编辑修改呦!</div>
+                    <div class="alert alert-info" role="alert">注📢: 勾选"拉取失败时仅保存网址"功能对应行背景色高亮,
+                        记得点击编辑修改呦!
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-bordered" id="siteTable">
                             <thead>
@@ -166,15 +189,17 @@
                             const tr = trHtml +
                                 '<td>' + value.id + '</td>' +
                                 '<td><img class="lozad img-circle" width="30" src="data:image/png;base64,' + value.icon + '" data-loaded="true"></td>' +
-                                '<td>' + value.title + '</td>' +
-                                '<td><a href="' + value.url + '" target="_blank">' + value.url + '</a></td>' +
+                                '<td class="truncate-text"><span title="' + value.title + '">' + value.title + '</span></td>' +
+                                '<td class="truncate-text">' +
+                                '<a href="' + value.url + '" target="_blank" title="' + value.url + '">' + value.url + '</a>' +
+                                '</td>' +
                                 '<td>' + value.category + '</td>' +
                                 '<td>' + value.created_at + '</td>' +
                                 '<td>' + value.updated_at + '</td>' +
                                 '<td style="text-align: center;">' + showUsedBadge + '</td>' +
                                 '<td style="text-align: center;">' + value.sort + '</td>' + <!-- 新增排序列 -->
                                 '<td style="text-align: center;">' +
-                                '<div class="btn-group">' +
+                                '<div class="btn-group"  id="siteTable">' +
                                 '    <a class="btn btn-xs btn-default btn-sync" href="#!" title=""' +
                                 '                                           data-id="' + value.id + '"' +
                                 '                                           data-title="' + value.title + '"' +
