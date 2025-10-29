@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  webstack-go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_RELATIVE_PATH: ./cmd/server
+        APP_ENV: prod
+    ports:
+      - "8000:8000"
+    environment:
+      - FEISHU_APP_ID=cli_a8723d9ef275d00e
+      - FEISHU_APP_SECRET=gQwAupMXlTaI5dy47DVwLgLNuwIRTUy1
+      - FEISHU_REDIRECT_URL=http://localhost:8000/api/auth/feishu/callback
+      - FEISHU_TENANT_KEY=
+    volumes:
+      - ./storage:/data/app/storage
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

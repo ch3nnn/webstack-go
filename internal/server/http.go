@@ -12,6 +12,7 @@ import (
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/docs"
+	authHandler "github.com/ch3nnn/webstack-go/internal/handler/auth"
 	categoryHandler "github.com/ch3nnn/webstack-go/internal/handler/category"
 	configHandler "github.com/ch3nnn/webstack-go/internal/handler/config"
 	dashboardHandler "github.com/ch3nnn/webstack-go/internal/handler/dashboard"
@@ -19,6 +20,7 @@ import (
 	siteHandler "github.com/ch3nnn/webstack-go/internal/handler/site"
 	userHandler "github.com/ch3nnn/webstack-go/internal/handler/user"
 	"github.com/ch3nnn/webstack-go/internal/middleware"
+	authService "github.com/ch3nnn/webstack-go/internal/service/auth"
 	"github.com/ch3nnn/webstack-go/pkg/jwt"
 	"github.com/ch3nnn/webstack-go/pkg/log"
 	httpx "github.com/ch3nnn/webstack-go/pkg/server/http"
@@ -36,6 +38,7 @@ func NewHTTPServer(
 	siteHandler *siteHandler.Handler,
 	categoryHandler *categoryHandler.Handler,
 	configHandler *configHandler.Handler,
+	authService authService.Service,
 ) *httpx.Server {
 	gin.SetMode(gin.DebugMode)
 	s := httpx.NewServer(
@@ -67,14 +70,15 @@ func NewHTTPServer(
 	)
 	// 404
 	s.NoRoute(v1.ErrHandler404)
-	// Index HTML
-	s.GET("/", indexHandler.Index)
+
+	// Index HTML with authentication
+	s.GET("/", middleware.IndexAuth(jwt, logger), indexHandler.Index)
 	// About HTML
 	s.GET("/about", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "about.html", nil)
 	})
 	// Login HTML
-	s.GET("login", func(ctx *gin.Context) {
+	s.GET("/login", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "admin_login.html", nil)
 	})
 	// Render HTML
@@ -110,6 +114,15 @@ func NewHTTPServer(
 		{
 			noAuthRouter.POST("/login", userHandler.Login)
 			noAuthRouter.GET("/about", indexHandler.About)
+
+			// 飞书认证路由
+			authHandler := authHandler.NewHandler(authService)
+			authGroup := noAuthRouter.Group("/auth")
+			{
+				authGroup.GET("/feishu/login", authHandler.FeishuLogin)
+				authGroup.GET("/feishu/callback", authHandler.FeishuCallback)
+				authGroup.POST("/logout", authHandler.Logout)
+			}
 		}
 		// Strict permission routing group
 		strictAuthRouter := v1.Group("/admin").Use(middleware.StrictAuth(jwt, logger))

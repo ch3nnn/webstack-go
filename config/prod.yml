@@ -19,3 +19,13 @@ log:
   max_age: 7
   max_size: 1024
   compress: true
+
+feishu:
+  app_id: ""               # 飞书应用 ID (通过环境变量 FEISHU_APP_ID 设置)
+  app_secret: ""           # 飞书应用密钥 (通过环境变量 FEISHU_APP_SECRET 设置)
+  redirect_url: ""  # 飞书 OAuth 回调地址 (通过环境变量 FEISHU_REDIRECT_URL 设置)
+  tenant_key: ""           # 企业租户 Key (通过环境变量 FEISHU_TENANT_KEY 设置)
+
+auth:
+  cookie_name: "webstack_session"  # 会话 Cookie 名称
+  jwt_expire_hours: 168            # JWT 过期时间（小时），默认 7 天

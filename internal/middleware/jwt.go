@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"github.com/ch3nnn/webstack-go/api/v1"
+	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/pkg/jwt"
 	"github.com/ch3nnn/webstack-go/pkg/log"
 )

@@ -17,6 +17,7 @@ import (
 	userHandler "github.com/ch3nnn/webstack-go/internal/handler/user"
 	"github.com/ch3nnn/webstack-go/internal/server"
 	"github.com/ch3nnn/webstack-go/internal/service"
+	authService "github.com/ch3nnn/webstack-go/internal/service/auth"
 	categoryService "github.com/ch3nnn/webstack-go/internal/service/category"
 	configService "github.com/ch3nnn/webstack-go/internal/service/config"
 	dashboardService "github.com/ch3nnn/webstack-go/internal/service/dashboard"
@@ -58,6 +59,7 @@ var serviceSet = wire.NewSet(
 	categoryService.NewService,
 	configService.NewService,
 	dashboardService.NewService,
+	authService.NewService,
 )
 
 var serverSet = wire.NewSet(

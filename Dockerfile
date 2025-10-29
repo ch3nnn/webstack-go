@@ -24,6 +24,12 @@ RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 ARG APP_ENV
 ENV APP_ENV=${APP_ENV}
 
+# 飞书OAuth环境变量
+ENV FEISHU_APP_ID=""
+ENV FEISHU_APP_SECRET=""
+ENV FEISHU_REDIRECT_URL=""
+ENV FEISHU_TENANT_KEY=""
+
 WORKDIR /data/app
 COPY --from=builder /data/app/bin /data/app
 COPY --from=builder /data/app/web/upload /data/app/web/upload/
