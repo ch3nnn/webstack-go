@@ -17,6 +17,7 @@ import (
 	user2 "github.com/ch3nnn/webstack-go/internal/handler/user"
 	"github.com/ch3nnn/webstack-go/internal/server"
 	"github.com/ch3nnn/webstack-go/internal/service"
+	"github.com/ch3nnn/webstack-go/internal/service/auth"
 	"github.com/ch3nnn/webstack-go/internal/service/category"
 	"github.com/ch3nnn/webstack-go/internal/service/config"
 	"github.com/ch3nnn/webstack-go/internal/service/dashboard"
@@ -58,7 +59,8 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	categoryHandler := category2.NewHandler(handlerHandler, categoryService)
 	configService := config.NewService(serviceService, iSysConfigDao)
 	configHandler := config2.NewHandler(handlerHandler, configService)
-	httpServer := server.NewHTTPServer(engine, logger, viperViper, jwtJWT, dashboardHandler, indexHandler, userHandler, siteHandler, categoryHandler, configHandler)
+	authService := auth.NewService(viperViper, jwtJWT)
+	httpServer := server.NewHTTPServer(engine, logger, viperViper, jwtJWT, dashboardHandler, indexHandler, userHandler, siteHandler, categoryHandler, configHandler, authService)
 	appApp := newApp(httpServer)
 	return appApp, func() {
 	}, nil
@@ -70,7 +72,7 @@ var repositorySet = wire.NewSet(repository.NewDB, repository.NewRepository, repo
 
 var handlerSet = wire.NewSet(handler.NewHandler, user2.NewHandler, index2.NewHandler, site2.NewHandler, category2.NewHandler, dashboard2.NewHandler, config2.NewHandler)
 
-var serviceSet = wire.NewSet(service.NewService, user.NewService, index.NewService, site.NewService, category.NewService, config.NewService, dashboard.NewService)
+var serviceSet = wire.NewSet(service.NewService, user.NewService, index.NewService, site.NewService, category.NewService, config.NewService, dashboard.NewService, auth.NewService)
 
 var serverSet = wire.NewSet(server.NewHTTPServer)
 

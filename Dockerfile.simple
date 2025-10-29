@@ -1,0 +1,37 @@
+FROM alpine:3.18
+
+# 设置时区
+RUN apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    apk del tzdata
+
+# 安装必要的运行时依赖
+RUN apk add --no-cache ca-certificates
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制编译好的二进制文件
+COPY bin/server-linux /app/server
+COPY config /app/config
+COPY web /app/web
+
+# 创建必要的目录
+RUN mkdir -p /app/storage
+
+# 设置环境变量
+ENV FEISHU_APP_ID=""
+ENV FEISHU_APP_SECRET=""
+ENV FEISHU_REDIRECT_URL=""
+ENV FEISHU_TENANT_KEY=""
+
+# 暴露端口
+EXPOSE 8000
+
+# 设置可执行权限
+RUN chmod +x /app/server
+
+# 启动命令
+ENTRYPOINT ["/app/server"]
+CMD ["-conf=config/prod.yml"]
