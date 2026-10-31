@@ -3,12 +3,14 @@ name: Web
 on:
   push:
     branches:
+      - master
       - main
     paths:
       - 'web/admin/**'
       - '.github/workflows/web.yml'
   pull_request:
     branches:
+      - master
       - main
     paths:
       - 'web/admin/**'
@@ -45,6 +47,9 @@ jobs:
         working-directory: web/admin
         run: npm run build
 
-      # dist 提交入库，保证 git clone 后 go build 直接可用；产物与源码不一致即失败
+      # dist 提交入库，保证 git clone 后 go build 直接可用；产物与源码不一致即失败。
+      # 先 add 再 diff --cached：新增的 hash 文件是未跟踪状态，单纯 git diff 看不到。
       - name: Verify committed dist is up to date
-        run: git diff --exit-code web/admin/dist
+        run: |
+          git add -A web/admin/dist
+          git diff --cached --exit-code web/admin/dist
