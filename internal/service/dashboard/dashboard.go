@@ -11,7 +11,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/duke-git/lancet/v2/mathutil"
 	humanize "github.com/dustin/go-humanize"
@@ -57,7 +56,9 @@ func (s *service) Dashboard(ctx *gin.Context) (*v1.DashboardResp, error) {
 		return
 	})
 	g.Go(func() (err error) {
-		cpuPercents, err := cpu.PercentWithContext(ctx, time.Second, false)
+		// interval 传 0：用「距上次调用」的差值算百分比，立即返回。
+		// 传 time.Second 会同步等待一整秒，首帧就要多等 1s（实测 1001ms）。
+		cpuPercents, err := cpu.PercentWithContext(ctx, 0, false)
 		if len(cpuPercents) > 0 {
 			cpuPercent = mathutil.RoundToFloat(cpuPercents[0], 2)
 		}

@@ -20,6 +20,28 @@ func (h *Handler) Dashboard(ctx *gin.Context) {
 
 	go func() {
 		defer close(messageChan)
+
+		// 推一帧；返回 false 表示该收尾了（采集失败或客户端已断开）
+		send := func() bool {
+			dashboard, err := h.dashboardService.Dashboard(ctx)
+			if err != nil {
+				h.Logger.Error("SSE（Server-Sent Events）dashboard api", zap.Error(err))
+				return false
+			}
+			// 消费端（SSEStream）停止读取时不能在通道上死等，否则 goroutine 泄漏
+			select {
+			case messageChan <- dashboard:
+				return true
+			case <-done:
+				return false
+			}
+		}
+
+		// 立即推首帧：前端在收到第一条事件之前只有骨架屏，等一个 tick 就是白等 1s
+		if !send() {
+			return
+		}
+
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
 
@@ -28,15 +50,7 @@ func (h *Handler) Dashboard(ctx *gin.Context) {
 			case <-done:
 				return
 			case <-ticker.C:
-				dashboard, err := h.dashboardService.Dashboard(ctx)
-				if err != nil {
-					h.Logger.Error("SSE（Server-Sent Events）dashboard api", zap.Error(err))
-					return
-				}
-				// 消费端（SSEStream）停止读取时不能在通道上死等，否则 goroutine 泄漏
-				select {
-				case messageChan <- dashboard:
-				case <-done:
+				if !send() {
 					return
 				}
 			}
