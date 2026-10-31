@@ -391,39 +391,42 @@ onMounted(async () => {
     </template>
   </n-card>
 
-  <n-modal v-model:show="detailVisible" preset="card" title="网站详情" class="modal">
+  <n-modal v-model:show="detailVisible" preset="card" title="网站详情" :style="{ width: '520px' }">
     <p class="detail-row"><span>名称</span>{{ detailRow?.title }}</p>
     <p class="detail-row"><span>链接</span>{{ detailRow?.url }}</p>
     <p class="detail-row"><span>分类</span>{{ detailRow?.category }}</p>
     <p class="detail-row"><span>描述</span>{{ detailRow?.description }}</p>
   </n-modal>
 
-  <n-modal v-model:show="editVisible" preset="card" title="编辑网站" class="modal">
-    <n-form label-placement="left" label-width="76">
-      <n-form-item label="分类">
-        <n-select v-model:value="edit.categoryId" :options="categoryOptions" clearable />
-      </n-form-item>
-      <n-form-item label="Logo">
-        <div class="logo-field">
-          <n-input v-model:value="edit.thumb" placeholder="请输入 Logo 链接" />
-          <n-upload :default-upload="false" :show-file-list="false" accept=".jpg,.png" @change="onFileChange">
-            <n-button attr-type="button">选择文件</n-button>
-          </n-upload>
-        </div>
-      </n-form-item>
-      <n-form-item label="名称">
-        <n-input v-model:value="edit.title" placeholder="请输入网站名称" />
-      </n-form-item>
-      <n-form-item label="链接">
-        <n-input v-model:value="edit.url" placeholder="请输入网站地址" />
-      </n-form-item>
-      <n-form-item label="描述">
-        <n-input v-model:value="edit.description" type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" />
-      </n-form-item>
-      <n-form-item label="排序">
-        <n-input-number v-model:value="edit.sort" :min="0" />
-      </n-form-item>
-    </n-form>
+  <!-- class 不会落到 naive 的弹框根节点上，宽度必须走 style（否则会铺满整个窗口） -->
+  <n-modal v-model:show="editVisible" preset="card" title="编辑网站" :style="{ width: '560px' }">
+    <div class="modal-body">
+      <n-form label-placement="left" label-width="76">
+        <n-form-item label="分类">
+          <n-select v-model:value="edit.categoryId" :options="categoryOptions" clearable />
+        </n-form-item>
+        <n-form-item label="Logo">
+          <div class="logo-field">
+            <n-input v-model:value="edit.thumb" placeholder="请输入 Logo 链接" />
+            <n-upload :default-upload="false" :show-file-list="false" accept=".jpg,.png" @change="onFileChange">
+              <n-button attr-type="button">选择文件</n-button>
+            </n-upload>
+          </div>
+        </n-form-item>
+        <n-form-item label="名称">
+          <n-input v-model:value="edit.title" placeholder="请输入网站名称" />
+        </n-form-item>
+        <n-form-item label="链接">
+          <n-input v-model:value="edit.url" placeholder="请输入网站地址" />
+        </n-form-item>
+        <n-form-item label="描述">
+          <n-input v-model:value="edit.description" type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" />
+        </n-form-item>
+        <n-form-item label="排序">
+          <n-input-number v-model:value="edit.sort" :min="0" />
+        </n-form-item>
+      </n-form>
+    </div>
     <template #footer>
       <div class="modal-footer">
         <n-button quaternary @click="editVisible = false">取消</n-button>
@@ -491,8 +494,11 @@ onMounted(async () => {
   margin-top: 12px;
 }
 
-.modal {
-  width: 560px;
+.modal-body {
+  /* 卡片高度不随窗口，内容自己滚，头部/底部按钮始终可见 */
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .modal-footer {
