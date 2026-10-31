@@ -47,9 +47,7 @@ jobs:
         working-directory: web/admin
         run: npm run build
 
-      # dist 提交入库，保证 git clone 后 go build 直接可用；产物与源码不一致即失败。
-      # 先 add 再 diff --cached：新增的 hash 文件是未跟踪状态，单纯 git diff 看不到。
-      - name: Verify committed dist is up to date
-        run: |
-          git add -A web/admin/dist
-          git diff --cached --exit-code web/admin/dist
+      # dist 不再入库，由 make web / CI / 镜像构建时生成；
+      # 这里只要求「前端能构建通过」，再顺带确认 go:embed 能拿到产物。
+      - name: Verify dist feeds go:embed
+        run: test -f web/admin/dist/index.html

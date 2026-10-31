@@ -1,10 +1,24 @@
+import { writeFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
 import vue from '@vitejs/plugin-vue'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
+
+/**
+ * 产物目录里必须一直留一个文件：Go 侧的 //go:embed all:admin/dist 匹配不到文件会直接编译失败，
+ * 而 emptyOutDir 会把 .gitkeep 一起删掉。构建结束补回来。
+ */
+function keepPlaceholder(): Plugin {
+  return {
+    name: 'keep-dist-placeholder',
+    closeBundle() {
+      writeFileSync(fileURLToPath(new URL('./dist/.gitkeep', import.meta.url)), '')
+    },
+  }
+}
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), keepPlaceholder()],
   // 产物挂载在 Go 侧 /ui，避免与既有 /assets 静态目录冲突
   base: '/ui/',
   resolve: {

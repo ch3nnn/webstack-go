@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/docs"
@@ -73,9 +74,12 @@ func NewHTTPServer(
 	if err != nil {
 		panic(err)
 	}
-	spaIndex, err := fs.ReadFile(spaFS, "index.html")
-	if err != nil {
-		panic(err)
+	// 产物未构建时（仓库里只有 .gitkeep 占位）不 panic：后台管理不可用，
+	// 但公共站、接口文档等照常，启动日志里给出怎么修。
+	spaIndex, spaErr := fs.ReadFile(spaFS, "index.html")
+	if spaErr != nil {
+		logger.Error("管理端前端产物缺失，/admin 将不可用；请先执行 make web（或使用官方发布镜像/二进制）",
+			zap.Error(spaErr))
 	}
 	s.StaticFS("/ui", http.FS(spaFS))
 
@@ -100,6 +104,11 @@ func NewHTTPServer(
 
 	// 管理端为 SPA：/login 与 /admin/** 一律返回 dist/index.html，鉴权由前端路由守卫接管
 	serveSPA := func(ctx *gin.Context) {
+		if spaErr != nil {
+			ctx.String(http.StatusServiceUnavailable,
+				"管理端前端产物缺失：请在仓库根目录执行 `make web` 重新构建（或使用官方发布的二进制/镜像）。")
+			return
+		}
 		ctx.Header("Cache-Control", "no-cache")
 		ctx.Data(http.StatusOK, "text/html; charset=utf-8", spaIndex)
 	}

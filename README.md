@@ -23,9 +23,13 @@
 
 - Golang 1.23+（`go.mod` 的 go 指令是 1.23.0，1.22 无法编译）
 - SQLite
+- Node.js 20+（**只有从源码构建时需要**，用来编译管理端前端）
 
-> 管理端 SPA 的构建产物（`web/admin/dist`）已随仓库提交，`go build` 不需要 Node.js。
-> 只有修改前端源码时才需要 Node.js 20+，见「三、管理端前端开发」。
+> 管理端 SPA 的构建产物不随仓库提交：`web/admin/dist` 里只保留一个 `.gitkeep` 占位，
+> 真正的产物在构建时生成并被打进二进制。因此：
+>
+> - 直接下载 Releases 二进制或使用 Docker 镜像 —— 不需要 Node.js，产物已内置；
+> - 从源码 `make build` —— 需要 Node.js，构建脚本会先编译前端再编译后端。
 
 ### 二、启动服务
 
@@ -43,13 +47,14 @@
 > 可在“系统设置 > 隐私与安全性 > 安全性”中点击“仍然允许”，然后再次尝试执行二进制文件。
 
 
-**2、源码运行服务 (需要 Golang 环境)**
-1. 目录下执行 `go mod tidy` 拉取项目依赖库
-2. 执行 `go build -o ./bin/server ./cmd/server` 编译项目，生成可执行文件 server 
-3. 编译完执行 `./bin/server -conf=config/prod.yml` 首次启动程序之后，会生成 SQLite 数据库，并自动创建表结构
+**2、源码运行服务 (需要 Golang + Node.js 环境)**
+1. 执行 `make build`：先 `npm ci && npm run build` 生成管理端产物，再 `go build` 把产物内嵌进 `./bin/server`
+2. 执行 `./bin/server -conf=config/prod.yml` 首次启动程序之后，会生成 SQLite 数据库，并自动创建表结构
 
-> 整个部署流程只需要 Go：前端产物 `web/admin/dist` 已在仓库里，`go build` 会把它内嵌进二进制，
-> **不需要 `npm install` / `npm run build`**。只有改前端源码时才需要 Node.js（见第三节）。
+只想重新编译后端（`web/admin/dist` 里已有产物）时用 `make build-server`。
+
+> `//go:embed all:admin/dist` 要求该目录非空，所以仓库里保留了一个 `dist/.gitkeep`。
+> 如果产物缺失，`go build` 仍能通过，但启动日志会告警、`/admin` 返回 503 并提示先执行 `make web`。
 
 
 **3、Docker 运行服务**
@@ -84,7 +89,7 @@ services:
 
 ## 三、管理端前端开发
 
-管理端位于 `web/admin`，Vue 3 + TypeScript + Vite + Naive UI。产物 `web/admin/dist` 由 `web/assets.go` 的 `//go:embed admin/dist` 打进二进制，静态资源路径为 `/ui`，SPA 路由挂在 `/admin/*`，公共站（`/`、`/about`）仍是 Go 模板。
+管理端位于 `web/admin`，Vue 3 + TypeScript + Vite + Naive UI。产物 `web/admin/dist` 不提交入库，由 `make web`（或 CI / Docker 构建阶段）生成，再由 `web/assets.go` 的 `//go:embed admin/dist` 打进二进制；静态资源路径为 `/ui`，SPA 路由挂在 `/admin/*`，公共站（`/`、`/about`）仍是 Go 模板。
 
 ```bash
 cd web/admin
@@ -92,14 +97,15 @@ npm ci
 npm run dev      # http://127.0.0.1:5173，/api 与 /assets 代理到 127.0.0.1:8000
 ```
 
-改完前端后必须重新构建并提交产物，否则二进制里仍是旧界面：
+改完前端后跑一遍类型检查、lint 与构建（或直接在仓库根目录 `make web`）：
 
 ```bash
 cd web/admin
 npm run typecheck && npm run lint && npm run build
 ```
 
-CI（`.github/workflows/web.yml`）会校验类型、lint，以及 `git diff --exit-code web/admin/dist`——产物与源码不一致会直接失败。
+产物不需要提交：`web/admin/dist/*` 已在 `.gitignore` 里，只有 `.gitkeep` 占位入库。
+CI（`.github/workflows/web.yml`）校验类型、lint 与构建；Docker 镜像与 release 二进制在各自的构建流程里现场生成前端产物。
 
 ### 回滚
 

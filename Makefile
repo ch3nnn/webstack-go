@@ -5,8 +5,18 @@ init:
 	go install github.com/incu6us/goimports-reviser/v3@latest
 	go install mvdan.cc/gofumpt@latest
 
+# 管理端前端产物不随仓库提交，构建后端之前先生成
+.PHONY: web
+web:
+	cd web/admin && npm ci --no-audit --no-fund && npm run build
+
 .PHONY: build
-build:
+build: web
+	go build -ldflags="-s -w" -o ./bin/server ./cmd/server
+
+# 只编后端：要求 web/admin/dist 里已经有构建好的产物
+.PHONY: build-server
+build-server:
 	go build -ldflags="-s -w" -o ./bin/server ./cmd/server
 
 .PHONY: docker
@@ -24,7 +34,5 @@ fmt:
 	find . -name '*.go' -not -name "*.pb.go" -not -name "*.gen.go" | xargs gofumpt -w -extra
 
 .PHONY: run
-run:
-	go mod tidy
-	go build -ldflags="-s -w" -o ./bin/server ./cmd/server
+run: build
 	./bin/server -conf=config/prod.yml
