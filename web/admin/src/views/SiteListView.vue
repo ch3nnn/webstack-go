@@ -215,6 +215,8 @@ async function onSave() {
   }
 }
 
+const LOGO_SIZE = 24
+
 function logoUrl(row: Site): string {
   if (!row.icon) return ''
   return row.icon.startsWith('data:') ? row.icon : `data:image/png;base64,${row.icon}`
@@ -226,7 +228,13 @@ const columns: DataTableColumns<Site> = [
     title: 'Logo',
     key: 'icon',
     width: 62,
-    render: (row) => h('img', { src: logoUrl(row), class: 'logo', alt: '' }),
+    render: (row) => {
+      // 列渲染函数在 NDataTable 的渲染上下文里执行，拿不到本组件的 data-v，
+      // 作用域样式对它无效，尺寸必须内联
+      const src = logoUrl(row)
+      const style = `width:${LOGO_SIZE}px;height:${LOGO_SIZE}px;border-radius:50%;object-fit:contain;display:block;background:#f2f3f5`
+      return src ? h('img', { src, style, alt: '' }) : h('span', { style })
+    },
   },
   {
     title: '名称简介',
@@ -456,14 +464,7 @@ onMounted(async () => {
   font-size: 12px;
 }
 
-.logo {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.truncate {
+:deep(.truncate) {
   display: inline-block;
   overflow: hidden;
   max-width: 100%;
@@ -472,11 +473,11 @@ onMounted(async () => {
   vertical-align: bottom;
 }
 
-.link {
+:deep(.link) {
   color: #2f6feb;
 }
 
-.actions {
+:deep(.actions) {
   display: flex;
   gap: 2px;
 }

@@ -347,13 +347,13 @@ onMounted(load)
   gap: 8px;
 }
 
-.icon-option {
+:deep(.icon-option) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-.actions {
+:deep(.actions) {
   display: flex;
   gap: 2px;
 }
