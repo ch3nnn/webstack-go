@@ -39,6 +39,8 @@ interface CategoryRow extends Category {
 const message = useMessage()
 
 const rows = ref<CategoryRow[]>([])
+/** 展开状态由数据驱动：default-expand-all 只在首次渲染时读一次，异步加载时读到的是空数组 */
+const expandedKeys = ref<Array<string | number>>([])
 const loading = ref(false)
 const failed = ref(false)
 
@@ -95,6 +97,7 @@ async function load() {
       if (item.children) item.children.sort((a, b) => a.sort - b.sort)
     })
     rows.value = tree.sort((a, b) => a.sort - b.sort)
+    expandedKeys.value = rows.value.filter((item) => item.children?.length).map((item) => item.id)
   } catch (error) {
     failed.value = true
     message.error(errorMessage(error))
@@ -275,11 +278,16 @@ const columns: DataTableColumns<CategoryRow> = [
     width: 210,
     render: (row) =>
       h('div', { class: 'actions' }, [
-        h(
-          NButton,
-          { size: 'tiny', quaternary: true, onClick: () => openCreateChild(row) },
-          { default: () => '新增子分类' },
-        ),
+        // 只有一级分类能建子类，二级分类不显示这个按钮
+        ...(row.pid
+          ? []
+          : [
+              h(
+                NButton,
+                { size: 'tiny', quaternary: true, onClick: () => openCreateChild(row) },
+                { default: () => '新增子分类' },
+              ),
+            ]),
         h(
           NButton,
           { size: 'tiny', quaternary: true, onClick: () => openEdit(row) },
@@ -320,9 +328,10 @@ onMounted(load)
       :data="rows"
       :loading="loading"
       :row-key="(row: CategoryRow) => row.id"
+      :expanded-row-keys="expandedKeys"
       :bordered="false"
       size="small"
-      default-expand-all
+      @update:expanded-row-keys="(keys: Array<string | number>) => (expandedKeys = keys)"
     />
   </n-card>
 
