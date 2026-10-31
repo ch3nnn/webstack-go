@@ -32,6 +32,16 @@
         body.night.boxed-container .page-container .main-content {
             background-color: #2c2e2f;
         }
+        /* 白色字标只在深色导航栏上可读，浅色时换成深色字标 */
+        .navbar-brand a.logo .logo-dark-bg {
+            display: none;
+        }
+        body.night .navbar-brand a.logo .logo-light-bg {
+            display: none;
+        }
+        body.night .navbar-brand a.logo .logo-dark-bg {
+            display: block;
+        }
         .back-home {
             float: right;
             height: 85px;
@@ -71,7 +81,11 @@
                 {{ if .SiteLogo }}
                 <img src="{{ imgSrc .SiteLogo }}" class="site-logo" alt="{{ .SiteTitle }}"/>
                 {{ else }}
-                <img src="assets/static/index/images/logo@2x.png" class="site-logo" alt="WebStack"/>
+                {{/* 没配 logo 时：浅色导航栏配深色字标，深色导航栏配白色字标 */}}
+                <img src="assets/static/index/images/logo_dark@2x.png"
+                     class="site-logo logo-light-bg" alt="WebStack"/>
+                <img src="assets/static/index/images/logo@2x.png"
+                     class="site-logo logo-dark-bg" alt="WebStack"/>
                 {{ end }}
             </a>
         </div>
