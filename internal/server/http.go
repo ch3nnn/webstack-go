@@ -80,9 +80,7 @@ func NewHTTPServer(
 	)
 	// 公共站保持服务端渲染（SEO 依赖）
 	s.GET("/", indexHandler.Index)
-	s.GET("/about", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "about.html", nil)
-	})
+	s.GET("/about", indexHandler.AboutPage)
 
 	// 管理端为 SPA：/login 与 /admin/** 一律返回 dist/index.html，鉴权由前端路由守卫接管
 	serveSPA := func(ctx *gin.Context) {

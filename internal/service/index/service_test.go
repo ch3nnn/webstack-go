@@ -101,9 +101,13 @@ func TestService_About(t *testing.T) {
 	configFunc.EXPECT().FindOne(gomock.Any()).Return(sysConfig, nil)
 
 	configService := NewService(srv, siteDao, categoryDao, configDao)
-	_, err := configService.About(ctx)
+	resp, err := configService.About(ctx)
 
 	assert.NoError(t, err)
+	if assert.NotNil(t, resp) {
+		// 关于页导航栏的 logo 要跟网站配置里的一致，所以这个字段必须带出来
+		assert.Equal(t, "config", resp.SiteLogo)
+	}
 }
 
 func TestService_Index(t *testing.T) {

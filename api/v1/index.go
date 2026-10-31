@@ -25,6 +25,8 @@ type About struct {
 	AboutSite   string `json:"about_site"`   // 关于站点
 	AboutAuthor string `json:"about_author"` // 关于作者
 	IsAbout     bool   `json:"is_about"`     // 是否开启关于
+	SiteTitle   string `json:"site_title"`   // 站点标题（关于页导航栏用）
+	SiteLogo    string `json:"site_logo"`    // 站点 logo，纯 base64（关于页导航栏用）
 }
 
 type ConfigSite struct {

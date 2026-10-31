@@ -20,18 +20,38 @@
     <link rel="stylesheet" href="/assets/static/index/css/hclonely.css"/>
     <script src="assets/static/index/js/jquery-1.11.1.min.js"></script>
     <style>
-        /* 深色主题下补两条：本页导航是 .navbar-inner 结构，hclonely.css 的 night 规则只覆盖首页的 .user-info-navbar */
-        body.night .navbar-inner {
+        /* 导航栏统一深色：与首页侧边栏的品牌区同色。站点配置里的 logo 是白字版，
+           只有深底才读得清，浅色主题下也不会变成一条白带。 */
+        .navbar-inner {
             background-color: #2c2e2f;
             border-bottom: 1px solid #3f4142;
         }
-        .navbar-brand .logo-dark-bg { display: none; }
-        body.night .navbar-brand .logo-light-bg { display: none; }
-        body.night .navbar-brand .logo-dark-bg { display: block; }
         /* xenon-core 里 .boxed-container .page-container .main-content 是浅底色，
            深色下会留一片白，这里用更高优先级盖掉 */
         body.night.boxed-container .page-container .main-content {
             background-color: #2c2e2f;
+        }
+        /* 配置里的 logo 尺寸不可控，统一按导航栏高度缩放 */
+        .navbar-brand a.logo .site-logo {
+            display: block;
+            height: 40px;
+            width: auto;
+            max-width: 220px;
+            object-fit: contain;
+        }
+        .back-home {
+            float: right;
+            height: 85px;
+            line-height: 85px;
+            padding: 0 30px;
+            color: #a9a9a9;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .back-home:hover,
+        .back-home:focus {
+            color: #fff;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -48,14 +68,15 @@
     <div class="navbar-inner">
         <div class="navbar-brand">
             <a href="/" class="logo">
-                <img src="assets/static/index/images/logo_dark@2x.png" width="100%" alt=""
-                     class="hidden-xs logo-light-bg"/>
-                <img src="assets/static/index/images/logo@2x.png" width="100%" alt=""
-                     class="hidden-xs logo-dark-bg"/>
-                <img src="assets/static/index/images/logo@2x.png" width="100%" alt="" class="visible-xs"/>
+                {{ if .SiteLogo }}
+                <img src="data:image/png;base64,{{ .SiteLogo }}" class="site-logo" alt="{{ .SiteTitle }}"/>
+                {{ else }}
+                <img src="assets/static/index/images/logo@2x.png" class="site-logo" alt="WebStack"/>
+                {{ end }}
             </a>
         </div>
         <div class="navbar-mobile-clear"></div>
+        <a href="/" class="back-home"><i class="fa fa-home"></i> 返回首页</a>
     </div>
 </nav>
 <div class="page-container">
