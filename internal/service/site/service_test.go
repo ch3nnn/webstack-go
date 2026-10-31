@@ -261,7 +261,7 @@ func TestSiteService_Update(t *testing.T) {
 		Description: "site",
 		IsUsed:      pointer.Of(true),
 		File:        &multipart.FileHeader{},
-		Sort:        1,
+		Sort:        pointer.Of(1),
 	}
 
 	ctx := &gin.Context{}

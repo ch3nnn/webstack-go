@@ -61,9 +61,9 @@ func (s *service) Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.Site
 		column := gormx.ColumnName(query.StSite.IsUsed)
 		update[column] = req.IsUsed
 	}
-	if req.Sort >= 0 {
+	if req.Sort != nil {
 		column := gormx.ColumnName(query.StSite.Sort)
-		update[column] = req.Sort
+		update[column] = *req.Sort
 	}
 
 	_, err = s.siteRepository.WithContext(ctx).Update(update, s.siteRepository.WhereByID(req.Id))

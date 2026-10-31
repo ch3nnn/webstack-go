@@ -197,7 +197,7 @@ func TestSiteHandler_Update(t *testing.T) {
 		Icon:        "update-icon",
 		Description: "更新描述",
 		IsUsed:      pointer.Of(true),
-		Sort:        2,
+		Sort:        pointer.Of(2),
 	}
 
 	// Mock service 返回

@@ -1,0 +1,1 @@
+let t=[];const a=new WeakMap;function r(){t.forEach(e=>e(...a.get(e))),t=[]}function u(e,...n){a.set(e,n),!t.includes(e)&&t.push(e)===1&&requestAnimationFrame(r)}function f(e,n="default",o=[]){const s=e.$slots[n];return s===void 0?o:s()}export{u as b,f as g};

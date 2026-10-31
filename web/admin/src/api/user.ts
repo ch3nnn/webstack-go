@@ -32,3 +32,12 @@ export async function fetchInfo(): Promise<UserInfo> {
 export async function logout(): Promise<void> {
   await client.post('/admin/logout')
 }
+
+/** 改密同样先 md5 再提交 */
+export async function updatePassword(oldPassword: string, newPassword: string): Promise<void> {
+  const body = new URLSearchParams({
+    old_password: md5(oldPassword),
+    new_password: md5(newPassword),
+  })
+  await client.patch('/admin/modify_password', body)
+}
