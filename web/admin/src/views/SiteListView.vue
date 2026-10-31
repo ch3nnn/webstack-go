@@ -404,9 +404,17 @@ const columns: DataTableColumns<Site> = [
   },
 ]
 
+/**
+ * 高亮 = 「拉取失败的自动兜底」且「用户还没动过」。
+ *
+ * 抓取失败时后端把 title 兜底成 url（batchcreate.go 的 condition.Ternary），
+ * 所以 url == title 是「标题仍是原始网址」的信号；但只看它的话，用户改完标题
+ * 之外的字段（描述、Logo、分类…）高亮不会消失。加上 updated_at == created_at，
+ * 意味着这行自创建后没被编辑过——保存过一次编辑就会让它消失。
+ */
 function rowProps(row: Site) {
-  // 拉取失败时后端用 url 兜底成 title，旧页面用高亮提示需要手工修正
-  return row.url === row.title ? { class: 'row-warn' } : {}
+  const untouched = row.updated_at === row.created_at
+  return row.url === row.title && untouched ? { class: 'row-warn' } : {}
 }
 
 onMounted(async () => {
@@ -443,7 +451,7 @@ onMounted(async () => {
     </div>
 
     <p class="notice">
-      注：勾选「拉取失败时仅保存网址」创建的行，背景会有高亮，记得点编辑修正。
+      注：抓取失败的行（标题仍是原始网址）会有高亮，保存一次编辑后自动消失。
     </p>
 
     <ErrorState v-if="failed" @retry="load" />
