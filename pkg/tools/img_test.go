@@ -124,3 +124,37 @@ func TestImgSrc(t *testing.T) {
 		})
 	}
 }
+
+func TestMultipartImgToBase64_非SVG的XML不算SVG(t *testing.T) {
+	// XHTML 错误页 / RSS 也以 <?xml 开头，不能被当成 SVG 存成图片
+	xhtml := `<?xml version="1.0"?><html><body>404 Not Found</body></html>`
+	header := multipartFileHeader(t, "page.xml", []byte(xhtml))
+
+	_, err := MultipartImgToBase64(header, 64, 64)
+	assert.Error(t, err, "非 SVG 的 XML 应当按位图解码失败报错，而不是被存成 SVG")
+}
+
+func TestMultipartImgToBase64_SVG带DOCTYPE和注释(t *testing.T) {
+	cases := map[string]string{
+		"DOCTYPE": `<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">` + testSVG,
+		"注释":      "<!-- generator: figma -->\n" + testSVG,
+		"空白+声明":   "  \n<?xml version=\"1.0\"?>\n" + testSVG,
+	}
+	for name, content := range cases {
+		t.Run(name, func(t *testing.T) {
+			header := multipartFileHeader(t, "logo.svg", []byte(content))
+			got, err := MultipartImgToBase64(header, 64, 64)
+			assert.NoError(t, err)
+			assert.True(t, strings.HasPrefix(got, "data:image/svg+xml;base64,"), "没被识别为 SVG: %s", got)
+		})
+	}
+}
+
+func TestMultipartImgToBase64_超大SVG报错(t *testing.T) {
+	big := testSVG + strings.Repeat("<rect/>", 8*1024) // ~40KB
+	assert.Greater(t, len(big), maxSVGBytes)
+	header := multipartFileHeader(t, "big.svg", []byte(big))
+
+	_, err := MultipartImgToBase64(header, 64, 64)
+	assert.Error(t, err, "超过上限的 SVG 应当报错，而不是原样入库把首页撑大")
+}

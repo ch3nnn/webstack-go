@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -22,13 +23,47 @@ const (
 	pngDataURIPrefix = "data:image/png;base64,"
 	// 外链图片读入内存的上限，避免被超大响应拖垮
 	maxRemoteImageBytes = 8 << 20
+	// SVG 是原样入库的矢量图：超过这个尺寸会撑大首页，也可能撞上数据库 text 字段上限
+	maxSVGBytes = 32 << 10
+	// 判类型只看开头这么多字节
+	sniffBytes = 1024
 )
 
-// isSVG 判断内容是不是 SVG：跳过 UTF-8 BOM 和空白后，看是否以 <svg 或 <?xml 开头。
-// 不能只认扩展名/Content-Type —— 上传的文件头不可信，外链也常给 application/octet-stream。
+// isSVG 判断内容是不是 SVG：跳过 BOM、空白、XML 声明/PI/DOCTYPE/注释后，看是否以 <svg 开头。
+// 不能只认扩展名/Content-Type —— 上传的文件头不可信，外链也常给 application/octet-stream；
+// 也不能见到 <?xml 就当 SVG —— XHTML 错误页和 RSS 都以它开头。
 func isSVG(data []byte) bool {
-	trimmed := bytes.TrimLeft(bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF}), " \t\r\n")
-	return bytes.HasPrefix(trimmed, []byte("<svg")) || bytes.HasPrefix(trimmed, []byte("<?xml"))
+	if len(data) > sniffBytes {
+		data = data[:sniffBytes]
+	}
+	return bytes.HasPrefix(skipXMLProlog(data), []byte("<svg"))
+}
+
+// skipXMLProlog 跳过 BOM、空白，以及 <??> / <!-- --> / <!DOCTYPE ...> 这些前导声明。
+func skipXMLProlog(data []byte) []byte {
+	for {
+		data = bytes.TrimLeft(bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF}), " \t\r\n")
+
+		var end int
+		switch {
+		case bytes.HasPrefix(data, []byte("<?")):
+			end = bytes.Index(data, []byte("?>"))
+			end += 2
+		case bytes.HasPrefix(data, []byte("<!--")):
+			end = bytes.Index(data, []byte("-->"))
+			end += 3
+		case len(data) >= 9 && bytes.EqualFold(data[:9], []byte("<!doctype")):
+			end = bytes.IndexByte(data, '>')
+			end++
+		default:
+			return data
+		}
+
+		if end <= 0 { // 声明被截断了，交给后面的匹配失败
+			return data
+		}
+		data = data[end:]
+	}
 }
 
 // img2Base64 把图片字节转成可直接入库的字符串。
@@ -36,6 +71,9 @@ func isSVG(data []byte) bool {
 // 位图仍按 width/height 缩放，返回纯 base64（历史数据就是这个格式）。
 func img2Base64(data []byte, width, height int) (base64Str string, err error) {
 	if isSVG(data) {
+		if len(data) > maxSVGBytes {
+			return "", fmt.Errorf("SVG 体积 %d 字节，超过上限 %d 字节", len(data), maxSVGBytes)
+		}
 		return svgDataURIPrefix + base64.StdEncoding.EncodeToString(data), nil
 	}
 
@@ -86,9 +124,12 @@ func URLImgToBase64(url string, width, height int) (base64Str string, err error)
 	}
 	defer resp.Body.Close()
 
-	data, err := io.ReadAll(io.LimitReader(resp.Body, maxRemoteImageBytes))
+	data, err := io.ReadAll(io.LimitReader(resp.Body, maxRemoteImageBytes+1))
 	if err != nil {
 		return
+	}
+	if len(data) > maxRemoteImageBytes {
+		return "", fmt.Errorf("外链图片超过上限 %d 字节", maxRemoteImageBytes)
 	}
 
 	return img2Base64(data, width, height)

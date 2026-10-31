@@ -385,26 +385,10 @@ onMounted(load)
   width: 100%;
 }
 
-.modal-body {
-  max-height: 62vh;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
 :deep(.icon-option) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-:deep(.actions) {
-  display: flex;
-  gap: 2px;
-}
 </style>

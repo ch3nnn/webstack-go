@@ -4,6 +4,7 @@ import { onMounted, reactive, ref } from 'vue'
 
 import { fetchConfig, updateSiteSettings, type SiteSettingsPayload } from '@/api/config'
 import { errorMessage } from '@/api/client'
+import { imgSrc } from '@/utils/img'
 
 const message = useMessage()
 
@@ -66,13 +67,6 @@ async function load() {
   } finally {
     loading.value = false
   }
-}
-
-/** 后端把 logo / favicon 存成纯 base64（无 data: 前缀） */
-function imgSrc(value: string): string {
-  if (!value) return ''
-  if (value.startsWith('data:') || value.startsWith('http') || value.startsWith('/')) return value
-  return `data:image/png;base64,${value}`
 }
 
 function pickFile(event: Event, target: 'logo' | 'favicon') {
@@ -190,11 +184,6 @@ onMounted(load)
   width: 28px;
   height: 28px;
   object-fit: contain;
-}
-
-.hint {
-  color: var(--color-text-secondary);
-  font-size: 12px;
 }
 
 .auto-save-hint {

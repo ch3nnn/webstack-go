@@ -64,3 +64,27 @@ body {
     transform: none;
   }
 }
+
+/* ---- 弹框与表格里的通用块：各页面逐字相同过，统一放这里 ---- */
+.modal-body {
+  /* 卡片高度不随窗口，内容自己滚，头部/底部按钮始终可见 */
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.hint {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 2px;
+}

@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { NButton, NResult } from 'naive-ui'
 
-withDefaults(defineProps<{ description?: string }>(), {
-  description: '请稍后重试',
-})
-
 const emit = defineEmits<{ retry: [] }>()
 </script>
 
 <template>
   <div class="error">
-    <n-result status="error" title="加载失败" :description="description">
+    <n-result status="error" title="加载失败" description="请稍后重试">
       <template #footer>
         <n-button size="small" @click="emit('retry')">重试</n-button>
       </template>

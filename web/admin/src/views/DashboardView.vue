@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NCard, NGrid, NGridItem, NProgress, NSkeleton } from 'naive-ui'
-import { onUnmounted, ref } from 'vue'
+import { onActivated, onDeactivated, onUnmounted, ref } from 'vue'
 
 import ErrorState from '@/components/ErrorState.vue'
 
@@ -44,6 +44,11 @@ function connect() {
 }
 
 connect()
+// 页面被 keep-alive 缓存：切走只触发 deactivated，不关连接服务端会一直采样
+onActivated(() => {
+  if (!source) connect()
+})
+onDeactivated(() => source?.close())
 onUnmounted(() => source?.close())
 
 function percent(value: number | undefined): number {

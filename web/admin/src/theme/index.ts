@@ -31,6 +31,3 @@ export const themeOverrides: GlobalThemeOverrides = {
     paddingMedium: '16px 20px',
   },
 }
-
-/** 表格统一行高，列表页与抽屉共用 */
-export const TABLE_ROW_HEIGHT = 44

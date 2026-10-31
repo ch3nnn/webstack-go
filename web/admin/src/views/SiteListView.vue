@@ -21,7 +21,7 @@ import {
   type DataTableColumns,
   type UploadFileInfo,
 } from 'naive-ui'
-import { computed, h, onMounted, reactive, ref } from 'vue'
+import { computed, h, onMounted, reactive, ref, watch } from 'vue'
 
 import { listCategories, type Category } from '@/api/category'
 import { errorMessage } from '@/api/client'
@@ -37,10 +37,11 @@ import {
 } from '@/api/site'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
+import { imgSrc } from '@/utils/img'
 
 const message = useMessage()
 
-const rows = ref<Site[]>([])
+const rows = ref<SiteRow[]>([])
 const total = ref(0)
 const page = ref(1)
 const pageSize = ref(10)
@@ -48,7 +49,7 @@ const loading = ref(false)
 const failed = ref(false)
 const search = ref('')
 /** 列表按创建时间倒序；只有带分类过滤时后端才按 sort 升序，那种情况下重拉才看得到新位置 */
-const sortSnapshot = new Map<number, number>()
+type SiteRow = Site & { originSort: number }
 const categoryId = ref<number | null>(null)
 const categories = ref<Category[]>([])
 
@@ -155,9 +156,8 @@ async function load() {
       search: search.value || undefined,
       category_id: categoryId.value,
     })
-    rows.value = data.list
+    rows.value = data.list.map((item) => ({ ...item, originSort: item.sort }))
     total.value = data.pagination?.total ?? 0
-    data.list.forEach((item) => sortSnapshot.set(item.id, item.sort))
   } catch (error) {
     failed.value = true
     message.error(errorMessage(error))
@@ -196,14 +196,15 @@ async function onUsedChange(row: Site, value: boolean) {
   }
 }
 
-async function commitSort(row: Site) {
+async function commitSort(row: SiteRow) {
   const next = row.sort
-  if (next === (sortSnapshot.get(row.id) ?? 0)) return
+  if (next === row.originSort) return
   try {
     await updateSite({ id: row.id, sort: next })
-    sortSnapshot.set(row.id, next)
+    row.originSort = next
   } catch (error) {
     message.error(errorMessage(error))
+    await load()
   }
   if (categoryId.value) await load()
 }
@@ -252,6 +253,14 @@ function onFileChange(options: { file: UploadFileInfo }) {
   edit.fileName = file.name
 }
 
+// 点 X 或遮罩关闭不会走 closeEdit，这里兜住 object URL 的回收
+watch(editVisible, (visible) => {
+  if (!visible && edit.fileUrl) {
+    URL.revokeObjectURL(edit.fileUrl)
+    edit.fileUrl = ''
+  }
+})
+
 function closeEdit() {
   editVisible.value = false
   resetLogoPreview()
@@ -294,23 +303,20 @@ async function onSave() {
 }
 
 const LOGO_SIZE = 24
-
-/** 后端把 logo 存成纯 base64（位图）、SVG 的 data URI，也可能是外链 */
-function imageSrc(icon: string): string {
-  if (!icon) return ''
-  if (icon.startsWith('data:') || icon.startsWith('http') || icon.startsWith('/')) return icon
-  return `data:image/png;base64,${icon}`
-}
+/** 表格里没有 data-v，尺寸只能内联；样式恒定，提到模块级避免逐行拼接 */
+const LOGO_STYLE =
+  `width:${LOGO_SIZE}px;height:${LOGO_SIZE}px;border-radius:50%;object-fit:contain;` +
+  `display:block;margin:0 auto;background:#f2f3f5`
 
 /** 预览优先级：刚选的文件 > 正在输入的链接 > 当前已有图标 */
 const logoPreview = computed(() => {
   if (edit.fileUrl) return edit.fileUrl
   const typed = edit.thumb.trim()
   if (typed) return typed
-  return imageSrc(edit.icon)
+  return imgSrc(edit.icon)
 })
 
-const columns: DataTableColumns<Site> = [
+const columns: DataTableColumns<SiteRow> = [
   { title: 'ID', key: 'id', width: 66, fixed: 'left' },
   {
     title: 'Logo',
@@ -320,11 +326,8 @@ const columns: DataTableColumns<Site> = [
     render: (row) => {
       // 列渲染函数在 NDataTable 的渲染上下文里执行，拿不到本组件的 data-v，
       // 作用域样式对它无效，尺寸必须内联
-      const src = imageSrc(row.icon)
-      const style =
-        `width:${LOGO_SIZE}px;height:${LOGO_SIZE}px;border-radius:50%;object-fit:contain;` +
-        `display:block;margin:0 auto;background:#f2f3f5`
-      return src ? h('img', { src, style, alt: '' }) : h('span', { style })
+      const src = imgSrc(row.icon)
+      return src ? h('img', { src, style: LOGO_STYLE, alt: '' }) : h('span', { style: LOGO_STYLE })
     },
   },
   {
@@ -648,28 +651,10 @@ onMounted(async () => {
   color: #2f6feb;
 }
 
-:deep(.actions) {
-  display: flex;
-  gap: 2px;
-}
-
 .pager {
   display: flex;
   justify-content: flex-end;
   margin-top: 12px;
-}
-
-.modal-body {
-  /* 卡片高度不随窗口，内容自己滚，头部/底部按钮始终可见 */
-  max-height: 60vh;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
 }
 
 .logo-field {

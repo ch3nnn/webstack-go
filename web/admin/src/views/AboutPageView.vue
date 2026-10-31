@@ -135,11 +135,6 @@ onMounted(load)
   color: #1f2329;
 }
 
-.hint {
-  color: var(--color-text-secondary);
-  font-size: 12px;
-}
-
 .url-field a {
   color: #2f6feb;
   font-size: 12px;
