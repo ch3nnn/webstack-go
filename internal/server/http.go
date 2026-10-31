@@ -3,12 +3,15 @@ package server
 import (
 	"fmt"
 	"html/template"
+	"io/fs"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/docs"
@@ -22,8 +25,22 @@ import (
 	"github.com/ch3nnn/webstack-go/pkg/jwt"
 	"github.com/ch3nnn/webstack-go/pkg/log"
 	httpx "github.com/ch3nnn/webstack-go/pkg/server/http"
+	"github.com/ch3nnn/webstack-go/pkg/tools"
 	assets "github.com/ch3nnn/webstack-go/web"
 )
+
+// templateFuncs 是模板里可用的函数集合。
+//
+// imgSrc：图标可能是外链、SVG 的 data URI，或位图的纯 base64，统一拼成可直接用的 src。
+// 返回 template.URL 是必须的：html/template 的 URL 过滤器会把 data: 协议整个替换成
+// #ZgotmplZ，图片就成空白了；template.URL 只是跳过协议过滤，属性里的引号仍会被转义。
+func templateFuncs() template.FuncMap {
+	return template.FuncMap{
+		"imgSrc": func(icon string) template.URL {
+			return template.URL(tools.ImgSrc(icon))
+		},
+	}
+}
 
 func NewHTTPServer(
 	engine *gin.Engine,
@@ -48,7 +65,23 @@ func NewHTTPServer(
 	s.MaxMultipartMemory = 32 << 20 // 32MB
 
 	s.StaticFS("/assets", http.FS(assets.Static))
-	s.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
+	s.SetHTMLTemplate(template.Must(template.New("").
+		Funcs(templateFuncs()).
+		ParseFS(assets.Templates, "templates/**/*")))
+
+	// 管理端 SPA 产物：静态资源走 /ui，index.html 读入内存后由 NoRoute 回退返回
+	spaFS, err := fs.Sub(assets.SPA, "admin/dist")
+	if err != nil {
+		panic(err)
+	}
+	// 产物未构建时（仓库里只有 .gitkeep 占位）不 panic：后台管理不可用，
+	// 但公共站、接口文档等照常，启动日志里给出怎么修。
+	spaIndex, spaErr := fs.ReadFile(spaFS, "index.html")
+	if spaErr != nil {
+		logger.Error("管理端前端产物缺失，/admin 将不可用；请先执行 make web（或使用官方发布镜像/二进制）",
+			zap.Error(spaErr))
+	}
+	s.StaticFS("/ui", http.FS(spaFS))
 
 	// Swagger Doc
 	docs.SwaggerInfo.BasePath = "/v1"
@@ -65,43 +98,28 @@ func NewHTTPServer(
 		middleware.RequestLogMiddleware(logger),
 		middleware.ResponseLogMiddleware(logger),
 	)
-	// 404
-	s.NoRoute(v1.ErrHandler404)
-	// Index HTML
+	// 公共站保持服务端渲染（SEO 依赖）
 	s.GET("/", indexHandler.Index)
-	// About HTML
-	s.GET("/about", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "about.html", nil)
-	})
-	// Login HTML
-	s.GET("login", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "admin_login.html", nil)
-	})
-	// Render HTML
-	render := s.Group("/admin").Use(middleware.NoStrictAuth(jwt, logger))
-	{
-		render.GET("", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "admin_index.html", nil)
-		})
-		render.GET("dashboard", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "dashboard.html", nil)
-		})
-		render.GET("modify_password", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "admin_modify_password.html", nil)
-		})
-		render.GET("category", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "category_view.html", nil)
-		})
-		render.GET("site", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "site_list.html", nil)
-		})
-		render.GET("site/add", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "site_add.html", nil)
-		})
-		render.GET("config", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "conf_web.html", nil)
-		})
+	s.GET("/about", indexHandler.AboutPage)
+
+	// 管理端为 SPA：/login 与 /admin/** 一律返回 dist/index.html，鉴权由前端路由守卫接管
+	serveSPA := func(ctx *gin.Context) {
+		if spaErr != nil {
+			ctx.String(http.StatusServiceUnavailable,
+				"管理端前端产物缺失：请在仓库根目录执行 `make web` 重新构建（或使用官方发布的二进制/镜像）。")
+			return
+		}
+		ctx.Header("Cache-Control", "no-cache")
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", spaIndex)
 	}
+	// 404
+	s.NoRoute(func(ctx *gin.Context) {
+		if p := ctx.Request.URL.Path; p == "/login" || p == "/admin" || strings.HasPrefix(p, "/admin/") {
+			serveSPA(ctx)
+			return
+		}
+		v1.ErrHandler404(ctx)
+	})
 
 	v1 := s.Group("/api")
 	{

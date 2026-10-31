@@ -138,3 +138,36 @@ func TestService_Update(t *testing.T) {
 
 	assert.NoError(t, err)
 }
+
+// 回归：is_search 要真正进入 update map（列名 is_search，值取指针内容）
+func TestService_Update_IsSearch(t *testing.T) {
+	ctx := &gin.Context{}
+
+	repo, _ := setupRepository(t)
+	srv := s.NewService(logger, j, repo)
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	configDao := repository.NewMockISysConfigDao(ctrl)
+	configFunc := repository.NewMockiCustomGenSysConfigFunc(ctrl)
+
+	var got map[string]any
+	configDao.EXPECT().WithContext(gomock.Any()).Return(configFunc)
+	configDao.EXPECT().WhereByID(gomock.Any()).Return(func(dao gen.Dao) gen.Dao { return dao })
+	configFunc.EXPECT().Update(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(v interface{}, _ ...func(dao gen.Dao) gen.Dao) (int64, error) {
+			got, _ = v.(map[string]any)
+			return 1, nil
+		})
+
+	configService := NewService(srv, configDao)
+	_, err := configService.Update(ctx, &v1.ConfigUpdateReq{
+		IsSearch: pointer.Of(false),
+	})
+
+	assert.NoError(t, err)
+	if assert.NotNil(t, got) {
+		assert.Equal(t, false, got["is_search"], "update map 里应有 is_search=false，实际: %v", got)
+	}
+}

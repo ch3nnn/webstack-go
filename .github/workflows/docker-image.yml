@@ -3,6 +3,7 @@ name: Build and Push Multi-Arch Docker Image
 on:
   push:
     branches:
+      - master
       - main
     tags:
       - v*
@@ -13,6 +14,7 @@ on:
       - '**/README*'
   pull_request:
     branches:
+      - master
       - main
     paths-ignore:
       - '.*'

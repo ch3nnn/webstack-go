@@ -21,12 +21,12 @@ type Category struct {
 
 type (
 	CategoryCreateReq struct {
-		ParentID int    `form:"parent_id"` // 分类父ID
-		Level    int32  `form:"level"`     // 分类等级 1 一级分类  2 二级分类
-		Name     string `form:"name"`      // 菜单名称
-		Icon     string `form:"icon"`      // 图标
-		IsUsed   bool   `form:"is_used"`   // 是否启用 1:是 0:否
-		SortID   int    `form:"sort_id"`   // 排序 ID
+		ParentID int    `json:"parent_id" form:"parent_id"` // 分类父ID
+		Level    int32  `json:"level" form:"level"`         // 分类等级 1 一级分类  2 二级分类
+		Name     string `json:"name" form:"name"`           // 菜单名称
+		Icon     string `json:"icon" form:"icon"`           // 图标
+		IsUsed   bool   `json:"is_used" form:"is_used"`     // 是否启用 1:是 0:否
+		SortID   int    `json:"sort_id" form:"sort_id"`     // 排序 ID
 	}
 
 	CategoryCreateResp struct {
@@ -78,12 +78,12 @@ type (
 
 type (
 	CategoryUpdateReq struct {
-		ID     int     `form:"id" binding:"required"` // ID
-		Pid    *int    `form:"parent_id"`             // 父类ID
-		Name   *string `form:"name"`                  // 菜单名称
-		Icon   *string `form:"icon"`                  // 图标
-		IsUsed *bool   `form:"used"`                  // 是否启用
-		SortID *int    `form:"sort_id"`               // 排序 ID
+		ID     int     `json:"id" form:"id" binding:"required"` // ID
+		Pid    *int    `json:"parent_id" form:"parent_id"`      // 父类ID
+		Name   *string `json:"name" form:"name"`                // 菜单名称
+		Icon   *string `json:"icon" form:"icon"`                // 图标
+		IsUsed *bool   `json:"used" form:"used"`                // 是否启用
+		SortID *int    `json:"sort_id" form:"sort_id"`          // 排序 ID
 	}
 
 	CategoryUpdateResp struct {

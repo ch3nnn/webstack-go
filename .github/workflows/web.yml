@@ -1,0 +1,53 @@
+name: Web
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'web/admin/**'
+      - '.github/workflows/web.yml'
+  pull_request:
+    branches:
+      - master
+      - main
+    paths:
+      - 'web/admin/**'
+      - '.github/workflows/web.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/admin/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web/admin
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: web/admin
+        run: npm run typecheck
+
+      - name: Lint
+        working-directory: web/admin
+        run: npm run lint
+
+      - name: Build
+        working-directory: web/admin
+        run: npm run build
+
+      # dist 不再入库，由 make web / CI / 镜像构建时生成；
+      # 这里只要求「前端能构建通过」，再顺带确认 go:embed 能拿到产物。
+      - name: Verify dist feeds go:embed
+        run: test -f web/admin/dist/index.html

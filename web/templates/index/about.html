@@ -19,21 +19,78 @@
     <link rel="stylesheet" href="/assets/static/index/css/nav.css"/>
     <link rel="stylesheet" href="/assets/static/index/css/hclonely.css"/>
     <script src="assets/static/index/js/jquery-1.11.1.min.js"></script>
+    <style>
+        /* 导航栏跟随主题：浅色沿用 xenon 的白色，深色下补一条与内容区一致的深底。
+           本页导航是 .navbar-inner 结构，hclonely.css 的 night 规则只覆盖首页的
+           .user-info-navbar，不补就是浅色下一条白带／深色下一条亮带。 */
+        body.night .navbar-inner {
+            background-color: #2c2e2f;
+            border-bottom: 1px solid #3f4142;
+        }
+        /* xenon-core 里 .boxed-container .page-container .main-content 是浅底色，
+           深色下会留一片白，这里用更高优先级盖掉 */
+        body.night.boxed-container .page-container .main-content {
+            background-color: #2c2e2f;
+        }
+        /* 白色字标只在深色导航栏上可读，浅色时换成深色字标 */
+        .navbar-brand a.logo .logo-dark-bg {
+            display: none;
+        }
+        body.night .navbar-brand a.logo .logo-light-bg {
+            display: none;
+        }
+        body.night .navbar-brand a.logo .logo-dark-bg {
+            display: block;
+        }
+        .back-home {
+            float: right;
+            height: 85px;
+            line-height: 85px;
+            padding: 0 30px;
+            color: #6b7184;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .back-home:hover,
+        .back-home:focus {
+            color: #1f2329;
+            text-decoration: none;
+        }
+        body.night .back-home {
+            color: #a9a9a9;
+        }
+        body.night .back-home:hover,
+        body.night .back-home:focus {
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body class="page-body boxed-container">
+<script>
+    // 深浅色主题与首页共用同一个 night cookie，这里在内容渲染前应用，
+    // 避免从首页（深色）点进关于页时先闪一下浅色。
+    if (/(?:^|;\s*)night=1(?:;|$)/.test(document.cookie)) {
+        document.body.classList.add('night');
+    }
+</script>
 <nav class="navbar horizontal-menu navbar-fixed-top">
     <div class="navbar-inner">
         <div class="navbar-brand">
             <a href="/" class="logo">
-                <img src="assets/static/index/images/logo_dark@2x.png" width="100%" alt="" class="hidden-xs"/>
-                <img src="assets/static/index/images/logo@2x.png" width="100%" alt="" class="visible-xs"/>
+                {{ if .SiteLogo }}
+                <img src="{{ imgSrc .SiteLogo }}" class="site-logo" alt="{{ .SiteTitle }}"/>
+                {{ else }}
+                {{/* 没配 logo 时：浅色导航栏配深色字标，深色导航栏配白色字标 */}}
+                <img src="assets/static/index/images/logo_dark@2x.png"
+                     class="site-logo logo-light-bg" alt="WebStack"/>
+                <img src="assets/static/index/images/logo@2x.png"
+                     class="site-logo logo-dark-bg" alt="WebStack"/>
+                {{ end }}
             </a>
         </div>
         <div class="navbar-mobile-clear"></div>
-        <a href="https://github.com/ch3nnn/webstack-go" target="_blank">
-            <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" alt="Fork me on GitHub"/>
-        </a>
+        <a href="/" class="back-home"><i class="fa fa-home"></i> 返回首页</a>
     </div>
 </nav>
 <div class="page-container">
@@ -97,10 +154,6 @@
         <!-- Main Footer -->
         <footer class="main-footer sticky footer-type-1 fixed">
             <div class="footer-inner">
-                <div class="footer-text">
-                    &copy; 2022- 2023
-                    <a href="/about"><strong>WebStack-Go</strong></a> design by <a href="https://ch3nnn.cn" target="_blank"><strong>Ch3nnn</strong></a>
-                </div>
                 <div class="go-up">
                     <a href="#" rel="go-top">
                         <i class="fa-angle-up"></i>

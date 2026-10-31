@@ -32,7 +32,7 @@ func (s *service) Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.Site
 		update[column] = req.Title
 	}
 	if req.Icon != "" {
-		base64Str, err := tools.ResizeURLImgToBase64(req.Icon, FaviconWidth, FaviconHeight)
+		base64Str, err := tools.URLImgToBase64(req.Icon, FaviconWidth, FaviconHeight)
 		if err != nil {
 			base64Str = repository.DefaultFaviconBase64
 		}
@@ -41,7 +41,7 @@ func (s *service) Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.Site
 		update[column] = base64Str
 	}
 	if req.File != nil && req.File.Size > 0 {
-		base64Str, err := tools.ResizeMultipartImgToBase64(req.File, FaviconWidth, FaviconHeight)
+		base64Str, err := tools.MultipartImgToBase64(req.File, FaviconWidth, FaviconHeight)
 		if err != nil {
 			base64Str = repository.DefaultFaviconBase64
 		}
@@ -61,9 +61,9 @@ func (s *service) Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.Site
 		column := gormx.ColumnName(query.StSite.IsUsed)
 		update[column] = req.IsUsed
 	}
-	if req.Sort >= 0 {
+	if req.Sort != nil {
 		column := gormx.ColumnName(query.StSite.Sort)
-		update[column] = req.Sort
+		update[column] = *req.Sort
 	}
 
 	_, err = s.siteRepository.WithContext(ctx).Update(update, s.siteRepository.WhereByID(req.Id))

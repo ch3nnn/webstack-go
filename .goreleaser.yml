@@ -2,6 +2,12 @@ version: 2
 
 project_name: "webstack-go"
 
+# 管理端产物不入库；发布前在这里生成，让 go:embed 打进二进制。
+# hooks 以 shell 命令执行，所以直接 cd 进前端目录。
+before:
+  hooks:
+    - sh -c 'cd web/admin && npm ci --no-audit --no-fund && npm run build'
+
 builds:
   - id: default
     dir: .  # 根目录
@@ -22,7 +28,8 @@ builds:
 
 archives:
   - id: default
-    format: tar.gz
+    formats:
+      - tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - src: "config/*"
@@ -30,7 +37,8 @@ archives:
     wrap_in_directory: true
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
 
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"

@@ -1,9 +1,20 @@
-FROM golang:1.22-alpine AS builder
+# 管理端前端产物不入库，镜像构建时现场生成
+FROM node:20-alpine AS web
+WORKDIR /web
+COPY web/admin/package.json web/admin/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY web/admin/ ./
+RUN npm run build
+
+
+FROM golang:1.23-alpine AS builder
 RUN set -eux && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 
 ARG APP_RELATIVE_PATH
 
 COPY . /data/app
+# 覆盖仓库里的占位 dist（只有 .gitkeep），让 go:embed 拿到真正的产物
+COPY --from=web /web/dist /data/app/web/admin/dist
 WORKDIR /data/app
 
 RUN rm -rf /data/app/bin/

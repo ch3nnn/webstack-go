@@ -99,6 +99,20 @@ func (mr *MockISysConfigDaoMockRecorder) WhereByIsAbout(isAbout any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WhereByIsAbout", reflect.TypeOf((*MockISysConfigDao)(nil).WhereByIsAbout), isAbout)
 }
 
+// WhereByIsSearch mocks base method.
+func (m *MockISysConfigDao) WhereByIsSearch(isSearch bool) func(gen.Dao) gen.Dao {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WhereByIsSearch", isSearch)
+	ret0, _ := ret[0].(func(gen.Dao) gen.Dao)
+	return ret0
+}
+
+// WhereByIsSearch indicates an expected call of WhereByIsSearch.
+func (mr *MockISysConfigDaoMockRecorder) WhereByIsSearch(isSearch any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WhereByIsSearch", reflect.TypeOf((*MockISysConfigDao)(nil).WhereByIsSearch), isSearch)
+}
+
 // WhereBySiteDesc mocks base method.
 func (m *MockISysConfigDao) WhereBySiteDesc(siteDesc string) func(gen.Dao) gen.Dao {
 	m.ctrl.T.Helper()
@@ -407,4 +421,18 @@ func (mr *MockiCustomGenSysConfigFuncMockRecorder) Update(v any, whereFunc ...an
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{v}, whereFunc...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockiCustomGenSysConfigFunc)(nil).Update), varargs...)
+}
+
+// WhereBySiteURL mocks base method.
+func (m *MockISysConfigDao) WhereBySiteURL(siteUrl string) func(gen.Dao) gen.Dao {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WhereBySiteURL", siteUrl)
+	ret0, _ := ret[0].(func(gen.Dao) gen.Dao)
+	return ret0
+}
+
+// WhereBySiteURL indicates an expected call of WhereBySiteURL.
+func (mr *MockISysConfigDaoMockRecorder) WhereBySiteURL(siteUrl any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WhereBySiteURL", reflect.TypeOf((*MockISysConfigDao)(nil).WhereBySiteURL), siteUrl)
 }

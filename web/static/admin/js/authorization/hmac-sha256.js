@@ -1,1 +1,0 @@
-(function(e,i,r){typeof exports=="object"?module.exports=exports=i(require("./core"),require("./sha256"),require("./hmac")):typeof define=="function"&&define.amd?define(["./core","./sha256","./hmac"],i):i(e.CryptoJS)})(this,function(e){return e.HmacSHA256});

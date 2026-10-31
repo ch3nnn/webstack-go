@@ -52,6 +52,15 @@ var DefaultSysMenuAdmin = []*model.SysMenu{
 		Sort:   601,
 		IsUsed: true,
 	},
+	{
+		ID:     6,
+		Pid:    4,
+		Name:   "关于页面设置",
+		Link:   "/admin/about_page",
+		Level:  1,
+		Sort:   602,
+		IsUsed: true,
+	},
 }
 
 var _ iCustomGenSysMenuFunc = (*customSysMenuDao)(nil)

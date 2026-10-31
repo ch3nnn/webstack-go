@@ -22,6 +22,8 @@ func (s *service) About(ctx *gin.Context) (*v1.AboutResp, error) {
 			AboutSite:   sysConfig.AboutSite,
 			AboutAuthor: sysConfig.AboutAuthor,
 			IsAbout:     sysConfig.IsAbout,
+			SiteTitle:   sysConfig.SiteTitle,
+			SiteLogo:    sysConfig.SiteLogo,
 		},
 	}, nil
 }

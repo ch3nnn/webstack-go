@@ -31,6 +31,7 @@ func newSysConfig(db *gorm.DB, opts ...gen.DOOption) sysConfig {
 	_sysConfig.AboutSite = field.NewString(tableName, "about_site")
 	_sysConfig.AboutAuthor = field.NewString(tableName, "about_author")
 	_sysConfig.IsAbout = field.NewBool(tableName, "is_about")
+	_sysConfig.IsSearch = field.NewBool(tableName, "is_search")
 	_sysConfig.SiteTitle = field.NewString(tableName, "site_title")
 	_sysConfig.SiteKeyword = field.NewString(tableName, "site_keyword")
 	_sysConfig.SiteDesc = field.NewString(tableName, "site_desc")
@@ -52,6 +53,7 @@ type sysConfig struct {
 	AboutSite   field.String
 	AboutAuthor field.String
 	IsAbout     field.Bool
+	IsSearch    field.Bool
 	SiteTitle   field.String
 	SiteKeyword field.String
 	SiteDesc    field.String
@@ -79,6 +81,7 @@ func (s *sysConfig) updateTableName(table string) *sysConfig {
 	s.AboutSite = field.NewString(table, "about_site")
 	s.AboutAuthor = field.NewString(table, "about_author")
 	s.IsAbout = field.NewBool(table, "is_about")
+	s.IsSearch = field.NewBool(table, "is_search")
 	s.SiteTitle = field.NewString(table, "site_title")
 	s.SiteKeyword = field.NewString(table, "site_keyword")
 	s.SiteDesc = field.NewString(table, "site_desc")
@@ -112,11 +115,12 @@ func (s *sysConfig) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *sysConfig) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 11)
+	s.fieldMap = make(map[string]field.Expr, 12)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["about_site"] = s.AboutSite
 	s.fieldMap["about_author"] = s.AboutAuthor
 	s.fieldMap["is_about"] = s.IsAbout
+	s.fieldMap["is_search"] = s.IsSearch
 	s.fieldMap["site_title"] = s.SiteTitle
 	s.fieldMap["site_keyword"] = s.SiteKeyword
 	s.fieldMap["site_desc"] = s.SiteDesc

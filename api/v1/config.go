@@ -12,6 +12,7 @@ type ConfigResp struct {
 	AboutSite   string `json:"about_site"`   // 关于网站的信息
 	AboutAuthor string `json:"about_author"` // 关于作者的信息
 	IsAbout     bool   `json:"is_about"`     // 是否显示关于信息
+	IsSearch    bool   `json:"is_search"`    // 是否显示首页搜索框
 	SiteTitle   string `json:"site_title"`   // 网站标题
 	SiteKeyword string `json:"site_keyword"` // 网站关键词
 	SiteDesc    string `json:"site_desc"`    // 网站描述
@@ -26,6 +27,7 @@ type (
 		AboutSite   *string               `json:"about_site" form:"about_site"`     // 关于网站的信息
 		AboutAuthor *string               `json:"about_author" form:"about_author"` // 关于作者的信息
 		IsAbout     *bool                 `json:"is_about" form:"is_about"`         // 是否显示关于信息
+		IsSearch    *bool                 `json:"is_search" form:"is_search"`       // 是否显示首页搜索框
 		SiteTitle   *string               `json:"site_title" form:"site_title"`     // 网站标题
 		SiteKeyword *string               `json:"site_keyword" form:"site_keyword"` // 网站关键词
 		SiteDesc    *string               `json:"site_desc" form:"site_desc"`       // 网站描述

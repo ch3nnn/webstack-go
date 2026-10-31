@@ -12,3 +12,10 @@
 
 # (binary is a macro for -text -diff)
 *.png binary
+
+# 字体是二进制，禁止按文本做 EOL 转换
+*.eot binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.otf binary

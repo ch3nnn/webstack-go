@@ -22,6 +22,7 @@ type iWhereSysConfigFunc interface {
 	WhereByAboutSite(aboutSite string) func(dao gen.Dao) gen.Dao
 	WhereByAboutAuthor(aboutAuthor string) func(dao gen.Dao) gen.Dao
 	WhereByIsAbout(isAbout bool) func(dao gen.Dao) gen.Dao
+	WhereByIsSearch(isSearch bool) func(dao gen.Dao) gen.Dao
 	WhereBySiteTitle(siteTitle string) func(dao gen.Dao) gen.Dao
 	WhereBySiteKeyword(siteKeyword string) func(dao gen.Dao) gen.Dao
 	WhereBySiteDesc(siteDesc string) func(dao gen.Dao) gen.Dao
@@ -71,6 +72,12 @@ func (s *sysConfigDao) WhereByAboutSite(aboutSite string) func(dao gen.Dao) gen.
 func (s *sysConfigDao) WhereByAboutAuthor(aboutAuthor string) func(dao gen.Dao) gen.Dao {
 	return func(dao gen.Dao) gen.Dao {
 		return dao.Where(query.SysConfig.AboutAuthor.Eq(aboutAuthor))
+	}
+}
+
+func (s *sysConfigDao) WhereByIsSearch(isSearch bool) func(dao gen.Dao) gen.Dao {
+	return func(dao gen.Dao) gen.Dao {
+		return dao.Where(query.SysConfig.IsSearch.Is(isSearch))
 	}
 }
 

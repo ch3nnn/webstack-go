@@ -1,6 +1,14 @@
 bin/
 storage/logs
+web/admin/node_modules
+web/admin/.vite
+
+# 管理端构建产物不入库：由 make web / CI / 镜像构建时生成。
+# 只保留 .gitkeep，否则 //go:embed all:admin/dist 匹配不到文件会直接编译失败。
+web/admin/dist/*
+!web/admin/dist/.gitkeep
 .idea
 *.log
 deploy/docker-compose/conf
 deploy/docker-compose/data
+storage/*.db

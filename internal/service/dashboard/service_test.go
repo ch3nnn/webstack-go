@@ -9,6 +9,7 @@ import (
 	"flag"
 	"os"
 	"testing"
+	"time"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
@@ -74,4 +75,23 @@ func TestDashboardService_Dashboard(t *testing.T) {
 	_, err := dashboardService.Dashboard(ctx)
 
 	assert.NoError(t, err)
+}
+
+// 仪表盘是 SSE 首屏：采集一旦阻塞，前端就只能在骨架屏里干等。
+// cpu.Percent(interval) 会阻塞整整一个 interval（实测 1001ms），这里给 500ms 上限守住。
+func TestService_Dashboard_采集不能阻塞(t *testing.T) {
+	ctx := &gin.Context{}
+
+	repo, _ := setupRepository(t)
+	srv := s.NewService(logger, j, repo)
+	dashboardService := NewService(srv)
+
+	start := time.Now()
+	resp, err := dashboardService.Dashboard(ctx)
+	elapsed := time.Since(start)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Less(t, elapsed.Milliseconds(), int64(500),
+		"Dashboard 采集耗时 %dms，说明又阻塞在 CPU 采样上了", elapsed.Milliseconds())
 }

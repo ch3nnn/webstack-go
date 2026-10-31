@@ -1,0 +1,90 @@
+/**
+ * 动效基线。验收项落地在此文件，页面不得自带 transition: all。
+ * 1) 时长 <= 250ms，进场 ease-out
+ * 2) 可点击元素必须有 :active 反馈
+ * 3) hover 动效仅在精细指针设备生效
+ * 4) 弹层从触发点缩放，起点 scale(0.95) + opacity 0
+ * 5) 高频元素（表格/抽屉/弹窗内容）不加装饰性动效
+ * 6) prefers-reduced-motion 下只保留颜色与透明度过渡
+ */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-press: 140ms;
+  --dur-pop: 180ms;
+  --color-border: #eef0f4;
+  --color-text-secondary: #6b7280;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    sans-serif;
+  color: #1f2329;
+  background: #f5f6f8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 按压反馈：所有按钮类元素 */
+.n-button,
+.pressable {
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.n-button:active,
+.pressable:active {
+  transform: scale(0.97);
+}
+
+/* hover 只在有真实指针的设备上生效 */
+@media (hover: hover) and (pointer: fine) {
+  .hoverable {
+    transition: background-color var(--dur-pop) var(--ease-out);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-property: color, background-color, border-color, opacity !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .n-button:active,
+  .pressable:active {
+    transform: none;
+  }
+}
+
+/* ---- 弹框与表格里的通用块：各页面逐字相同过，统一放这里 ---- */
+.modal-body {
+  /* 卡片高度不随窗口，内容自己滚，头部/底部按钮始终可见 */
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.hint {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 2px;
+}

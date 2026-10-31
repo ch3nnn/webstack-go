@@ -7,6 +7,7 @@ package config
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -121,4 +122,35 @@ func TestConfigHandler_Update(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+// 回归：管理端发的是 JSON + 下划线键名，is_search 必须能绑定到 IsSearch
+func TestConfigHandler_Update_IsSearchJSON(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	var got *v1.ConfigUpdateReq
+	mockConfigService := configservice.NewMockService(ctrl)
+	mockConfigService.EXPECT().Update(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, req *v1.ConfigUpdateReq) (*v1.ConfigUpdateResp, error) {
+			got = req
+			return &v1.ConfigUpdateResp{}, nil
+		})
+
+	configHandler := NewHandler(hdl, mockConfigService)
+	router.PUT("/config/is-search", configHandler.Update)
+
+	req, _ := http.NewRequest(http.MethodPut, "/config/is-search",
+		bytes.NewBufferString(`{"is_search":false}`))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	if !assert.NotNil(t, got) {
+		return
+	}
+	if assert.NotNil(t, got.IsSearch, `JSON 键 "is_search" 未绑定到 IsSearch`) {
+		assert.False(t, *got.IsSearch)
+	}
 }
