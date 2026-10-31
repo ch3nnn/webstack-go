@@ -54,9 +54,9 @@
                 <div class="logo">
                     <a href="/" class="logo-expanded">
                         {{ if .ConfigSite.SiteLogo }}
-                            <img src="data:image/png;base64,{{ .ConfigSite.SiteLogo }}" width="100%" alt=""/>
+                            <img src="data:image/png;base64,{{ .ConfigSite.SiteLogo }}" class="site-logo" alt=""/>
                         {{ else }}
-                            <img src="assets/static/index/images/logo@2x.png" width="100%" alt=""/>
+                            <img src="assets/static/index/images/logo@2x.png" class="site-logo" alt=""/>
                         {{ end }}
                     </a>
                     <a href="index.html" class="logo-collapsed">
