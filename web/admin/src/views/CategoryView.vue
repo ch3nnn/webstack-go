@@ -5,18 +5,17 @@ import {
   NDataTable,
   NForm,
   NFormItem,
-  NGrid,
-  NGridItem,
   NInput,
   NInputNumber,
+  NModal,
   NPopconfirm,
   NSelect,
   NSwitch,
   useMessage,
   type DataTableColumns,
+  type SelectOption,
 } from 'naive-ui'
 import { computed, h, onMounted, reactive, ref } from 'vue'
-import type { SelectOption } from 'naive-ui'
 
 import {
   createCategory,
@@ -42,8 +41,12 @@ const message = useMessage()
 const rows = ref<CategoryRow[]>([])
 const loading = ref(false)
 const failed = ref(false)
+
+const formVisible = ref(false)
 const submitting = ref(false)
 const editingId = ref<number | null>(null)
+/** 上级分类在「编辑」与「加子分类」时锁定，避免改出跨级数据 */
+const parentLocked = ref(false)
 
 const form = reactive({
   parentId: 0,
@@ -53,14 +56,17 @@ const form = reactive({
   isUsed: true,
 })
 
-const roots = computed(() => rows.value)
-
 const parentOptions = computed(() => [
   { label: '一级分类', value: 0 },
-  ...roots.value.map((item) => ({ label: item.name, value: item.id })),
+  ...rows.value.map((item) => ({ label: item.name, value: item.id })),
 ])
 
 const iconOptions = LINE_ICONS.map((icon) => ({ label: icon, value: icon }))
+
+const modalTitle = computed(() => {
+  if (editingId.value !== null) return '修改分类'
+  return form.parentId !== 0 ? '新增子分类' : '新增分类'
+})
 
 function renderIconLabel(option: SelectOption) {
   return h('span', { class: 'icon-option' }, [
@@ -68,8 +74,6 @@ function renderIconLabel(option: SelectOption) {
     String(option.label),
   ])
 }
-
-const isChildForm = computed(() => form.parentId !== 0)
 
 async function load() {
   loading.value = true
@@ -101,6 +105,7 @@ async function load() {
 
 function resetForm() {
   editingId.value = null
+  parentLocked.value = false
   form.parentId = 0
   form.name = ''
   form.icon = 'linecons-globe'
@@ -108,7 +113,52 @@ function resetForm() {
   form.isUsed = true
 }
 
-async function onSubmit() {
+function openCreate() {
+  resetForm()
+  formVisible.value = true
+}
+
+function closeForm() {
+  formVisible.value = false
+  resetForm()
+}
+
+/** 行内「新增子分类」：只有一级分类能加子类 */
+async function openCreateChild(row: CategoryRow) {
+  try {
+    const detail = await getCategory(row.id)
+    if (!detail.is_add) {
+      message.warning('二级分类不可创建分类')
+      return
+    }
+    resetForm()
+    form.parentId = detail.id
+    parentLocked.value = true
+    formVisible.value = true
+  } catch (error) {
+    message.error(errorMessage(error))
+  }
+}
+
+/** 行内「修改」：先取详情回显，再开弹框 */
+async function openEdit(row: CategoryRow) {
+  try {
+    const detail = await getCategory(row.id)
+    resetForm()
+    editingId.value = detail.id
+    form.parentId = detail.pid
+    form.name = detail.name
+    form.icon = detail.icon || 'linecons-globe'
+    form.sortId = detail.sort_id
+    form.isUsed = row.is_used
+    parentLocked.value = true
+    formVisible.value = true
+  } catch (error) {
+    message.error(errorMessage(error))
+  }
+}
+
+async function submitForm() {
   if (!form.name.trim()) {
     message.warning('请输入分类名称')
     return
@@ -136,7 +186,7 @@ async function onSubmit() {
       })
       message.success('新增成功')
     }
-    resetForm()
+    closeForm()
     await load()
   } catch (error) {
     message.error(errorMessage(error))
@@ -145,39 +195,10 @@ async function onSubmit() {
   }
 }
 
-async function onAddChild(row: CategoryRow) {
-  try {
-    const detail = await getCategory(row.id)
-    if (!detail.is_add) {
-      message.warning('二级分类不可创建分类')
-      return
-    }
-    resetForm()
-    form.parentId = detail.id
-  } catch (error) {
-    message.error(errorMessage(error))
-  }
-}
-
-async function onEdit(row: CategoryRow) {
-  try {
-    const detail = await getCategory(row.id)
-    editingId.value = detail.id
-    form.parentId = detail.pid
-    form.name = detail.name
-    form.icon = detail.icon || 'linecons-globe'
-    form.sortId = detail.sort_id
-    form.isUsed = row.is_used
-  } catch (error) {
-    message.error(errorMessage(error))
-  }
-}
-
 async function onDelete(row: CategoryRow) {
   try {
     await deleteCategory(row.id)
     message.success('已删除')
-    if (editingId.value === row.id) resetForm()
     await load()
   } catch (error) {
     message.error(errorMessage(error))
@@ -185,7 +206,7 @@ async function onDelete(row: CategoryRow) {
 }
 
 /**
- * 排序在失焦/提交时才落库：输入过程中每敲一个字符都发请求 + 重拉列表，
+ * 排序在失焦时才落库：输入过程中每敲一个字符都发请求 + 重拉列表，
  * 会把正在编辑的输入框整个换掉。
  * 落库后重新拉列表——列表按 sort 升序排，不重拉就看不到新位置。
  */
@@ -213,7 +234,13 @@ async function onUsedChange(row: CategoryRow, value: boolean) {
 }
 
 const columns: DataTableColumns<CategoryRow> = [
-  { title: '名称', key: 'name', minWidth: 140 },
+  { title: '名称', key: 'name', minWidth: 160 },
+  {
+    title: '图标',
+    key: 'icon',
+    width: 90,
+    render: (row) => h('i', { class: row.icon }),
+  },
   {
     title: '排序',
     key: 'sort',
@@ -231,12 +258,6 @@ const columns: DataTableColumns<CategoryRow> = [
       }),
   },
   {
-    title: '图标',
-    key: 'icon',
-    width: 90,
-    render: (row) => h('i', { class: row.icon }),
-  },
-  {
     title: '启用',
     key: 'is_used',
     width: 80,
@@ -251,24 +272,25 @@ const columns: DataTableColumns<CategoryRow> = [
   {
     title: '操作',
     key: 'actions',
-    width: 190,
+    width: 210,
     render: (row) =>
       h('div', { class: 'actions' }, [
         h(
           NButton,
-          { size: 'tiny', quaternary: true, onClick: () => onAddChild(row) },
-          { default: () => '新增' },
+          { size: 'tiny', quaternary: true, onClick: () => openCreateChild(row) },
+          { default: () => '新增子分类' },
         ),
         h(
           NButton,
-          { size: 'tiny', quaternary: true, onClick: () => onEdit(row) },
+          { size: 'tiny', quaternary: true, onClick: () => openEdit(row) },
           { default: () => '修改' },
         ),
         h(
           NPopconfirm,
           { onPositiveClick: () => onDelete(row) },
           {
-            trigger: () => h(NButton, { size: 'tiny', quaternary: true, type: 'error' }, { default: () => '删除' }),
+            trigger: () =>
+              h(NButton, { size: 'tiny', quaternary: true, type: 'error' }, { default: () => '删除' }),
             default: () => `确认删除分类「${row.name}」？`,
           },
         ),
@@ -280,70 +302,89 @@ onMounted(load)
 </script>
 
 <template>
-  <n-grid :cols="24" :x-gap="12" :y-gap="12" responsive="screen" item-responsive>
-    <n-grid-item span="24 l:8">
-      <n-card size="small" :title="editingId === null ? '新增分类' : '修改分类'">
-        <n-form label-placement="left" label-width="76" @submit.prevent="onSubmit">
-          <n-form-item label="上级分类">
-            <n-select
-              v-model:value="form.parentId"
-              :options="parentOptions"
-              :disabled="editingId !== null || isChildForm"
-            />
-          </n-form-item>
-          <n-form-item label="分类名称">
-            <n-input v-model:value="form.name" placeholder="请输入分类名称" />
-          </n-form-item>
-          <n-form-item label="分类图标">
-            <n-select
-              v-model:value="form.icon"
-              :options="iconOptions"
-              :render-label="renderIconLabel"
-              filterable
-            />
-          </n-form-item>
-          <n-form-item label="排序">
-            <n-input-number v-model:value="form.sortId" :min="0" class="full" />
-          </n-form-item>
-          <n-form-item label="是否启用">
-            <n-switch v-model:value="form.isUsed" />
-          </n-form-item>
-          <n-form-item label=" ">
-            <div class="form-actions">
-              <n-button type="primary" :loading="submitting" attr-type="submit">提交</n-button>
-              <n-button v-if="editingId !== null" quaternary @click="resetForm">取消</n-button>
-            </div>
-          </n-form-item>
-        </n-form>
-      </n-card>
-    </n-grid-item>
+  <n-card size="small">
+    <div class="toolbar">
+      <n-button type="primary" @click="openCreate">新增</n-button>
+    </div>
 
-    <n-grid-item span="24 l:16">
-      <n-card size="small" title="分类列表">
-        <ErrorState v-if="failed" @retry="load" />
-        <EmptyState v-else-if="!loading && rows.length === 0" description="还没有分类" action-text="新增分类" @action="resetForm" />
-        <n-data-table
-          v-else
-          :columns="columns"
-          :data="rows"
-          :loading="loading"
-          :row-key="(row: CategoryRow) => row.id"
-          :bordered="false"
-          size="small"
-          default-expand-all
-        />
-      </n-card>
-    </n-grid-item>
-  </n-grid>
+    <ErrorState v-if="failed" @retry="load" />
+    <EmptyState
+      v-else-if="!loading && rows.length === 0"
+      description="还没有分类"
+      action-text="新增分类"
+      @action="openCreate"
+    />
+    <n-data-table
+      v-else
+      :columns="columns"
+      :data="rows"
+      :loading="loading"
+      :row-key="(row: CategoryRow) => row.id"
+      :bordered="false"
+      size="small"
+      default-expand-all
+    />
+  </n-card>
+
+  <!-- 宽度必须走 style：naive 的弹框在 teleport 里渲染，class 落不到根节点 -->
+  <n-modal
+    v-model:show="formVisible"
+    preset="card"
+    :title="modalTitle"
+    :style="{ width: '520px' }"
+    :mask-closable="false"
+  >
+    <div class="modal-body">
+      <n-form label-placement="left" label-width="76">
+        <n-form-item label="上级分类">
+          <n-select v-model:value="form.parentId" :options="parentOptions" :disabled="parentLocked" />
+        </n-form-item>
+        <n-form-item label="分类名称">
+          <n-input v-model:value="form.name" placeholder="请输入分类名称" @keyup.enter="submitForm" />
+        </n-form-item>
+        <n-form-item label="分类图标">
+          <n-select
+            v-model:value="form.icon"
+            :options="iconOptions"
+            :render-label="renderIconLabel"
+            filterable
+          />
+        </n-form-item>
+        <n-form-item label="排序">
+          <n-input-number v-model:value="form.sortId" :min="0" class="full" />
+        </n-form-item>
+        <n-form-item label="是否启用">
+          <n-switch v-model:value="form.isUsed" />
+        </n-form-item>
+      </n-form>
+    </div>
+    <template #footer>
+      <div class="modal-footer">
+        <n-button quaternary @click="closeForm">取消</n-button>
+        <n-button type="primary" :loading="submitting" @click="submitForm">提交</n-button>
+      </div>
+    </template>
+  </n-modal>
 </template>
 
 <style scoped>
+.toolbar {
+  margin-bottom: 12px;
+}
+
 .full {
   width: 100%;
 }
 
-.form-actions {
+.modal-body {
+  max-height: 62vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.modal-footer {
   display: flex;
+  justify-content: flex-end;
   gap: 8px;
 }
 
