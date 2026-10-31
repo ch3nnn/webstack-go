@@ -295,7 +295,7 @@ async function onSave() {
 
 const LOGO_SIZE = 24
 
-/** 后端把 logo 存成纯 base64（无 data: 前缀），也可能是外链 */
+/** 后端把 logo 存成纯 base64（位图）、SVG 的 data URI，也可能是外链 */
 function imageSrc(icon: string): string {
   if (!icon) return ''
   if (icon.startsWith('data:') || icon.startsWith('http') || icon.startsWith('/')) return icon
@@ -568,12 +568,12 @@ onMounted(async () => {
                 <n-upload
                   :default-upload="false"
                   :show-file-list="false"
-                  accept=".jpg,.png"
+                  accept=".jpg,.jpeg,.png,.svg"
                   @change="onFileChange"
                 >
                   <n-button attr-type="button">选择文件</n-button>
                 </n-upload>
-                <span class="logo-hint">{{ edit.fileName || '未选择新文件' }}</span>
+                <span class="logo-hint">{{ edit.fileName || '未选择新文件（PNG / JPG / SVG）' }}</span>
               </div>
             </div>
           </div>

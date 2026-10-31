@@ -11,7 +11,7 @@
     <meta name="description" content="{{ .ConfigSite.SiteDesc }}">
 
     {{ if .ConfigSite.SiteFavicon }}
-        <link rel="shortcut icon" href="data:image/png;base64,{{ .ConfigSite.SiteFavicon }}">
+        <link rel="shortcut icon" href="{{ imgSrc .ConfigSite.SiteFavicon }}">
     {{ else }}
         <link rel="shortcut icon" href="/assets/static/index/images/favicon.png">
     {{ end }}
@@ -54,7 +54,7 @@
                 <div class="logo">
                     <a href="/" class="logo-expanded">
                         {{ if .ConfigSite.SiteLogo }}
-                            <img src="data:image/png;base64,{{ .ConfigSite.SiteLogo }}" class="site-logo" alt=""/>
+                            <img src="{{ imgSrc .ConfigSite.SiteLogo }}" class="site-logo" alt=""/>
                         {{ else }}
                             <img src="assets/static/index/images/logo@2x.png" class="site-logo" alt=""/>
                         {{ end }}
@@ -174,7 +174,7 @@
                      data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{{ .Description }}">
                     <div class="xe-comment-entry">
                         <a class="xe-user-img">
-                            <img data-src="data:image/png;base64,{{ .Icon }}" class="lozad img-circle" width="40">
+                            <img data-src="{{ imgSrc .Icon }}" class="lozad img-circle" width="40">
                         </a>
                         <div class="xe-comment">
                             <a href="#" class="xe-user-name overflowClip_1">

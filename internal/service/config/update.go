@@ -61,7 +61,7 @@ func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.Co
 		update[column] = *req.IsSearch
 	}
 	if req.LogoFile != nil && req.LogoFile.Size > 0 {
-		base64Str, err := tools.ResizeMultipartImgToBase64(req.LogoFile, LogoWidth, LogoHeight)
+		base64Str, err := tools.MultipartImgToBase64(req.LogoFile, LogoWidth, LogoHeight)
 		if err != nil {
 			base64Str = repository.DefaultLogoBase64
 		}
@@ -70,7 +70,7 @@ func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.Co
 		update[column] = base64Str
 	}
 	if req.FaviconFile != nil && req.FaviconFile.Size > 0 {
-		base64Str, err := tools.ResizeMultipartImgToBase64(req.FaviconFile, FaviconWidth, FaviconHeight)
+		base64Str, err := tools.MultipartImgToBase64(req.FaviconFile, FaviconWidth, FaviconHeight)
 		if err != nil {
 			base64Str = repository.DefaultFaviconBase64
 		}

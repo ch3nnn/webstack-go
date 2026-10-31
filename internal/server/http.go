@@ -24,8 +24,22 @@ import (
 	"github.com/ch3nnn/webstack-go/pkg/jwt"
 	"github.com/ch3nnn/webstack-go/pkg/log"
 	httpx "github.com/ch3nnn/webstack-go/pkg/server/http"
+	"github.com/ch3nnn/webstack-go/pkg/tools"
 	assets "github.com/ch3nnn/webstack-go/web"
 )
+
+// templateFuncs 是模板里可用的函数集合。
+//
+// imgSrc：图标可能是外链、SVG 的 data URI，或位图的纯 base64，统一拼成可直接用的 src。
+// 返回 template.URL 是必须的：html/template 的 URL 过滤器会把 data: 协议整个替换成
+// #ZgotmplZ，图片就成空白了；template.URL 只是跳过协议过滤，属性里的引号仍会被转义。
+func templateFuncs() template.FuncMap {
+	return template.FuncMap{
+		"imgSrc": func(icon string) template.URL {
+			return template.URL(tools.ImgSrc(icon))
+		},
+	}
+}
 
 func NewHTTPServer(
 	engine *gin.Engine,
@@ -50,7 +64,9 @@ func NewHTTPServer(
 	s.MaxMultipartMemory = 32 << 20 // 32MB
 
 	s.StaticFS("/assets", http.FS(assets.Static))
-	s.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
+	s.SetHTMLTemplate(template.Must(template.New("").
+		Funcs(templateFuncs()).
+		ParseFS(assets.Templates, "templates/**/*")))
 
 	// 管理端 SPA 产物：静态资源走 /ui，index.html 读入内存后由 NoRoute 回退返回
 	spaFS, err := fs.Sub(assets.SPA, "admin/dist")

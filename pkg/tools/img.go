@@ -12,12 +12,34 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strings"
 
 	"github.com/disintegration/imaging"
 )
 
-func resizeImg2Base64(r io.Reader, width, height int) (base64Str string, err error) {
-	img, err := imaging.Decode(r, imaging.AutoOrientation(true))
+const (
+	svgDataURIPrefix = "data:image/svg+xml;base64,"
+	pngDataURIPrefix = "data:image/png;base64,"
+	// 外链图片读入内存的上限，避免被超大响应拖垮
+	maxRemoteImageBytes = 8 << 20
+)
+
+// isSVG 判断内容是不是 SVG：跳过 UTF-8 BOM 和空白后，看是否以 <svg 或 <?xml 开头。
+// 不能只认扩展名/Content-Type —— 上传的文件头不可信，外链也常给 application/octet-stream。
+func isSVG(data []byte) bool {
+	trimmed := bytes.TrimLeft(bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF}), " \t\r\n")
+	return bytes.HasPrefix(trimmed, []byte("<svg")) || bytes.HasPrefix(trimmed, []byte("<?xml"))
+}
+
+// img2Base64 把图片字节转成可直接入库的字符串。
+// SVG 是矢量图，重采样只会丢精度，所以原样保留并补上 data URI 前缀；
+// 位图仍按 width/height 缩放，返回纯 base64（历史数据就是这个格式）。
+func img2Base64(data []byte, width, height int) (base64Str string, err error) {
+	if isSVG(data) {
+		return svgDataURIPrefix + base64.StdEncoding.EncodeToString(data), nil
+	}
+
+	img, err := imaging.Decode(bytes.NewReader(data), imaging.AutoOrientation(true))
 	if err != nil {
 		return
 	}
@@ -33,32 +55,25 @@ func resizeImg2Base64(r io.Reader, width, height int) (base64Str string, err err
 	return
 }
 
-// ResizeMultipartImgToBase64 将multipart.FileHeader表示的图片文件调整大小，并以base64编码字符串的形式返回。
-// 参数f是包含图片文件信息的multipart.FileHeader指针；
-// 参数width和height分别是目标图片的宽度和高度。
-// 返回值base64Str是调整大小后的图片的base64编码字符串；err是错误信息，如果执行过程中发生错误则不为nil。
-func ResizeMultipartImgToBase64(f *multipart.FileHeader, width, height int) (base64Str string, err error) {
+// MultipartImgToBase64 把表单上传的图片转成入库字符串（SVG 原样保留，位图缩放到 width×height）。
+func MultipartImgToBase64(f *multipart.FileHeader, width, height int) (base64Str string, err error) {
 	file, err := f.Open()
 	if err != nil {
 		return
 	}
 	defer file.Close()
 
-	return resizeImg2Base64(file, width, height)
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return
+	}
+
+	return img2Base64(data, width, height)
 }
 
-// ResizeURLImgToBase64 从指定的URL获取图像，并将其调整为指定的宽度和高度后，转换为Base64编码的字符串。
-// 参数:
-//
-//	url - 图像的URL地址。
-//	width - 调整后图像的宽度。
-//	height - 调整后图像的高度。
-//
-// 返回值:
-//
-//	base64Str - 转换后的Base64编码字符串。
-//	err - 错误信息，如果执行过程中遇到任何错误，则返回该错误。
-func ResizeURLImgToBase64(url string, width, height int) (base64Str string, err error) {
+// URLImgToBase64 抓取外链图片并转成入库字符串（SVG 原样保留，位图缩放到 width×height）。
+// 参数 url 是图片地址，width/height 是位图的目标尺寸。
+func URLImgToBase64(url string, width, height int) (base64Str string, err error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -71,5 +86,24 @@ func ResizeURLImgToBase64(url string, width, height int) (base64Str string, err 
 	}
 	defer resp.Body.Close()
 
-	return resizeImg2Base64(resp.Body, width, height)
+	data, err := io.ReadAll(io.LimitReader(resp.Body, maxRemoteImageBytes))
+	if err != nil {
+		return
+	}
+
+	return img2Base64(data, width, height)
+}
+
+// ImgSrc 把库里的图标值变成可以直接放进 <img src> / <link href> 的值。
+// 库里可能是：外链、本站相对路径、SVG 的 data URI，或位图的纯 base64。
+func ImgSrc(icon string) string {
+	if icon == "" {
+		return ""
+	}
+	if strings.HasPrefix(icon, "data:") ||
+		strings.HasPrefix(icon, "http") ||
+		strings.HasPrefix(icon, "/") {
+		return icon
+	}
+	return pngDataURIPrefix + icon
 }

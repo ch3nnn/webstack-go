@@ -69,7 +69,7 @@
         <div class="navbar-brand">
             <a href="/" class="logo">
                 {{ if .SiteLogo }}
-                <img src="data:image/png;base64,{{ .SiteLogo }}" class="site-logo" alt="{{ .SiteTitle }}"/>
+                <img src="{{ imgSrc .SiteLogo }}" class="site-logo" alt="{{ .SiteTitle }}"/>
                 {{ else }}
                 <img src="assets/static/index/images/logo@2x.png" class="site-logo" alt="WebStack"/>
                 {{ end }}
