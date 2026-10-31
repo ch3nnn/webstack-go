@@ -2,41 +2,34 @@
 import {
   NButton,
   NCard,
-  NCheckbox,
   NDataTable,
-  NForm,
-  NFormItem,
   NInput,
   NInputNumber,
-  NModal,
   NPagination,
   NPopconfirm,
-  NRadio,
-  NRadioGroup,
   NSelect,
   NSwitch,
   NTooltip,
-  NUpload,
   useMessage,
   type DataTableColumns,
-  type UploadFileInfo,
 } from 'naive-ui'
-import { computed, h, onMounted, reactive, ref, watch } from 'vue'
+import { computed, h, onMounted, ref } from 'vue'
 
 import { listCategories, type Category } from '@/api/category'
 import { errorMessage } from '@/api/client'
 import {
-  createSites,
   deleteSite,
   exportUrl,
   listSites,
   syncSite,
   updateSite,
   type Site,
-  type SiteCreateResult,
 } from '@/api/site'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
+import SiteCreateModal from '@/components/site/SiteCreateModal.vue'
+import SiteDetailModal from '@/components/site/SiteDetailModal.vue'
+import SiteEditModal from '@/components/site/SiteEditModal.vue'
 import { imgSrc } from '@/utils/img'
 
 const message = useMessage()
@@ -53,77 +46,13 @@ type SiteRow = Site & { originSort: number }
 const categoryId = ref<number | null>(null)
 const categories = ref<Category[]>([])
 
-/* ---- 批量新增弹框 ---- */
 const createVisible = ref(false)
-const creating = ref(false)
-const createResult = ref<SiteCreateResult | null>(null)
-const createForm = reactive({
-  categoryId: null as number | null,
-  url: '',
-  isUsed: true,
-  failSwitch: false,
-})
-
-function openCreate() {
-  createForm.categoryId = null
-  createForm.url = ''
-  createForm.isUsed = true
-  createForm.failSwitch = false
-  createResult.value = null
-  createVisible.value = true
-}
-
-function closeCreate() {
-  createVisible.value = false
-  createResult.value = null
-}
-
-async function submitCreate() {
-  if (!createForm.url.trim()) {
-    message.warning('请输入网站链接')
-    return
-  }
-  creating.value = true
-  createResult.value = null
-  try {
-    createResult.value = await createSites({
-      category_id: createForm.categoryId,
-      url: createForm.url.trim(),
-      is_used: createForm.isUsed,
-      fail_switch: createForm.failSwitch,
-    })
-    await load()
-    if (createResult.value.failCount === 0) {
-      message.success(`成功创建 ${createResult.value.successCount} 条`)
-      createForm.url = ''
-    }
-  } catch (error) {
-    message.error(errorMessage(error))
-  } finally {
-    creating.value = false
-  }
-}
 
 const detailVisible = ref(false)
 const detailRow = ref<Site | null>(null)
 
 const editVisible = ref(false)
-const saving = ref(false)
-const edit = reactive({
-  id: 0,
-  title: '',
-  url: '',
-  description: '',
-  categoryId: null as number | null,
-  sort: 0,
-  thumb: '',
-  file: null as File | null,
-  /** 当前行的 logo（base64），用于打开弹框时先展示已有图标 */
-  icon: '',
-  /** 选中文件后的本地预览地址（object URL，用完要 revoke） */
-  fileUrl: '',
-  fileName: '',
-})
+const editRow = ref<Site | null>(null)
 
 const categoryOptions = computed(() => {
   const options: { label: string; value: number }[] = []
@@ -225,81 +154,8 @@ function onDetail(row: Site) {
 }
 
 function onEdit(row: Site) {
-  edit.id = row.id
-  edit.title = row.title
-  edit.url = row.url
-  edit.description = row.description
-  edit.categoryId = row.category_id || null
-  edit.sort = row.sort
-  edit.thumb = ''
-  edit.file = null
-  edit.icon = row.icon
-  resetLogoPreview()
+  editRow.value = row
   editVisible.value = true
-}
-
-function resetLogoPreview() {
-  if (edit.fileUrl) URL.revokeObjectURL(edit.fileUrl)
-  edit.fileUrl = ''
-  edit.fileName = ''
-}
-
-function onFileChange(options: { file: UploadFileInfo }) {
-  const file = options.file.file ?? null
-  edit.file = file
-  resetLogoPreview()
-  if (!file) return
-  edit.fileUrl = URL.createObjectURL(file)
-  edit.fileName = file.name
-}
-
-// 点 X 或遮罩关闭不会走 closeEdit，这里兜住 object URL 的回收
-watch(editVisible, (visible) => {
-  if (!visible && edit.fileUrl) {
-    URL.revokeObjectURL(edit.fileUrl)
-    edit.fileUrl = ''
-  }
-})
-
-function closeEdit() {
-  editVisible.value = false
-  resetLogoPreview()
-  edit.file = null
-}
-
-async function onSave() {
-  if (!edit.title.trim()) {
-    message.warning('请输入网站名称')
-    return
-  }
-  if (!edit.url.trim()) {
-    message.warning('请输入网站链接')
-    return
-  }
-  if (!edit.description.trim()) {
-    message.warning('请输入网站描述')
-    return
-  }
-  saving.value = true
-  try {
-    await updateSite({
-      id: edit.id,
-      title: edit.title.trim(),
-      url: edit.url.trim(),
-      description: edit.description.trim(),
-      category_id: edit.categoryId ?? undefined,
-      sort: edit.sort,
-      thumb: edit.thumb.trim() || undefined,
-      file: edit.file ?? undefined,
-    })
-    message.success(`编号 ${edit.id} 修改完成`)
-    closeEdit()
-    await load()
-  } catch (error) {
-    message.error(errorMessage(error))
-  } finally {
-    saving.value = false
-  }
 }
 
 const LOGO_SIZE = 24
@@ -307,14 +163,6 @@ const LOGO_SIZE = 24
 const LOGO_STYLE =
   `width:${LOGO_SIZE}px;height:${LOGO_SIZE}px;border-radius:50%;object-fit:contain;` +
   `display:block;margin:0 auto;background:#f2f3f5`
-
-/** 预览优先级：刚选的文件 > 正在输入的链接 > 当前已有图标 */
-const logoPreview = computed(() => {
-  if (edit.fileUrl) return edit.fileUrl
-  const typed = edit.thumb.trim()
-  if (typed) return typed
-  return imgSrc(edit.icon)
-})
 
 const columns: DataTableColumns<SiteRow> = [
   { title: 'ID', key: 'id', width: 66, fixed: 'left' },
@@ -430,7 +278,7 @@ onMounted(async () => {
   <n-card size="small">
     <div class="toolbar">
       <div class="toolbar-left">
-        <n-button type="primary" @click="openCreate">新增</n-button>
+        <n-button type="primary" @click="createVisible = true">新增</n-button>
         <n-button attr-type="button" @click="onExport">导出</n-button>
       </div>
       <div class="toolbar-right">
@@ -462,7 +310,7 @@ onMounted(async () => {
       v-else-if="!loading && rows.length === 0"
       description="暂无网站数据"
       action-text="新增网站"
-      @action="openCreate"
+      @action="createVisible = true"
     />
     <template v-else>
       <n-data-table
@@ -490,118 +338,16 @@ onMounted(async () => {
     </template>
   </n-card>
 
-  <!-- 批量新增：一行一个 URL -->
-  <n-modal
-    v-model:show="createVisible"
-    preset="card"
-    title="新增网站"
-    :style="{ width: '560px' }"
-    :mask-closable="false"
-  >
-    <div class="modal-body">
-      <n-form label-placement="left" label-width="96">
-        <n-form-item label="分类">
-          <n-select
-            v-model:value="createForm.categoryId"
-            :options="categoryOptions"
-            clearable
-            placeholder="请选择分类"
-          />
-        </n-form-item>
-        <n-form-item label="网址">
-          <n-input
-            v-model:value="createForm.url"
-            type="textarea"
-            :autosize="{ minRows: 6, maxRows: 12 }"
-            placeholder="必须包含 http:// 或 https://，一行一个"
-          />
-        </n-form-item>
-        <n-form-item label="是否启用">
-          <n-radio-group v-model:value="createForm.isUsed">
-            <n-radio :value="true">启用</n-radio>
-            <n-radio :value="false">禁用</n-radio>
-          </n-radio-group>
-        </n-form-item>
-        <n-form-item label="失败处理">
-          <n-checkbox v-model:checked="createForm.failSwitch">拉取失败时仅保存网址</n-checkbox>
-        </n-form-item>
-      </n-form>
-      <div v-if="createResult" class="create-result">
-        <p class="create-result__title">
-          成功创建 {{ createResult.successCount }} 条，失败 {{ createResult.failCount }} 条
-        </p>
-        <template v-if="createResult.failURLs?.length">
-          <p class="create-result__hint">以下 URL 创建失败：</p>
-          <ul class="create-result__list">
-            <li v-for="url in createResult.failURLs" :key="url">{{ url }}</li>
-          </ul>
-        </template>
-        <p v-else class="create-result__hint">无失败 URL。</p>
-      </div>
-    </div>
-    <template #footer>
-      <div class="modal-footer">
-        <n-button quaternary @click="closeCreate">关闭</n-button>
-        <n-button type="primary" :loading="creating" @click="submitCreate">提交</n-button>
-      </div>
-    </template>
-  </n-modal>
-
-  <n-modal v-model:show="detailVisible" preset="card" title="网站详情" :style="{ width: '520px' }">
-    <p class="detail-row"><span>名称</span>{{ detailRow?.title }}</p>
-    <p class="detail-row"><span>链接</span>{{ detailRow?.url }}</p>
-    <p class="detail-row"><span>分类</span>{{ detailRow?.category }}</p>
-    <p class="detail-row"><span>描述</span>{{ detailRow?.description }}</p>
-  </n-modal>
+  <SiteCreateModal v-model:show="createVisible" :category-options="categoryOptions" @done="load" />
+  <SiteDetailModal v-model:show="detailVisible" :row="detailRow" />
 
   <!-- class 不会落到 naive 的弹框根节点上，宽度必须走 style（否则会铺满整个窗口） -->
-  <n-modal v-model:show="editVisible" preset="card" title="编辑网站" :style="{ width: '560px' }">
-    <div class="modal-body">
-      <n-form label-placement="left" label-width="76">
-        <n-form-item label="分类">
-          <n-select v-model:value="edit.categoryId" :options="categoryOptions" clearable />
-        </n-form-item>
-        <n-form-item label="Logo">
-          <div class="logo-field">
-            <img v-if="logoPreview" :src="logoPreview" class="logo-preview" alt="" />
-            <span v-else class="logo-preview logo-preview--empty" />
-            <div class="logo-inputs">
-              <n-input v-model:value="edit.thumb" placeholder="请输入 Logo 链接" />
-              <div class="logo-actions">
-                <n-upload
-                  :default-upload="false"
-                  :show-file-list="false"
-                  accept=".jpg,.jpeg,.png,.svg"
-                  @change="onFileChange"
-                >
-                  <n-button attr-type="button">选择文件</n-button>
-                </n-upload>
-                <span class="logo-hint">{{ edit.fileName || '未选择新文件（PNG / JPG / SVG）' }}</span>
-              </div>
-            </div>
-          </div>
-        </n-form-item>
-        <n-form-item label="名称">
-          <n-input v-model:value="edit.title" placeholder="请输入网站名称" />
-        </n-form-item>
-        <n-form-item label="链接">
-          <n-input v-model:value="edit.url" placeholder="请输入网站地址" />
-        </n-form-item>
-        <n-form-item label="描述">
-          <n-input v-model:value="edit.description" type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" />
-        </n-form-item>
-        <n-form-item label="排序">
-          <n-input-number v-model:value="edit.sort" :min="0" />
-        </n-form-item>
-      </n-form>
-    </div>
-    <template #footer>
-      <div class="modal-footer">
-        <n-button quaternary @click="closeEdit">取消</n-button>
-        <n-button type="primary" :loading="saving" @click="onSave">确认</n-button>
-      </div>
-    </template>
-  </n-modal>
+  <SiteEditModal
+    v-model:show="editVisible"
+    :site="editRow"
+    :category-options="categoryOptions"
+    @saved="load"
+  />
 </template>
 
 <style scoped>
@@ -657,95 +403,4 @@ onMounted(async () => {
   margin-top: 12px;
 }
 
-.logo-field {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  align-items: flex-start;
-}
-
-.logo-preview {
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  object-fit: contain;
-  background: #fafafa;
-}
-
-.logo-preview--empty {
-  display: block;
-}
-
-.logo-inputs {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.logo-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-/* n-upload 默认撑满一行，会把文件名挤到最右边 */
-.logo-actions :deep(.n-upload) {
-  width: auto;
-}
-
-.logo-hint {
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.create-result {
-  margin-top: 4px;
-  padding: 10px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: #fafafa;
-  font-size: 13px;
-}
-
-.create-result__title {
-  margin: 0 0 6px;
-  font-weight: 500;
-}
-
-.create-result__hint {
-  margin: 0;
-  color: var(--color-text-secondary);
-}
-
-.create-result__list {
-  margin: 4px 0 0;
-  padding-left: 18px;
-  color: #b23b3b;
-  word-break: break-all;
-}
-
-.detail-row {
-  display: flex;
-  gap: 12px;
-  margin: 0 0 10px;
-  font-size: 13px;
-  word-break: break-all;
-}
-
-.detail-row span {
-  flex: 0 0 48px;
-  color: var(--color-text-secondary);
-}
-
-:deep(.row-warn td) {
-  background: #fffaf0;
-}
 </style>
