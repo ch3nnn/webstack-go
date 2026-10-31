@@ -38,6 +38,13 @@
 </head>
 
 <body class="page-body">
+<script>
+    // 深浅色主题：switchNightMode() 只负责切换并写 cookie，这里在内容渲染前把它应用回来，
+    // 否则刷新后总是回到默认浅色。放在 body 开头是为了避免先闪一下浅色。
+    if (/(?:^|;\s*)night=1(?:;|$)/.test(document.cookie)) {
+        document.body.classList.add('night');
+    }
+</script>
 <!-- skin-white -->
 <div class="page-container">
     <div class="sidebar-menu toggle-others fixed">
