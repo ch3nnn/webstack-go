@@ -1,0 +1,50 @@
+name: Web
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/admin/**'
+      - '.github/workflows/web.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'web/admin/**'
+      - '.github/workflows/web.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/admin/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web/admin
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: web/admin
+        run: npm run typecheck
+
+      - name: Lint
+        working-directory: web/admin
+        run: npm run lint
+
+      - name: Build
+        working-directory: web/admin
+        run: npm run build
+
+      # dist 提交入库，保证 git clone 后 go build 直接可用；产物与源码不一致即失败
+      - name: Verify committed dist is up to date
+        run: git diff --exit-code web/admin/dist

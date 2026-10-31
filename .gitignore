@@ -1,5 +1,7 @@
 bin/
 storage/logs
+web/admin/node_modules
+web/admin/.vite
 .idea
 *.log
 deploy/docker-compose/conf
