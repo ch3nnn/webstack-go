@@ -7,6 +7,7 @@ package site
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -251,4 +252,36 @@ func TestSiteHandler_Export(t *testing.T) {
 
 	// 验证结果
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+// 回归：站点批量新增的线格式键名（下划线）必须能绑定，否则会静默丢掉分类与启用状态。
+func TestSiteHandler_Create_JSONWireKeys(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	var got *v1.SiteCreateReq
+	mockSiteService := siteservice.NewMockService(ctrl)
+	mockSiteService.EXPECT().BatchCreate(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, req *v1.SiteCreateReq) (*v1.SiteCreateResp, error) {
+			got = req
+			return &v1.SiteCreateResp{SuccessCount: 1}, nil
+		})
+
+	siteHandler := NewHandler(hdl, mockSiteService)
+	router.POST("/sites/json", siteHandler.Create)
+
+	httpReq, _ := http.NewRequest(http.MethodPost, "/sites/json",
+		bytes.NewBufferString(`{"category_id":5,"url":"http://a.com","is_used":true,"fail_switch":true}`))
+	httpReq.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httpReq)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	if !assert.NotNil(t, got) {
+		return
+	}
+	assert.Equal(t, 5, got.CategoryID)
+	assert.Equal(t, "http://a.com", got.Url)
+	assert.True(t, got.IsUsed)
+	assert.True(t, got.FailSwitch)
 }

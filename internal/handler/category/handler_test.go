@@ -7,6 +7,7 @@ package category
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -141,4 +142,73 @@ func TestCategoryHandler_Delete(t *testing.T) {
 	router.ServeHTTP(w, httpReq)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+// 回归：前端按 Swagger 声明的 @Accept json 发送下划线键名，
+// 这些键必须能绑定到请求结构体（缺 json tag 时 ShouldBind 会静默丢弃它们）。
+func TestCategoryHandler_Update_JSONWireKeys(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	var got *v1.CategoryUpdateReq
+	mockCategoryService := categoryservice.NewMockService(ctrl)
+	mockCategoryService.EXPECT().Update(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, req *v1.CategoryUpdateReq) (*v1.CategoryUpdateResp, error) {
+			got = req
+			return &v1.CategoryUpdateResp{}, nil
+		})
+
+	categoryHandler := NewHandler(hdl, mockCategoryService)
+	router.PUT("/category/update", categoryHandler.Update)
+
+	httpReq, _ := http.NewRequest(http.MethodPut, "/category/update",
+		bytes.NewBufferString(`{"id":1,"used":true,"sort_id":3}`))
+	httpReq.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httpReq)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	if !assert.NotNil(t, got) {
+		return
+	}
+	assert.Equal(t, 1, got.ID)
+	if assert.NotNil(t, got.IsUsed, `JSON 键 "used" 未绑定到 IsUsed`) {
+		assert.True(t, *got.IsUsed)
+	}
+	if assert.NotNil(t, got.SortID, `JSON 键 "sort_id" 未绑定到 SortID`) {
+		assert.Equal(t, 3, *got.SortID)
+	}
+}
+
+func TestCategoryHandler_Create_JSONWireKeys(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	var got *v1.CategoryCreateReq
+	mockCategoryService := categoryservice.NewMockService(ctrl)
+	mockCategoryService.EXPECT().Create(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, req *v1.CategoryCreateReq) (*v1.CategoryCreateResp, error) {
+			got = req
+			return &v1.CategoryCreateResp{}, nil
+		})
+
+	categoryHandler := NewHandler(hdl, mockCategoryService)
+	router.POST("/categories/json", categoryHandler.Create)
+
+	httpReq, _ := http.NewRequest(http.MethodPost, "/categories/json",
+		bytes.NewBufferString(`{"parent_id":7,"level":2,"name":"子分类","icon":"linecons-cog","is_used":true,"sort_id":9}`))
+	httpReq.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httpReq)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	if !assert.NotNil(t, got) {
+		return
+	}
+	assert.Equal(t, 7, got.ParentID)
+	assert.Equal(t, int32(2), got.Level)
+	assert.Equal(t, "子分类", got.Name)
+	assert.Equal(t, "linecons-cog", got.Icon)
+	assert.True(t, got.IsUsed)
+	assert.Equal(t, 9, got.SortID)
 }
