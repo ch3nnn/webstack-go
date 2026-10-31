@@ -123,6 +123,9 @@ onMounted(load)
 <template>
   <n-spin :show="loading">
     <n-card size="small" title="站点设置" class="card">
+      <p class="auto-save-hint">
+        {{ savingSite ? '正在保存…' : '每项修改后自动保存，无需手动提交。' }}
+      </p>
       <n-form label-placement="left" label-width="88">
         <n-form-item label="首页搜索框">
           <div class="switch-field">
@@ -191,9 +194,6 @@ onMounted(load)
           </div>
         </n-form-item>
       </n-form>
-      <p class="auto-save-hint">
-        {{ savingSite ? '正在保存…' : '每项修改后自动保存，无需手动提交。' }}
-      </p>
     </n-card>
 
     <n-card size="small" title="关于页面" class="card">
@@ -244,7 +244,7 @@ onMounted(load)
 }
 
 .auto-save-hint {
-  margin: 4px 0 0;
+  margin: 0 0 12px;
   color: var(--color-text-secondary);
   font-size: 12px;
 }
