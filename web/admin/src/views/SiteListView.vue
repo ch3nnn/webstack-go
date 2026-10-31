@@ -63,6 +63,11 @@ const edit = reactive({
   sort: 0,
   thumb: '',
   file: null as File | null,
+  /** 当前行的 logo（base64），用于打开弹框时先展示已有图标 */
+  icon: '',
+  /** 选中文件后的本地预览地址（object URL，用完要 revoke） */
+  fileUrl: '',
+  fileName: '',
 })
 
 const categoryOptions = computed(() => {
@@ -173,11 +178,30 @@ function onEdit(row: Site) {
   edit.sort = row.sort
   edit.thumb = ''
   edit.file = null
+  edit.icon = row.icon
+  resetLogoPreview()
   editVisible.value = true
 }
 
+function resetLogoPreview() {
+  if (edit.fileUrl) URL.revokeObjectURL(edit.fileUrl)
+  edit.fileUrl = ''
+  edit.fileName = ''
+}
+
 function onFileChange(options: { file: UploadFileInfo }) {
-  edit.file = options.file.file ?? null
+  const file = options.file.file ?? null
+  edit.file = file
+  resetLogoPreview()
+  if (!file) return
+  edit.fileUrl = URL.createObjectURL(file)
+  edit.fileName = file.name
+}
+
+function closeEdit() {
+  editVisible.value = false
+  resetLogoPreview()
+  edit.file = null
 }
 
 async function onSave() {
@@ -206,7 +230,7 @@ async function onSave() {
       file: edit.file ?? undefined,
     })
     message.success(`编号 ${edit.id} 修改完成`)
-    editVisible.value = false
+    closeEdit()
     await load()
   } catch (error) {
     message.error(errorMessage(error))
@@ -217,10 +241,20 @@ async function onSave() {
 
 const LOGO_SIZE = 24
 
-function logoUrl(row: Site): string {
-  if (!row.icon) return ''
-  return row.icon.startsWith('data:') ? row.icon : `data:image/png;base64,${row.icon}`
+/** 后端把 logo 存成纯 base64（无 data: 前缀），也可能是外链 */
+function imageSrc(icon: string): string {
+  if (!icon) return ''
+  if (icon.startsWith('data:') || icon.startsWith('http') || icon.startsWith('/')) return icon
+  return `data:image/png;base64,${icon}`
 }
+
+/** 预览优先级：刚选的文件 > 正在输入的链接 > 当前已有图标 */
+const logoPreview = computed(() => {
+  if (edit.fileUrl) return edit.fileUrl
+  const typed = edit.thumb.trim()
+  if (typed) return typed
+  return imageSrc(edit.icon)
+})
 
 const columns: DataTableColumns<Site> = [
   { title: 'ID', key: 'id', width: 66, fixed: 'left' },
@@ -232,7 +266,7 @@ const columns: DataTableColumns<Site> = [
     render: (row) => {
       // 列渲染函数在 NDataTable 的渲染上下文里执行，拿不到本组件的 data-v，
       // 作用域样式对它无效，尺寸必须内联
-      const src = logoUrl(row)
+      const src = imageSrc(row.icon)
       const style =
         `width:${LOGO_SIZE}px;height:${LOGO_SIZE}px;border-radius:50%;object-fit:contain;` +
         `display:block;margin:0 auto;background:#f2f3f5`
@@ -407,10 +441,22 @@ onMounted(async () => {
         </n-form-item>
         <n-form-item label="Logo">
           <div class="logo-field">
-            <n-input v-model:value="edit.thumb" placeholder="请输入 Logo 链接" />
-            <n-upload :default-upload="false" :show-file-list="false" accept=".jpg,.png" @change="onFileChange">
-              <n-button attr-type="button">选择文件</n-button>
-            </n-upload>
+            <img v-if="logoPreview" :src="logoPreview" class="logo-preview" alt="" />
+            <span v-else class="logo-preview logo-preview--empty" />
+            <div class="logo-inputs">
+              <n-input v-model:value="edit.thumb" placeholder="请输入 Logo 链接" />
+              <div class="logo-actions">
+                <n-upload
+                  :default-upload="false"
+                  :show-file-list="false"
+                  accept=".jpg,.png"
+                  @change="onFileChange"
+                >
+                  <n-button attr-type="button">选择文件</n-button>
+                </n-upload>
+                <span class="logo-hint">{{ edit.fileName || '未选择新文件' }}</span>
+              </div>
+            </div>
           </div>
         </n-form-item>
         <n-form-item label="名称">
@@ -429,7 +475,7 @@ onMounted(async () => {
     </div>
     <template #footer>
       <div class="modal-footer">
-        <n-button quaternary @click="editVisible = false">取消</n-button>
+        <n-button quaternary @click="closeEdit">取消</n-button>
         <n-button type="primary" :loading="saving" @click="onSave">确认</n-button>
       </div>
     </template>
@@ -509,8 +555,51 @@ onMounted(async () => {
 
 .logo-field {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
+  align-items: flex-start;
+}
+
+.logo-preview {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  object-fit: contain;
+  background: #fafafa;
+}
+
+.logo-preview--empty {
+  display: block;
+}
+
+.logo-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.logo-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* n-upload 默认撑满一行，会把文件名挤到最右边 */
+.logo-actions :deep(.n-upload) {
+  width: auto;
+}
+
+.logo-hint {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detail-row {
