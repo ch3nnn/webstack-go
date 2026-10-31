@@ -135,6 +135,7 @@
 
         </nav>
         <!-- 搜索 -->
+        {{ if .ConfigSite.IsSearch }}
         <section class="sousuo">
             <div class="search">
                 <div class="search-box">
@@ -161,6 +162,7 @@
             </div>
         </section>
         <script>search('/assets/static/index/images/search_icon.png')</script>
+        {{ end }}
         <!-- 常用推荐 -->
         {{ range .CategorySites }}
         {{ if .SiteList }}

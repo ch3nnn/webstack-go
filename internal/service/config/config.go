@@ -22,6 +22,7 @@ func (s *service) GetConfig(ctx context.Context) (*v1.ConfigResp, error) {
 		AboutSite:   conf.AboutSite,
 		AboutAuthor: conf.AboutAuthor,
 		IsAbout:     conf.IsAbout,
+		IsSearch:    conf.IsSearch,
 		SiteTitle:   conf.SiteTitle,
 		SiteKeyword: conf.SiteKeyword,
 		SiteDesc:    conf.SiteDesc,

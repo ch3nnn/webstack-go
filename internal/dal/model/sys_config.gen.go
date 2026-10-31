@@ -12,6 +12,7 @@ type SysConfig struct {
 	AboutSite   string `gorm:"column:about_site;type:text" json:"about_site"`
 	AboutAuthor string `gorm:"column:about_author;type:text" json:"about_author"`
 	IsAbout     bool   `gorm:"column:is_about;type:bool;default:false" json:"is_about"`
+	IsSearch    bool   `gorm:"column:is_search;type:bool;default:true" json:"is_search"`
 	SiteTitle   string `gorm:"column:site_title;type:varchar(50)" json:"site_title"`
 	SiteKeyword string `gorm:"column:site_keyword;type:text" json:"site_keyword"`
 	SiteDesc    string `gorm:"column:site_desc;type:text" json:"site_desc"`

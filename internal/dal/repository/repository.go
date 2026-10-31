@@ -154,6 +154,7 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 			field.Attrs(&model.SysConfig{
 				AboutSite:   DefaultAboutSite,
 				AboutAuthor: DefaultAuthor,
+				IsSearch:    true,
 				SiteTitle:   DefaultSiteTitle,
 				SiteKeyword: DefaultSiteKeyword,
 				SiteDesc:    DefaultSiteDesc,

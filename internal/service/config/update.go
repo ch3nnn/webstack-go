@@ -56,6 +56,10 @@ func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.Co
 		column := gormx.ColumnName(query.SysConfig.IsAbout)
 		update[column] = *req.IsAbout
 	}
+	if req.IsSearch != nil {
+		column := gormx.ColumnName(query.SysConfig.IsSearch)
+		update[column] = *req.IsSearch
+	}
 	if req.LogoFile != nil && req.LogoFile.Size > 0 {
 		base64Str, err := tools.ResizeMultipartImgToBase64(req.LogoFile, LogoWidth, LogoHeight)
 		if err != nil {

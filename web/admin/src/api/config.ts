@@ -5,6 +5,8 @@ export interface SiteConfig {
   about_site: string
   about_author: string
   is_about: boolean
+  /** 是否在首页显示搜索框 */
+  is_search: boolean
   site_title: string
   site_keyword: string
   site_desc: string
@@ -20,6 +22,7 @@ export async function fetchConfig(): Promise<SiteConfig> {
 }
 
 export interface SiteSettingsPayload {
+  is_search: boolean
   site_title: string
   site_keyword: string
   site_desc: string
@@ -31,6 +34,7 @@ export interface SiteSettingsPayload {
 
 export async function updateSiteSettings(payload: SiteSettingsPayload): Promise<void> {
   const form = new FormData()
+  form.append('is_search', String(payload.is_search))
   form.append('site_title', payload.site_title)
   form.append('site_keyword', payload.site_keyword)
   form.append('site_desc', payload.site_desc)

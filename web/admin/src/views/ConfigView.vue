@@ -15,6 +15,7 @@ const savingSite = ref(false)
 const savingAbout = ref(false)
 
 const site = reactive({
+  isSearch: true,
   siteTitle: '',
   siteKeyword: '',
   siteDesc: '',
@@ -39,6 +40,7 @@ async function load() {
   loading.value = true
   try {
     const data = await fetchConfig()
+    site.isSearch = data.is_search
     site.siteTitle = data.site_title
     site.siteKeyword = data.site_keyword
     site.siteDesc = data.site_desc
@@ -74,6 +76,7 @@ async function onSubmitSite() {
   savingSite.value = true
   try {
     await updateSiteSettings({
+      is_search: site.isSearch,
       site_title: site.siteTitle,
       site_keyword: site.siteKeyword,
       site_desc: site.siteDesc,
@@ -114,6 +117,12 @@ onMounted(load)
   <n-spin :show="loading">
     <n-card size="small" title="站点设置" class="card">
       <n-form label-placement="left" label-width="88">
+        <n-form-item label="首页搜索框">
+          <div class="switch-field">
+            <n-switch v-model:value="site.isSearch" />
+            <span class="hint">关闭后首页不显示搜索框</span>
+          </div>
+        </n-form-item>
         <n-form-item label="网站标题">
           <n-input v-model:value="site.siteTitle" maxlength="20" placeholder="请输入网站标题" />
         </n-form-item>
@@ -179,6 +188,12 @@ onMounted(load)
 <style scoped>
 .card {
   margin-bottom: 12px;
+}
+
+.switch-field {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .upload-field {

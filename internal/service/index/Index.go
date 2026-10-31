@@ -117,6 +117,7 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResp, error) {
 
 	return &v1.IndexResp{
 		ConfigSite: &v1.ConfigSite{
+			IsSearch:    sysConfig.IsSearch,
 			SiteTitle:   sysConfig.SiteTitle,
 			SiteKeyword: sysConfig.SiteKeyword,
 			SiteDesc:    sysConfig.SiteDesc,

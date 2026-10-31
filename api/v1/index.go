@@ -28,6 +28,7 @@ type About struct {
 }
 
 type ConfigSite struct {
+	IsSearch    bool   `json:"is_search"`    // 是否显示首页搜索框
 	SiteTitle   string `json:"site_title"`   // 站点标题
 	SiteKeyword string `json:"site_keyword"` // 站点关键字
 	SiteDesc    string `json:"site_desc"`    // 站点描述
