@@ -1,0 +1,24 @@
+import{aa as F,n as I,M as E,v as j,d as H,y as L,_ as J,F as $,o as r,c as m,C as K,ab as W,O as p,G as q,J as U,ac as Q,ad as G,ae as X,D as f,b as s,w as d,f as t,af as y,k as D,a as h,a6 as u,ag as Y}from"./index-Dx1zj60b.js";import{G as Z,a as B}from"./Grid-96ddnQUd.js";import{P as N}from"./Progress-DrAGOex7.js";import{E as ee}from"./ErrorState-C8PjiijT.js";import{_ as te}from"./_plugin-vue_export-helper-CtyYQGco.js";import"./get-slot-VaplJ9hC.js";import"./next-frame-once-C5Ksf8W7.js";let M=!1;function re(){if(F&&window.CSS&&!M&&(M=!0,"registerProperty"in window?.CSS))try{CSS.registerProperty({name:"--n-color-start",syntax:"<color>",inherits:!1,initialValue:"#0000"}),CSS.registerProperty({name:"--n-color-end",syntax:"<color>",inherits:!1,initialValue:"#0000"})}catch{}}function ae(o){const{heightSmall:e,heightMedium:l,heightLarge:n,borderRadius:i}=o;return{color:"#eee",colorEnd:"#ddd",borderRadius:i,heightSmall:e,heightMedium:l,heightLarge:n}}const se={common:I,self:ae};var oe=E([j("skeleton",`
+ height: 1em;
+ width: 100%;
+ transition:
+ --n-color-start .3s var(--n-bezier),
+ --n-color-end .3s var(--n-bezier),
+ background-color .3s var(--n-bezier);
+ animation: 2s skeleton-loading infinite cubic-bezier(0.36, 0, 0.64, 1);
+ background-color: var(--n-color-start);
+ `),E("@keyframes skeleton-loading",`
+ 0% {
+ background: var(--n-color-start);
+ }
+ 40% {
+ background: var(--n-color-end);
+ }
+ 80% {
+ background: var(--n-color-start);
+ }
+ 100% {
+ background: var(--n-color-start);
+ }
+ `)]);const ne={...L.props,text:Boolean,round:Boolean,circle:Boolean,height:[String,Number],width:[String,Number],size:String,repeat:{type:Number,default:1},animated:{type:Boolean,default:!0},sharp:{type:Boolean,default:!0}};var k=H({name:"Skeleton",inheritAttrs:!1,props:ne,setup(o){re();const{mergedClsPrefixRef:e,mergedComponentPropsRef:l}=q(o),n=U(()=>o.size||l?.value?.Skeleton?.size),i=L("Skeleton","-skeleton",oe,se,o,e);return{mergedClsPrefix:e,style:U(()=>{const c=i.value,{common:{cubicBezierEaseInOut:_}}=c,a=c.self,{color:g,colorEnd:b,borderRadius:v}=a;let S;const{circle:C,sharp:O,round:T,width:x,height:P,text:R,animated:A}=o,V=n.value;V!==void 0&&(S=a[Q("height",V)]);const w=C?x??P??S:x,z=(C?x??P:P)??S;return{display:R?"inline-block":"",verticalAlign:R?"-0.125em":"",borderRadius:C?"50%":T?"4096px":O?"":v,width:typeof w=="number"?G(w):w,height:typeof z=="number"?G(z):z,animation:A?"":"none","--n-bezier":_,"--n-color-start":g,"--n-color-end":b}})}},render(){const{repeat:o,style:e,mergedClsPrefix:l,$attrs:n}=this,i=J("div",$({class:`${l}-skeleton`,style:e},n));return o>1?(r(),m(p,{key:1},[K(()=>W(o,null).map(c=>[i,`
+`]))],64)):i}});const le={class:"metric"},ie={class:"metric"},ce={class:"metric"},de={key:1,class:"rows"},ue=H({__name:"DashboardView",setup(o){const e=D(null),l=D(!1);let n=null;function i(){l.value=!1,n?.close();const a=new EventSource("/api/admin/dashboard");n=a,a.addEventListener("dashboard",g=>{e.value=JSON.parse(g.data)}),a.onerror=()=>{a.close(),n=null,e.value||(l.value=!0)}}i(),X(()=>n?.close());function c(a){return typeof a!="number"||Number.isNaN(a)?0:Math.min(100,Math.max(0,Number(a.toFixed(1))))}const _=[["项目版本","ProjectVersion"],["运行环境","Env"],["操作系统","GoOS"],["架构","GoArch"],["Go 版本","GoVersion"],["主机名","Host"],["CPU","CpuName"],["核心数","CpuCores"],["项目路径","ProjectPath"]];return(a,g)=>l.value?(r(),f(ee,{key:0,onRetry:i})):(r(),m(p,{key:1},[s(t(Z),{cols:3,"x-gap":12,"y-gap":12,responsive:"screen","item-responsive":""},{default:d(()=>[s(t(B),{span:"3 m:1"},{default:d(()=>[s(t(y),{size:"small",title:"内存"},{default:d(()=>[e.value?(r(),m(p,{key:1},[s(t(N),{type:"line",percentage:c(e.value.MemUsedPercent),height:6,"show-indicator":!1},null,8,["percentage"]),h("p",le,u(e.value.MemUsed)+" / "+u(e.value.MemTotal),1)],64)):(r(),f(t(k),{key:0,text:"",repeat:3}))]),_:1})]),_:1}),s(t(B),{span:"3 m:1"},{default:d(()=>[s(t(y),{size:"small",title:"磁盘"},{default:d(()=>[e.value?(r(),m(p,{key:1},[s(t(N),{type:"line",percentage:c(e.value.DiskUsedPercent),height:6,"show-indicator":!1},null,8,["percentage"]),h("p",ie,u(e.value.DiskUsed)+" / "+u(e.value.DiskTotal),1)],64)):(r(),f(t(k),{key:0,text:"",repeat:3}))]),_:1})]),_:1}),s(t(B),{span:"3 m:1"},{default:d(()=>[s(t(y),{size:"small",title:"CPU"},{default:d(()=>[e.value?(r(),m(p,{key:1},[s(t(N),{type:"line",percentage:c(e.value.CpuUsedPercent),height:6,"show-indicator":!1},null,8,["percentage"]),h("p",ce,u(c(e.value.CpuUsedPercent))+"% · "+u(e.value.CpuCores)+" 核",1)],64)):(r(),f(t(k),{key:0,text:"",repeat:3}))]),_:1})]),_:1})]),_:1}),s(t(y),{size:"small",title:"系统信息",class:"system"},{default:d(()=>[e.value?(r(),m("dl",de,[(r(),m(p,null,Y(_,([b,v])=>(r(),m(p,{key:v},[h("dt",null,u(b),1),h("dd",null,u(e.value[v]),1)],64))),64))])):(r(),f(t(k),{key:0,text:"",repeat:6}))]),_:1})],64))}}),ke=te(ue,[["__scopeId","data-v-0508084e"]]);export{ke as default};

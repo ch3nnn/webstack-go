@@ -8,7 +8,17 @@ import {
   PricetagsOutline,
   SettingsOutline,
 } from '@vicons/ionicons5'
-import { NIcon, type MenuOption, useMessage } from 'naive-ui'
+import {
+  NDropdown,
+  NIcon,
+  NLayout,
+  NLayoutContent,
+  NLayoutHeader,
+  NLayoutSider,
+  NMenu,
+  type MenuOption,
+  useMessage,
+} from 'naive-ui'
 import { computed, h, ref, type Component } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 

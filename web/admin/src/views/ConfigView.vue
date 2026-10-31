@@ -56,6 +56,13 @@ async function load() {
   }
 }
 
+/** 后端把 logo / favicon 存成纯 base64（无 data: 前缀） */
+function imgSrc(value: string): string {
+  if (!value) return ''
+  if (value.startsWith('data:') || value.startsWith('http') || value.startsWith('/')) return value
+  return `data:image/png;base64,${value}`
+}
+
 function pickFile(event: Event, target: 'logo' | 'favicon') {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0] ?? null
@@ -124,7 +131,7 @@ onMounted(load)
         </n-form-item>
         <n-form-item label="网站 Logo">
           <div class="upload-field">
-            <img v-if="site.siteLogo" :src="site.siteLogo" class="preview" alt="logo" />
+            <img v-if="site.siteLogo" :src="imgSrc(site.siteLogo)" class="preview" alt="logo" />
             <n-button attr-type="button" @click="logoInput?.click()">选择文件</n-button>
             <input ref="logoInput" type="file" accept="image/*" class="hidden-input" @change="pickFile($event, 'logo')" />
             <span class="hint">{{ logoFile?.name ?? '未选择新文件' }}</span>
@@ -132,7 +139,7 @@ onMounted(load)
         </n-form-item>
         <n-form-item label="网站 Favicon">
           <div class="upload-field">
-            <img v-if="site.siteFavicon" :src="site.siteFavicon" class="preview" alt="favicon" />
+            <img v-if="site.siteFavicon" :src="imgSrc(site.siteFavicon)" class="preview" alt="favicon" />
             <n-button attr-type="button" @click="faviconInput?.click()">选择文件</n-button>
             <input
               ref="faviconInput"
