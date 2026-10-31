@@ -19,14 +19,39 @@
     <link rel="stylesheet" href="/assets/static/index/css/nav.css"/>
     <link rel="stylesheet" href="/assets/static/index/css/hclonely.css"/>
     <script src="assets/static/index/js/jquery-1.11.1.min.js"></script>
+    <style>
+        /* 深色主题下补两条：本页导航是 .navbar-inner 结构，hclonely.css 的 night 规则只覆盖首页的 .user-info-navbar */
+        body.night .navbar-inner {
+            background-color: #2c2e2f;
+            border-bottom: 1px solid #3f4142;
+        }
+        .navbar-brand .logo-dark-bg { display: none; }
+        body.night .navbar-brand .logo-light-bg { display: none; }
+        body.night .navbar-brand .logo-dark-bg { display: block; }
+        /* xenon-core 里 .boxed-container .page-container .main-content 是浅底色，
+           深色下会留一片白，这里用更高优先级盖掉 */
+        body.night.boxed-container .page-container .main-content {
+            background-color: #2c2e2f;
+        }
+    </style>
 </head>
 
 <body class="page-body boxed-container">
+<script>
+    // 深浅色主题与首页共用同一个 night cookie，这里在内容渲染前应用，
+    // 避免从首页（深色）点进关于页时先闪一下浅色。
+    if (/(?:^|;\s*)night=1(?:;|$)/.test(document.cookie)) {
+        document.body.classList.add('night');
+    }
+</script>
 <nav class="navbar horizontal-menu navbar-fixed-top">
     <div class="navbar-inner">
         <div class="navbar-brand">
             <a href="/" class="logo">
-                <img src="assets/static/index/images/logo_dark@2x.png" width="100%" alt="" class="hidden-xs"/>
+                <img src="assets/static/index/images/logo_dark@2x.png" width="100%" alt=""
+                     class="hidden-xs logo-light-bg"/>
+                <img src="assets/static/index/images/logo@2x.png" width="100%" alt=""
+                     class="hidden-xs logo-dark-bg"/>
                 <img src="assets/static/index/images/logo@2x.png" width="100%" alt="" class="visible-xs"/>
             </a>
         </div>
@@ -94,10 +119,6 @@
         <!-- Main Footer -->
         <footer class="main-footer sticky footer-type-1 fixed">
             <div class="footer-inner">
-                <div class="footer-text">
-                    &copy; 2022- 2023
-                    <a href="/about"><strong>WebStack-Go</strong></a> design by <a href="https://ch3nnn.cn" target="_blank"><strong>Ch3nnn</strong></a>
-                </div>
                 <div class="go-up">
                     <a href="#" rel="go-top">
                         <i class="fa-angle-up"></i>
