@@ -33,6 +33,8 @@ import ErrorState from '@/components/ErrorState.vue'
 
 interface CategoryRow extends Category {
   children?: CategoryRow[]
+  /** 本次编辑前的排序值，用于判断是否需要提交 */
+  originSort?: number
 }
 
 const message = useMessage()
@@ -75,7 +77,7 @@ async function load() {
   try {
     const flat = await listCategories()
     const byId = new Map<number, CategoryRow>()
-    flat.forEach((item) => byId.set(item.id, { ...item }))
+    flat.forEach((item) => byId.set(item.id, { ...item, originSort: item.sort }))
     const tree: CategoryRow[] = []
     byId.forEach((item) => {
       if (item.pid && byId.has(item.pid)) {
@@ -182,15 +184,22 @@ async function onDelete(row: CategoryRow) {
   }
 }
 
-async function onSortChange(row: CategoryRow, value: number) {
+/**
+ * 排序在失焦/提交时才落库：输入过程中每敲一个字符都发请求 + 重拉列表，
+ * 会把正在编辑的输入框整个换掉。
+ * 落库后重新拉列表——列表按 sort 升序排，不重拉就看不到新位置。
+ */
+async function commitSort(row: CategoryRow) {
+  const next = row.sort
+  if (next === (row.originSort ?? 0)) return
   try {
-    await updateCategory({ id: row.id, sort_id: value })
-    row.sort = value
+    await updateCategory({ id: row.id, sort_id: next })
+    row.originSort = next
     message.success(`分类「${row.name}」排序已更新`)
   } catch (error) {
     message.error(errorMessage(error))
-    await load()
   }
+  await load()
 }
 
 async function onUsedChange(row: CategoryRow, value: boolean) {
@@ -215,7 +224,10 @@ const columns: DataTableColumns<CategoryRow> = [
         size: 'small',
         showButton: false,
         min: 0,
-        onUpdateValue: (value: number | null) => onSortChange(row, value ?? 0),
+        onUpdateValue: (value: number | null) => {
+          row.sort = value ?? 0
+        },
+        onBlur: () => void commitSort(row),
       }),
   },
   {

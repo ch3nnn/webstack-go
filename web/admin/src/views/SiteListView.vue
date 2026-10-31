@@ -44,6 +44,8 @@ const pageSize = ref(10)
 const loading = ref(false)
 const failed = ref(false)
 const search = ref('')
+/** 列表按创建时间倒序；只有带分类过滤时后端才按 sort 升序，那种情况下重拉才看得到新位置 */
+const sortSnapshot = new Map<number, number>()
 const categoryId = ref<number | null>(null)
 const categories = ref<Category[]>([])
 
@@ -96,6 +98,7 @@ async function load() {
     })
     rows.value = data.list
     total.value = data.pagination?.total ?? 0
+    data.list.forEach((item) => sortSnapshot.set(item.id, item.sort))
   } catch (error) {
     failed.value = true
     message.error(errorMessage(error))
@@ -134,14 +137,16 @@ async function onUsedChange(row: Site, value: boolean) {
   }
 }
 
-async function onSortChange(row: Site, value: number) {
+async function commitSort(row: Site) {
+  const next = row.sort
+  if (next === (sortSnapshot.get(row.id) ?? 0)) return
   try {
-    await updateSite({ id: row.id, sort: value })
-    row.sort = value
+    await updateSite({ id: row.id, sort: next })
+    sortSnapshot.set(row.id, next)
   } catch (error) {
     message.error(errorMessage(error))
-    await load()
   }
+  if (categoryId.value) await load()
 }
 
 async function onDelete(row: Site) {
@@ -271,7 +276,10 @@ const columns: DataTableColumns<Site> = [
         size: 'small',
         showButton: false,
         min: 0,
-        onUpdateValue: (value: number | null) => onSortChange(row, value ?? 0),
+        onUpdateValue: (value: number | null) => {
+          row.sort = value ?? 0
+        },
+        onBlur: () => void commitSort(row),
       }),
   },
   {
