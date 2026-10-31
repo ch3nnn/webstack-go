@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import { NButton, NCard, NForm, NFormItem, NInput, NSpin, NSwitch, useMessage } from 'naive-ui'
-import { MdEditor } from 'md-editor-v3'
 import { onMounted, reactive, ref } from 'vue'
 
-import { fetchConfig, updateAbout, updateSiteSettings, type SiteSettingsPayload } from '@/api/config'
+import { fetchConfig, updateSiteSettings, type SiteSettingsPayload } from '@/api/config'
 import { errorMessage } from '@/api/client'
-
-import 'md-editor-v3/lib/style.css'
 
 const message = useMessage()
 
 const loading = ref(false)
 const savingSite = ref(false)
-const savingAbout = ref(false)
 
 /**
  * 站点设置改成改一项存一项：串行排队，避免连点造成并发写。
@@ -48,12 +44,6 @@ const site = reactive({
   siteFavicon: '',
 })
 
-const about = reactive({
-  aboutSite: '',
-  aboutAuthor: '',
-  isAbout: false,
-})
-
 const logoFile = ref<File | null>(null)
 const faviconFile = ref<File | null>(null)
 const logoInput = ref<HTMLInputElement | null>(null)
@@ -71,9 +61,6 @@ async function load() {
     site.siteURL = data.site_url
     site.siteLogo = data.site_logo
     site.siteFavicon = data.site_favicon
-    about.aboutSite = data.about_site
-    about.aboutAuthor = data.about_author
-    about.isAbout = data.is_about
   } catch (error) {
     message.error(errorMessage(error))
   } finally {
@@ -98,22 +85,6 @@ function pickFile(event: Event, target: 'logo' | 'favicon') {
   } else {
     faviconFile.value = file
     persistSite({ favicon: file })
-  }
-}
-
-async function onSubmitAbout() {
-  savingAbout.value = true
-  try {
-    await updateAbout({
-      about_site: about.aboutSite,
-      about_author: about.aboutAuthor,
-      is_about: about.isAbout,
-    })
-    message.success('关于页面已保存')
-  } catch (error) {
-    message.error(errorMessage(error))
-  } finally {
-    savingAbout.value = false
   }
 }
 
@@ -192,23 +163,6 @@ onMounted(load)
             />
             <span class="hint">{{ faviconFile?.name ?? '未选择新文件' }}</span>
           </div>
-        </n-form-item>
-      </n-form>
-    </n-card>
-
-    <n-card size="small" title="关于页面" class="card">
-      <n-form label-placement="top">
-        <n-form-item label="关于网站（Markdown）">
-          <MdEditor v-model="about.aboutSite" :toolbars-exclude="['github']" preview-theme="github" />
-        </n-form-item>
-        <n-form-item label="关于站长（Markdown）">
-          <MdEditor v-model="about.aboutAuthor" :toolbars-exclude="['github']" preview-theme="github" />
-        </n-form-item>
-        <n-form-item label="是否显示关于信息">
-          <n-switch v-model:value="about.isAbout" />
-        </n-form-item>
-        <n-form-item label=" ">
-          <n-button type="primary" :loading="savingAbout" @click="onSubmitAbout">保存关于页面</n-button>
         </n-form-item>
       </n-form>
     </n-card>

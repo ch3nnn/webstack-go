@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   AppsOutline,
+  DocumentTextOutline,
   GridOutline,
   KeyOutline,
   LinkOutline,
@@ -37,6 +38,7 @@ const ICONS: Record<string, Component> = {
   site: LinkOutline,
   category: PricetagsOutline,
   config: SettingsOutline,
+  about_page: DocumentTextOutline,
   modify_password: KeyOutline,
 }
 

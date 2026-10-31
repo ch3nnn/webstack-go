@@ -29,6 +29,10 @@ var DefaultSysUserMenuAdmin = []*model.SysUserMenu{
 		UserID: 1,
 		MenuID: 5,
 	},
+	{
+		UserID: 1,
+		MenuID: 6,
+	},
 }
 
 var _ iCustomGenSysUserMenuFunc = (*customSysUserMenuDao)(nil)

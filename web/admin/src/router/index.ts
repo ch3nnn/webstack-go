@@ -36,6 +36,12 @@ const router = createRouter({
           meta: { title: '网站分类' },
         },
         {
+          path: 'about_page',
+          name: 'about-page',
+          component: () => import('@/views/AboutPageView.vue'),
+          meta: { title: '关于页面设置' },
+        },
+        {
           path: 'config',
           name: 'config',
           component: () => import('@/views/ConfigView.vue'),
