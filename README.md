@@ -21,11 +21,11 @@
 
 ### 一、运行环境
 
-- Golang 1.22
+- Golang 1.23+（`go.mod` 的 go 指令是 1.23.0，1.22 无法编译）
 - SQLite
 
 > 管理端 SPA 的构建产物（`web/admin/dist`）已随仓库提交，`go build` 不需要 Node.js。
-> 只有修改前端源码时才需要 Node.js 20+，见「四、管理端前端开发」。
+> 只有修改前端源码时才需要 Node.js 20+，见「三、管理端前端开发」。
 
 ### 二、启动服务
 
@@ -47,6 +47,9 @@
 1. 目录下执行 `go mod tidy` 拉取项目依赖库
 2. 执行 `go build -o ./bin/server ./cmd/server` 编译项目，生成可执行文件 server 
 3. 编译完执行 `./bin/server -conf=config/prod.yml` 首次启动程序之后，会生成 SQLite 数据库，并自动创建表结构
+
+> 整个部署流程只需要 Go：前端产物 `web/admin/dist` 已在仓库里，`go build` 会把它内嵌进二进制，
+> **不需要 `npm install` / `npm run build`**。只有改前端源码时才需要 Node.js（见第三节）。
 
 
 **3、Docker 运行服务**
@@ -79,7 +82,7 @@ services:
    ```
 2. docker container 正常运行后, 在浏览器中打开界面，链接地址：http://127.0.0.1:8000
 
-## 四、管理端前端开发
+## 三、管理端前端开发
 
 管理端位于 `web/admin`，Vue 3 + TypeScript + Vite + Naive UI。产物 `web/admin/dist` 由 `web/assets.go` 的 `//go:embed admin/dist` 打进二进制，静态资源路径为 `/ui`，SPA 路由挂在 `/admin/*`，公共站（`/`、`/about`）仍是 Go 模板。
 
