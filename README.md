@@ -3,7 +3,7 @@
 基于 Golang 开源的网址导航网站项目，具备完整的前后台，您可以拿来制作自己平日收藏的网址导航。
 > v1: 使用 mysql 和 redis 组件, 丰富的后端功能。 v2: 简化版无需额外组件, 使用轻量级 sqlite 数据库。
 
-- 前端模板: [WebStackPage](https://github.com/WebStackPage/WebStackPage.github.io)、[光年后台模板](https://gitee.com/yinqi/Light-Year-Admin-Using-Iframe-v4)
+- 前端模板: 公共站 [WebStackPage](https://github.com/WebStackPage/WebStackPage.github.io)（服务端渲染）；管理端 Vue 3 + TypeScript + Vite + Naive UI（SPA，构建产物内嵌进二进制）
 - 后端框架: 基于 [go-nunu](https://github.com/go-nunu/nunu) 脚手架搭建
 
 功能：
@@ -23,6 +23,9 @@
 
 - Golang 1.22
 - SQLite
+
+> 管理端 SPA 的构建产物（`web/admin/dist`）已随仓库提交，`go build` 不需要 Node.js。
+> 只有修改前端源码时才需要 Node.js 20+，见「四、管理端前端开发」。
 
 ### 二、启动服务
 
@@ -75,6 +78,29 @@ services:
    5cb641ff3950 webstack-go:v2   "./server"   5 seconds ago Up 5 seconds 0.0.0.0:8000->8000/tcp webstack-go
    ```
 2. docker container 正常运行后, 在浏览器中打开界面，链接地址：http://127.0.0.1:8000
+
+## 四、管理端前端开发
+
+管理端位于 `web/admin`，Vue 3 + TypeScript + Vite + Naive UI。产物 `web/admin/dist` 由 `web/assets.go` 的 `//go:embed admin/dist` 打进二进制，静态资源路径为 `/ui`，SPA 路由挂在 `/admin/*`，公共站（`/`、`/about`）仍是 Go 模板。
+
+```bash
+cd web/admin
+npm ci
+npm run dev      # http://127.0.0.1:5173，/api 与 /assets 代理到 127.0.0.1:8000
+```
+
+改完前端后必须重新构建并提交产物，否则二进制里仍是旧界面：
+
+```bash
+cd web/admin
+npm run typecheck && npm run lint && npm run build
+```
+
+CI（`.github/workflows/web.yml`）会校验类型、lint，以及 `git diff --exit-code web/admin/dist`——产物与源码不一致会直接失败。
+
+### 回滚
+
+管理端前端已内嵌进二进制，**前端无法单独回滚**：回滚 = 换回上一个镜像 tag / 二进制版本。
 
 ## 效果图
 
