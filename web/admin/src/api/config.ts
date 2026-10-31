@@ -21,25 +21,27 @@ export async function fetchConfig(): Promise<SiteConfig> {
   return data
 }
 
+/** 每项都是可选的：只提交改动过的那一项，未传的字段后端按 nil 跳过 */
 export interface SiteSettingsPayload {
-  is_search: boolean
-  site_title: string
-  site_keyword: string
-  site_desc: string
-  site_record: string
-  site_url: string
+  is_search?: boolean
+  site_title?: string
+  site_keyword?: string
+  site_desc?: string
+  site_record?: string
+  site_url?: string
   logo?: File | null
   favicon?: File | null
 }
 
+/** 只提交传进来的字段，其余留在库里不动 */
 export async function updateSiteSettings(payload: SiteSettingsPayload): Promise<void> {
   const form = new FormData()
-  form.append('is_search', String(payload.is_search))
-  form.append('site_title', payload.site_title)
-  form.append('site_keyword', payload.site_keyword)
-  form.append('site_desc', payload.site_desc)
-  form.append('site_record', payload.site_record)
-  form.append('site_url', payload.site_url)
+  if (payload.is_search !== undefined) form.append('is_search', String(payload.is_search))
+  if (payload.site_title !== undefined) form.append('site_title', payload.site_title)
+  if (payload.site_keyword !== undefined) form.append('site_keyword', payload.site_keyword)
+  if (payload.site_desc !== undefined) form.append('site_desc', payload.site_desc)
+  if (payload.site_record !== undefined) form.append('site_record', payload.site_record)
+  if (payload.site_url !== undefined) form.append('site_url', payload.site_url)
   if (payload.logo) form.append('logo', payload.logo)
   if (payload.favicon) form.append('favicon', payload.favicon)
 

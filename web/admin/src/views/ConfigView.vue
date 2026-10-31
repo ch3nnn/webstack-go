@@ -3,7 +3,7 @@ import { NButton, NCard, NForm, NFormItem, NInput, NSpin, NSwitch, useMessage } 
 import { MdEditor } from 'md-editor-v3'
 import { onMounted, reactive, ref } from 'vue'
 
-import { fetchConfig, updateAbout, updateSiteSettings } from '@/api/config'
+import { fetchConfig, updateAbout, updateSiteSettings, type SiteSettingsPayload } from '@/api/config'
 import { errorMessage } from '@/api/client'
 
 import 'md-editor-v3/lib/style.css'
@@ -13,6 +13,29 @@ const message = useMessage()
 const loading = ref(false)
 const savingSite = ref(false)
 const savingAbout = ref(false)
+
+/**
+ * 站点设置改成改一项存一项：串行排队，避免连点造成并发写。
+ * 失败时重拉服务端值，把输入框回滚到真正存下的内容。
+ */
+let saveQueue: Promise<void> = Promise.resolve()
+
+function persistSite(patch: SiteSettingsPayload) {
+  saveQueue = saveQueue
+    .then(async () => {
+      savingSite.value = true
+      try {
+        await updateSiteSettings(patch)
+        message.success('站点设置已保存')
+      } catch (error) {
+        message.error(errorMessage(error))
+        await load()
+      } finally {
+        savingSite.value = false
+      }
+    })
+    .catch(() => {})
+}
 
 const site = reactive({
   isSearch: true,
@@ -68,29 +91,13 @@ function imgSrc(value: string): string {
 function pickFile(event: Event, target: 'logo' | 'favicon') {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0] ?? null
-  if (target === 'logo') logoFile.value = file
-  else faviconFile.value = file
-}
-
-async function onSubmitSite() {
-  savingSite.value = true
-  try {
-    await updateSiteSettings({
-      is_search: site.isSearch,
-      site_title: site.siteTitle,
-      site_keyword: site.siteKeyword,
-      site_desc: site.siteDesc,
-      site_record: site.siteRecord,
-      site_url: site.siteURL,
-      logo: logoFile.value,
-      favicon: faviconFile.value,
-    })
-    message.success('站点设置已保存')
-    await load()
-  } catch (error) {
-    message.error(errorMessage(error))
-  } finally {
-    savingSite.value = false
+  if (!file) return
+  if (target === 'logo') {
+    logoFile.value = file
+    persistSite({ logo: file })
+  } else {
+    faviconFile.value = file
+    persistSite({ favicon: file })
   }
 }
 
@@ -119,24 +126,47 @@ onMounted(load)
       <n-form label-placement="left" label-width="88">
         <n-form-item label="首页搜索框">
           <div class="switch-field">
-            <n-switch v-model:value="site.isSearch" />
+            <n-switch v-model:value="site.isSearch" @update:value="(v: boolean) => persistSite({ is_search: v })" />
             <span class="hint">关闭后首页不显示搜索框</span>
           </div>
         </n-form-item>
         <n-form-item label="网站标题">
-          <n-input v-model:value="site.siteTitle" maxlength="20" placeholder="请输入网站标题" />
+          <n-input
+            v-model:value="site.siteTitle"
+            maxlength="20"
+            placeholder="请输入网站标题"
+            @change="persistSite({ site_title: site.siteTitle })"
+          />
         </n-form-item>
         <n-form-item label="网站关键词">
-          <n-input v-model:value="site.siteKeyword" maxlength="20" placeholder="请输入站点关键词" />
+          <n-input
+            v-model:value="site.siteKeyword"
+            maxlength="20"
+            placeholder="请输入站点关键词"
+            @change="persistSite({ site_keyword: site.siteKeyword })"
+          />
         </n-form-item>
         <n-form-item label="站点描述">
-          <n-input v-model:value="site.siteDesc" type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" />
+          <n-input
+            v-model:value="site.siteDesc"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 4 }"
+            @change="persistSite({ site_desc: site.siteDesc })"
+          />
         </n-form-item>
         <n-form-item label="备案号">
-          <n-input v-model:value="site.siteRecord" placeholder="请输入备案号" />
+          <n-input
+            v-model:value="site.siteRecord"
+            placeholder="请输入备案号"
+            @change="persistSite({ site_record: site.siteRecord })"
+          />
         </n-form-item>
         <n-form-item label="备案链接">
-          <n-input v-model:value="site.siteURL" placeholder="请输入 ICP/IP/域名备案管理地址" />
+          <n-input
+            v-model:value="site.siteURL"
+            placeholder="请输入 ICP/IP/域名备案管理地址"
+            @change="persistSite({ site_url: site.siteURL })"
+          />
         </n-form-item>
         <n-form-item label="网站 Logo">
           <div class="upload-field">
@@ -160,10 +190,10 @@ onMounted(load)
             <span class="hint">{{ faviconFile?.name ?? '未选择新文件' }}</span>
           </div>
         </n-form-item>
-        <n-form-item label=" ">
-          <n-button type="primary" :loading="savingSite" @click="onSubmitSite">保存站点设置</n-button>
-        </n-form-item>
       </n-form>
+      <p class="auto-save-hint">
+        {{ savingSite ? '正在保存…' : '每项修改后自动保存，无需手动提交。' }}
+      </p>
     </n-card>
 
     <n-card size="small" title="关于页面" class="card">
@@ -209,6 +239,12 @@ onMounted(load)
 }
 
 .hint {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.auto-save-hint {
+  margin: 4px 0 0;
   color: var(--color-text-secondary);
   font-size: 12px;
 }
