@@ -6,7 +6,6 @@
 package dashboard
 
 import (
-	"errors"
 	"golang.org/x/sync/errgroup"
 	"math/big"
 	"os"
@@ -50,16 +49,12 @@ func (s *service) Dashboard(ctx *gin.Context) (*v1.DashboardResp, error) {
 	})
 	g.Go(func() (err error) {
 		cpuInfos, err := cpu.InfoWithContext(ctx)
-		if err != nil {
-			return err
+		// 部分环境（如 macOS）取不到 CPU 型号，不应让整页指标一起失败
+		if err != nil || len(cpuInfos) == 0 {
+			return nil
 		}
-
-		if len(cpuInfos) > 0 {
-			cpuInfo = &cpuInfos[0]
-			return
-		}
-
-		return errors.New("no cpu info")
+		cpuInfo = &cpuInfos[0]
+		return
 	})
 	g.Go(func() (err error) {
 		cpuPercents, err := cpu.PercentWithContext(ctx, time.Second, false)
@@ -89,9 +84,14 @@ func (s *service) Dashboard(ctx *gin.Context) (*v1.DashboardResp, error) {
 		DiskTotal:       humanize.BigBytes(big.NewInt(int64(diskInfo.Total))),
 		DiskUsed:        humanize.BigBytes(big.NewInt(int64(diskInfo.Used))),
 		DiskUsedPercent: mathutil.RoundToFloat(diskInfo.UsedPercent, 2),
-		CpuName:         cpuInfo.ModelName,
-		CpuCores:        cpuInfo.Cores,
+		CpuName:         "unknown",
+		CpuCores:        int32(runtime.NumCPU()),
 		CpuUsedPercent:  cpuPercent,
+	}
+
+	if cpuInfo != nil {
+		resp.CpuName = cpuInfo.ModelName
+		resp.CpuCores = cpuInfo.Cores
 	}
 
 	return resp, nil

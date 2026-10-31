@@ -16,21 +16,30 @@ import (
 
 func (h *Handler) Dashboard(ctx *gin.Context) {
 	messageChan := make(chan any)
+	done := ctx.Request.Context().Done()
+
 	go func() {
+		defer close(messageChan)
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+
 		for {
-			dashboard, err := h.dashboardService.Dashboard(ctx)
-			if err != nil {
-				h.Logger.Error("SSE（Server-Sent Events）dashboard api", zap.Error(err))
-				return
-			}
-
 			select {
-			case messageChan <- dashboard:
-			default:
+			case <-done:
 				return
+			case <-ticker.C:
+				dashboard, err := h.dashboardService.Dashboard(ctx)
+				if err != nil {
+					h.Logger.Error("SSE（Server-Sent Events）dashboard api", zap.Error(err))
+					return
+				}
+				// 消费端（SSEStream）停止读取时不能在通道上死等，否则 goroutine 泄漏
+				select {
+				case messageChan <- dashboard:
+				case <-done:
+					return
+				}
 			}
-
-			time.Sleep(1 * time.Second)
 		}
 	}()
 

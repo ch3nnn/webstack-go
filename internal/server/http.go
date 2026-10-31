@@ -3,7 +3,9 @@ package server
 import (
 	"fmt"
 	"html/template"
+	"io/fs"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -50,6 +52,17 @@ func NewHTTPServer(
 	s.StaticFS("/assets", http.FS(assets.Static))
 	s.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
 
+	// 管理端 SPA 产物：静态资源走 /ui，index.html 读入内存后由 NoRoute 回退返回
+	spaFS, err := fs.Sub(assets.SPA, "admin/dist")
+	if err != nil {
+		panic(err)
+	}
+	spaIndex, err := fs.ReadFile(spaFS, "index.html")
+	if err != nil {
+		panic(err)
+	}
+	s.StaticFS("/ui", http.FS(spaFS))
+
 	// Swagger Doc
 	docs.SwaggerInfo.BasePath = "/v1"
 	s.GET("/swagger/*any", ginSwagger.WrapHandler(
@@ -65,43 +78,25 @@ func NewHTTPServer(
 		middleware.RequestLogMiddleware(logger),
 		middleware.ResponseLogMiddleware(logger),
 	)
-	// 404
-	s.NoRoute(v1.ErrHandler404)
-	// Index HTML
+	// 公共站保持服务端渲染（SEO 依赖）
 	s.GET("/", indexHandler.Index)
-	// About HTML
 	s.GET("/about", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "about.html", nil)
 	})
-	// Login HTML
-	s.GET("login", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "admin_login.html", nil)
-	})
-	// Render HTML
-	render := s.Group("/admin").Use(middleware.NoStrictAuth(jwt, logger))
-	{
-		render.GET("", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "admin_index.html", nil)
-		})
-		render.GET("dashboard", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "dashboard.html", nil)
-		})
-		render.GET("modify_password", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "admin_modify_password.html", nil)
-		})
-		render.GET("category", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "category_view.html", nil)
-		})
-		render.GET("site", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "site_list.html", nil)
-		})
-		render.GET("site/add", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "site_add.html", nil)
-		})
-		render.GET("config", func(ctx *gin.Context) {
-			ctx.HTML(http.StatusOK, "conf_web.html", nil)
-		})
+
+	// 管理端为 SPA：/login 与 /admin/** 一律返回 dist/index.html，鉴权由前端路由守卫接管
+	serveSPA := func(ctx *gin.Context) {
+		ctx.Header("Cache-Control", "no-cache")
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", spaIndex)
 	}
+	// 404
+	s.NoRoute(func(ctx *gin.Context) {
+		if p := ctx.Request.URL.Path; p == "/login" || p == "/admin" || strings.HasPrefix(p, "/admin/") {
+			serveSPA(ctx)
+			return
+		}
+		v1.ErrHandler404(ctx)
+	})
 
 	v1 := s.Group("/api")
 	{

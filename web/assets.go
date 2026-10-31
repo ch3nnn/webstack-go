@@ -8,4 +8,7 @@ var (
 
 	//go:embed templates
 	Templates embed.FS
+
+	//go:embed admin/dist
+	SPA embed.FS
 )

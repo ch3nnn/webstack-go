@@ -6,3 +6,4 @@ web/admin/.vite
 *.log
 deploy/docker-compose/conf
 deploy/docker-compose/data
+storage/*.db
