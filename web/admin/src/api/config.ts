@@ -49,11 +49,16 @@ export async function updateSiteSettings(payload: SiteSettingsPayload): Promise<
 }
 
 export interface AboutPayload {
-  about_site: string
-  about_author: string
-  is_about: boolean
+  about_site?: string
+  about_author?: string
+  is_about?: boolean
 }
 
+/** 同样只提交传进来的字段，未传的后端按 nil 跳过 */
 export async function updateAbout(payload: AboutPayload): Promise<void> {
-  await client.put('/admin/config', payload)
+  const body: Record<string, unknown> = {}
+  if (payload.about_site !== undefined) body.about_site = payload.about_site
+  if (payload.about_author !== undefined) body.about_author = payload.about_author
+  if (payload.is_about !== undefined) body.is_about = payload.is_about
+  await client.put('/admin/config', body)
 }
