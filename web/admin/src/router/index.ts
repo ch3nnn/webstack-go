@@ -30,12 +30,6 @@ const router = createRouter({
           meta: { title: '网站信息' },
         },
         {
-          path: 'site/add',
-          name: 'site-add',
-          component: () => import('@/views/SiteAddView.vue'),
-          meta: { title: '新增网站' },
-        },
-        {
           path: 'category',
           name: 'category',
           component: () => import('@/views/CategoryView.vue'),

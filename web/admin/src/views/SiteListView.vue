@@ -2,6 +2,7 @@
 import {
   NButton,
   NCard,
+  NCheckbox,
   NDataTable,
   NForm,
   NFormItem,
@@ -10,6 +11,8 @@ import {
   NModal,
   NPagination,
   NPopconfirm,
+  NRadio,
+  NRadioGroup,
   NSelect,
   NSwitch,
   NTooltip,
@@ -19,23 +22,23 @@ import {
   type UploadFileInfo,
 } from 'naive-ui'
 import { computed, h, onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 import { listCategories, type Category } from '@/api/category'
 import { errorMessage } from '@/api/client'
 import {
+  createSites,
   deleteSite,
   exportUrl,
   listSites,
   syncSite,
   updateSite,
   type Site,
+  type SiteCreateResult,
 } from '@/api/site'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 
 const message = useMessage()
-const router = useRouter()
 
 const rows = ref<Site[]>([])
 const total = ref(0)
@@ -48,6 +51,57 @@ const search = ref('')
 const sortSnapshot = new Map<number, number>()
 const categoryId = ref<number | null>(null)
 const categories = ref<Category[]>([])
+
+/* ---- 批量新增弹框 ---- */
+const createVisible = ref(false)
+const creating = ref(false)
+const createResult = ref<SiteCreateResult | null>(null)
+const createForm = reactive({
+  categoryId: null as number | null,
+  url: '',
+  isUsed: true,
+  failSwitch: false,
+})
+
+function openCreate() {
+  createForm.categoryId = null
+  createForm.url = ''
+  createForm.isUsed = true
+  createForm.failSwitch = false
+  createResult.value = null
+  createVisible.value = true
+}
+
+function closeCreate() {
+  createVisible.value = false
+  createResult.value = null
+}
+
+async function submitCreate() {
+  if (!createForm.url.trim()) {
+    message.warning('请输入网站链接')
+    return
+  }
+  creating.value = true
+  createResult.value = null
+  try {
+    createResult.value = await createSites({
+      category_id: createForm.categoryId,
+      url: createForm.url.trim(),
+      is_used: createForm.isUsed,
+      fail_switch: createForm.failSwitch,
+    })
+    await load()
+    if (createResult.value.failCount === 0) {
+      message.success(`成功创建 ${createResult.value.successCount} 条`)
+      createForm.url = ''
+    }
+  } catch (error) {
+    message.error(errorMessage(error))
+  } finally {
+    creating.value = false
+  }
+}
 
 const detailVisible = ref(false)
 const detailRow = ref<Site | null>(null)
@@ -365,7 +419,7 @@ onMounted(async () => {
   <n-card size="small">
     <div class="toolbar">
       <div class="toolbar-left">
-        <n-button type="primary" @click="router.push('/admin/site/add')">新增</n-button>
+        <n-button type="primary" @click="openCreate">新增</n-button>
         <n-button attr-type="button" @click="onExport">导出</n-button>
       </div>
       <div class="toolbar-right">
@@ -397,7 +451,7 @@ onMounted(async () => {
       v-else-if="!loading && rows.length === 0"
       description="暂无网站数据"
       action-text="新增网站"
-      @action="router.push('/admin/site/add')"
+      @action="openCreate"
     />
     <template v-else>
       <n-data-table
@@ -424,6 +478,63 @@ onMounted(async () => {
       </div>
     </template>
   </n-card>
+
+  <!-- 批量新增：一行一个 URL -->
+  <n-modal
+    v-model:show="createVisible"
+    preset="card"
+    title="新增网站"
+    :style="{ width: '560px' }"
+    :mask-closable="false"
+  >
+    <div class="modal-body">
+      <n-form label-placement="left" label-width="96">
+        <n-form-item label="分类">
+          <n-select
+            v-model:value="createForm.categoryId"
+            :options="categoryOptions"
+            clearable
+            placeholder="请选择分类"
+          />
+        </n-form-item>
+        <n-form-item label="网址">
+          <n-input
+            v-model:value="createForm.url"
+            type="textarea"
+            :autosize="{ minRows: 6, maxRows: 12 }"
+            placeholder="必须包含 http:// 或 https://，一行一个"
+          />
+        </n-form-item>
+        <n-form-item label="是否启用">
+          <n-radio-group v-model:value="createForm.isUsed">
+            <n-radio :value="true">启用</n-radio>
+            <n-radio :value="false">禁用</n-radio>
+          </n-radio-group>
+        </n-form-item>
+        <n-form-item label="失败处理">
+          <n-checkbox v-model:checked="createForm.failSwitch">拉取失败时仅保存网址</n-checkbox>
+        </n-form-item>
+      </n-form>
+      <div v-if="createResult" class="create-result">
+        <p class="create-result__title">
+          成功创建 {{ createResult.successCount }} 条，失败 {{ createResult.failCount }} 条
+        </p>
+        <template v-if="createResult.failURLs?.length">
+          <p class="create-result__hint">以下 URL 创建失败：</p>
+          <ul class="create-result__list">
+            <li v-for="url in createResult.failURLs" :key="url">{{ url }}</li>
+          </ul>
+        </template>
+        <p v-else class="create-result__hint">无失败 URL。</p>
+      </div>
+    </div>
+    <template #footer>
+      <div class="modal-footer">
+        <n-button quaternary @click="closeCreate">关闭</n-button>
+        <n-button type="primary" :loading="creating" @click="submitCreate">提交</n-button>
+      </div>
+    </template>
+  </n-modal>
 
   <n-modal v-model:show="detailVisible" preset="card" title="网站详情" :style="{ width: '520px' }">
     <p class="detail-row"><span>名称</span>{{ detailRow?.title }}</p>
@@ -600,6 +711,32 @@ onMounted(async () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.create-result {
+  margin-top: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #fafafa;
+  font-size: 13px;
+}
+
+.create-result__title {
+  margin: 0 0 6px;
+  font-weight: 500;
+}
+
+.create-result__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.create-result__list {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: #b23b3b;
+  word-break: break-all;
 }
 
 .detail-row {
