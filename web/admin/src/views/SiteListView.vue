@@ -168,6 +168,9 @@ const LOGO_STYLE =
   `width:${LOGO_SIZE}px;height:${LOGO_SIZE}px;border-radius:50%;object-fit:contain;` +
   `display:block;margin:0 auto;background:#f2f3f5`
 
+/** 标题最长 50 个汉字、描述可能到 500 字：提示框自己限宽换行，不任凭内容撑开 */
+const TOOLTIP_STYLE = 'max-width:360px;word-break:break-all;white-space:pre-wrap'
+
 const columns: DataTableColumns<SiteRow> = [
   { title: 'ID', key: 'id', width: 66, fixed: 'left' },
   {
@@ -187,16 +190,29 @@ const columns: DataTableColumns<SiteRow> = [
     key: 'title',
     width: 220,
     fixed: 'left',
+    // ellipsis 会让 naive-ui 把表格切成 table-layout: fixed（见 DataTable 的
+    // mergedTableLayoutRef）；auto 布局下单元格的 min-content 由 nowrap 文本撑开，
+    // 368 字的标题会把这一列撑到 2679px，右侧操作列直接被挤出视口
+    ellipsis: true,
     render: (row) =>
-      h(NTooltip, null, {
+      h(NTooltip, { style: TOOLTIP_STYLE }, {
         trigger: () => h('span', { class: 'truncate' }, row.title),
-        default: () => row.description || row.title,
+        // 列头是「名称简介」：被截断的是标题，提示必须给出完整标题，描述只做补充
+        // tooltip 内容会被 teleport 到 body，拿不到 data-v，样式只能内联
+        default: () =>
+          row.description
+            ? [
+                h('div', { style: 'font-weight:500' }, row.title),
+                h('div', null, row.description),
+              ]
+            : row.title,
       }),
   },
   {
     title: '链接',
     key: 'url',
     width: 220,
+    ellipsis: true,
     render: (row) =>
       h(
         'a',
