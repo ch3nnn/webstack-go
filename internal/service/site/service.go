@@ -11,6 +11,7 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -92,16 +93,36 @@ func getWebLogoIconBase64(url string) (string, error) {
 	return base64.StdEncoding.EncodeToString(icon.ImageData), nil
 }
 
+// titleMaxRunes 对齐 model.StSite.Title 的 varchar(50)
+const titleMaxRunes = 50
+
+// getWebTitle 只取文档级的首个 <title>。
+//
+// 页面里除文档标题外，内联 SVG 也带 <title>（图标库、App 商店徽章等），
+// colly 的 OnHTML("title") 对每个 <title> 都回调一次；累加会把整页标题拼成
+// 几百字的标题（geogebra.org 曾被拼到 368 字）。选择器限定在 head 下，
+// 再用 picked 只认第一次回调：文档标题为空时也不能退而取 SVG 的标题。
+// 截断按 rune 而非 byte：中文标题按字节切会切出半个 UTF-8 序列。
 func getWebTitle(url string) (title string, err error) {
+	var picked bool
+
 	c := tools.NewColly()
-	c.OnHTML("title", func(e *colly.HTMLElement) {
-		title += e.Text
+	c.OnHTML("head > title", func(e *colly.HTMLElement) {
+		if picked {
+			return
+		}
+		picked = true
+		title = strings.TrimSpace(e.Text)
 	})
 	if err := c.Visit(url); err != nil {
 		return "", err
 	}
 
-	return
+	if runes := []rune(title); len(runes) > titleMaxRunes {
+		title = string(runes[:titleMaxRunes])
+	}
+
+	return title, nil
 }
 
 func getWebDescription(url string) (doc string, err error) {

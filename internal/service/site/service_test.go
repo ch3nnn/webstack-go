@@ -8,6 +8,8 @@ package site
 import (
 	"flag"
 	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -249,6 +251,61 @@ func TestSiteService_Sync(t *testing.T) {
 	siteService := NewService(srv, siteDao, categoryDao)
 	_, err := siteService.Sync(ctx, req)
 	assert.NoError(t, err)
+}
+
+// 页面里除文档级 <title> 外，内联 SVG 的 <title> 也会命中 colly 的 OnHTML("title")。
+// 曾经用 title += e.Text 累加，导致标题变成整页所有标题的拼接（geogebra.org 抓到 368 字）。
+func TestGetWebTitle(t *testing.T) {
+	const longTitle = "GeoGebra - the world's favorite, free math tools used by over 100 million students and teachers"
+
+	tests := []struct {
+		name    string
+		page    string
+		want    string
+		wantLen int
+	}{
+		{
+			name: "只取首个 title，不拼接内联 SVG 的 title",
+			page: `<html><head><title>GitHub · Change is constant.</title></head><body>
+				<svg><title>Duolingo</title><title>FedEx</title></svg></body></html>`,
+			want:    "GitHub · Change is constant.",
+			wantLen: 28,
+		},
+		{
+			name: "标题超长时按 rune 截断到 50",
+			page: `<html><head><title>  ` + longTitle + `  </title></head><body>
+				<svg><title>Download_on_the_App_Store_Badge_US-UK_RGB_blk_4SVG_092917</title></svg></body></html>`,
+			want:    string([]rune(longTitle)[:50]),
+			wantLen: 50,
+		},
+		{
+			name:    "文档标题为空白时不退而取 SVG 标题",
+			page:    `<html><head><title>   </title></head><body><svg><title>Download</title></svg></body></html>`,
+			want:    "",
+			wantLen: 0,
+		},
+		{
+			name:    "没有文档标题时不取 SVG 标题",
+			page:    `<html><head></head><body><svg><title>Duolingo</title></svg></body></html>`,
+			want:    "",
+			wantLen: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Content-Type", "text/html; charset=utf-8")
+				_, _ = w.Write([]byte(tt.page))
+			}))
+			defer srv.Close()
+
+			title, err := getWebTitle(srv.URL)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want, title)
+			assert.Equal(t, tt.wantLen, len([]rune(title)))
+		})
+	}
 }
 
 func TestSiteService_Update(t *testing.T) {
