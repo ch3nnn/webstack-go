@@ -21,8 +21,8 @@ build-server:
 
 .PHONY: docker
 docker:
-	docker build -t webstack-go:v2 --build-arg APP_CONF=config/prod.yml --build-arg  APP_RELATIVE_PATH=./cmd/server  .
-	docker run -itd -p 8000:8000 --name webstack-go webstack-go:v2
+	docker build -t webstack-go:v3 --build-arg APP_CONF=config/prod.yml --build-arg  APP_RELATIVE_PATH=./cmd/server  .
+	docker run -itd -p 8000:8000 --name webstack-go webstack-go:v3
 
 .PHONY: swag
 swag:
