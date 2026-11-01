@@ -13,7 +13,7 @@ import {
   useMessage,
   type DataTableColumns,
 } from 'naive-ui'
-import { computed, h, onMounted, ref } from 'vue'
+import { computed, h, onActivated, onMounted, ref } from 'vue'
 
 import { listCategories, type Category } from '@/api/category'
 import { errorMessage } from '@/api/client'
@@ -45,6 +45,8 @@ const search = ref('')
 type SiteRow = Site & { originSort: number }
 const categoryId = ref<number | null>(null)
 const categories = ref<Category[]>([])
+let categoryRequest = 0
+let initialActivation = true
 
 const createVisible = ref(false)
 
@@ -68,10 +70,12 @@ const categoryOptions = computed(() => {
 })
 
 async function loadCategories() {
+  const request = ++categoryRequest
   try {
-    categories.value = await listCategories()
+    const result = await listCategories()
+    if (request === categoryRequest) categories.value = result
   } catch (error) {
-    message.error(errorMessage(error))
+    if (request === categoryRequest) message.error(errorMessage(error))
   }
 }
 
@@ -268,6 +272,13 @@ function rowProps(row: Site) {
   return row.url === row.title && untouched ? { class: 'row-warn' } : {}
 }
 
+onActivated(() => {
+  if (initialActivation) {
+    initialActivation = false
+    return
+  }
+  void loadCategories()
+})
 onMounted(async () => {
   await loadCategories()
   await load()
