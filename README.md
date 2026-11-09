@@ -20,67 +20,66 @@
 
 ## 快速开始
 
-### 一、运行环境
+### 一、开发环境
 
-- Golang 1.23+（`go.mod` 的 go 指令是 1.23.0，1.22 无法编译）
-- SQLite
-- Node.js 20+（ **只有从源码构建时需要**，用来编译管理端前端）
+- Golang 1.23+
+- Node.js 20+（ **只有从源码构建时需要**，用来编译前端）
 
 ### 二、启动服务
 
-**1、二进制文件**
+**1、Docker 运行 (推荐)**
 
-你可以直接从[ Releases ](https://github.com/ch3nnn/webstack-go/releases)下载预先编译好的二进制文件，解压后执行:
+  - docker run 运行
 
-```bash
-./webstack-go -conf config/prod.yml 
-```
+    ```bash
+    docker run -i -t --restart always -p 8000:8000 --name webstack-go -v ./data/storage:/data/app/storage ch3nnn/webstack-go:latest
+    ```
+  
+  - docker compose
+  
+    ```yaml
+    services:
+      webstack-go:
+        stdin_open: true
+        tty: true
+        restart: always
+        ports:
+          - 8000:8000
+        container_name: webstack-go
+        image: ch3nnn/webstack-go:latest
+        volumes:
+          - ./data/storage:/data/app/storage
+    ```
+    
+  - 本地构建运行
 
-> [!NOTE]
-> MacOS 在执行二进制文件时会提示：未打开“webstack-go”，因为 Apple 无法检查其是否包含恶意软件。
->
-> 可在“系统设置 > 隐私与安全性 > 安全性”中点击“仍然允许”，然后再次尝试执行二进制文件。
+    目录下执行 `make docker` 等待启动, container 正常运行后, 在浏览器中打开界面，链接地址：http://127.0.0.1:8000
+  
+     ```shell
+     CONTAINER ID   IMAGE            COMMAND      CREATED         STATUS         PORTS                    NAMES
+     5cb641ff3950 webstack-go:v2   "./server"   5 seconds ago Up 5 seconds 0.0.0.0:8000->8000/tcp webstack-go
+     ```
 
 
-**2、源码运行服务 (需要 Golang + Node.js 环境)**
+**2、二进制文件运行**
 
-1. 执行 `make build`：先 `make web` 生成前端代码
-2. 执行 `./bin/server -conf=config/prod.yml` 首次启动程序之后，会生成 SQLite 数据库，并自动创建表结构
+  你可以直接从[ Releases ](https://github.com/ch3nnn/webstack-go/releases)下载预先编译好的二进制文件，解压后执行:
 
-**3、Docker 运行服务**
+  ```bash
+  ./webstack-go -conf config/prod.yml 
+  ```
 
-#### 下载镜像
+  > [!NOTE]
+  > MacOS 在执行二进制文件时会提示：未打开“webstack-go”，因为 Apple 无法检查其是否包含恶意软件。
+  >
+  > 可在“系统设置 > 隐私与安全性 > 安全性”中点击“仍然允许”，然后再次尝试执行二进制文件。
 
-1. docker run 运行
 
-```bash
-docker run -i -t --restart always -p 8000:8000 --name webstack-go -v ./data/storage:/data/app/storage ch3nnn/webstack-go:latest
-```
+**3、源码运行 (需要 Golang + Node.js 环境)**
 
-2. docker compose (推荐)
+  1. 执行 `make build`：先 `make web` 生成前端代码
+  2. 执行 `./bin/server -conf=config/prod.yml` 首次启动程序之后，会生成 SQLite 数据库，并自动创建表结构
 
-```yaml
-services:
-  webstack-go:
-    stdin_open: true
-    tty: true
-    restart: always
-    ports:
-      - 8000:8000
-    container_name: webstack-go
-    image: ch3nnn/webstack-go:latest
-    volumes:
-      - ./data/storage:/data/app/storage
-```
-
-#### 本地编译
-
-1. 目录下执行 `make docker` 等待启动
-   ```shell
-   CONTAINER ID   IMAGE            COMMAND      CREATED         STATUS         PORTS                    NAMES
-   5cb641ff3950 webstack-go:v2   "./server"   5 seconds ago Up 5 seconds 0.0.0.0:8000->8000/tcp webstack-go
-   ```
-2. docker container 正常运行后, 在浏览器中打开界面，链接地址：http://127.0.0.1:8000
 
 ## 效果图
 
