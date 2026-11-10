@@ -114,6 +114,7 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		&model.SysMenu{},
 		&model.StCategory{},
 		&model.StSite{},
+		&model.SysVisit{},
 	)
 	if err != nil {
 		fmt.Println("user migrate error")

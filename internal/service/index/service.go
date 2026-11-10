@@ -22,6 +22,8 @@ type Service interface {
 
 	// Index 首页
 	Index(ctx context.Context) (*v1.IndexResp, error)
+	// RecordVisit 记录一次首页访问（统计失败不影响页面）
+	RecordVisit(ctx *gin.Context)
 	// About 关于我
 	About(ctx *gin.Context) (*v1.AboutResp, error)
 }
@@ -31,6 +33,7 @@ type service struct {
 	siteRepo     repository.IStSiteDao
 	categoryRepo repository.IStCategoryDao
 	configRepo   repository.ISysConfigDao
+	visitRepo    repository.ISysVisitDao
 }
 
 func NewService(
@@ -38,12 +41,14 @@ func NewService(
 	siteRepo repository.IStSiteDao,
 	categoryRepo repository.IStCategoryDao,
 	configRepo repository.ISysConfigDao,
+	visitRepo repository.ISysVisitDao,
 ) Service {
 	return &service{
 		Service:      s,
 		siteRepo:     siteRepo,
 		categoryRepo: categoryRepo,
 		configRepo:   configRepo,
+		visitRepo:    visitRepo,
 	}
 }
 

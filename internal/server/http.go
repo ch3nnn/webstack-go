@@ -134,6 +134,7 @@ func NewHTTPServer(
 		{
 			// Dashboard
 			strictAuthRouter.GET("/dashboard", dashboardHandler.Dashboard) // SSE（Server-Sent Events）
+			strictAuthRouter.GET("/stat", dashboardHandler.Stat)           // 统计卡片与近 7 天趋势
 			// User
 			strictAuthRouter.GET("/info", userHandler.Info)
 			strictAuthRouter.POST("/logout", userHandler.Logout)

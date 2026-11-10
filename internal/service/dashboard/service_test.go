@@ -71,7 +71,7 @@ func TestDashboardService_Dashboard(t *testing.T) {
 	repo, _ := setupRepository(t)
 	srv := s.NewService(logger, j, repo)
 
-	dashboardService := NewService(srv)
+	dashboardService := NewService(srv, nil, nil)
 	_, err := dashboardService.Dashboard(ctx)
 
 	assert.NoError(t, err)
@@ -84,7 +84,7 @@ func TestService_Dashboard_采集不能阻塞(t *testing.T) {
 
 	repo, _ := setupRepository(t)
 	srv := s.NewService(logger, j, repo)
-	dashboardService := NewService(srv)
+	dashboardService := NewService(srv, nil, nil)
 
 	start := time.Now()
 	resp, err := dashboardService.Dashboard(ctx)

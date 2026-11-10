@@ -23,6 +23,7 @@ var (
 	SysMenu     *sysMenu
 	SysUser     *sysUser
 	SysUserMenu *sysUserMenu
+	SysVisit    *sysVisit
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -33,6 +34,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	SysMenu = &Q.SysMenu
 	SysUser = &Q.SysUser
 	SysUserMenu = &Q.SysUserMenu
+	SysVisit = &Q.SysVisit
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
@@ -44,6 +46,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		SysMenu:     newSysMenu(db, opts...),
 		SysUser:     newSysUser(db, opts...),
 		SysUserMenu: newSysUserMenu(db, opts...),
+		SysVisit:    newSysVisit(db, opts...),
 	}
 }
 
@@ -56,6 +59,7 @@ type Query struct {
 	SysMenu     sysMenu
 	SysUser     sysUser
 	SysUserMenu sysUserMenu
+	SysVisit    sysVisit
 }
 
 func (q *Query) Available() bool { return q.db != nil }

@@ -10,6 +10,7 @@
 package dashboard
 
 import (
+	context "context"
 	reflect "reflect"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
@@ -54,6 +55,21 @@ func (m *MockService) Dashboard(ctx *gin.Context) (*v1.DashboardResp, error) {
 func (mr *MockServiceMockRecorder) Dashboard(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Dashboard", reflect.TypeOf((*MockService)(nil).Dashboard), ctx)
+}
+
+// Stat mocks base method.
+func (m *MockService) Stat(ctx context.Context) (*v1.StatResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Stat", ctx)
+	ret0, _ := ret[0].(*v1.StatResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Stat indicates an expected call of Stat.
+func (mr *MockServiceMockRecorder) Stat(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stat", reflect.TypeOf((*MockService)(nil).Stat), ctx)
 }
 
 // i mocks base method.

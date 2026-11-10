@@ -40,12 +40,13 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	db := repository.NewDB(viperViper, logger)
 	repositoryRepository := repository.NewRepository(logger, db)
 	serviceService := service.NewService(logger, jwtJWT, repositoryRepository)
-	dashboardService := dashboard.NewService(serviceService)
-	dashboardHandler := dashboard2.NewHandler(handlerHandler, dashboardService)
 	iStSiteDao := repository.NewStSiteDao()
+	iSysVisitDao := repository.NewSysVisitDao()
+	dashboardService := dashboard.NewService(serviceService, iStSiteDao, iSysVisitDao)
+	dashboardHandler := dashboard2.NewHandler(handlerHandler, dashboardService)
 	iStCategoryDao := repository.NewStCategoryDao()
 	iSysConfigDao := repository.NewSysConfigDao()
-	indexService := index.NewService(serviceService, iStSiteDao, iStCategoryDao, iSysConfigDao)
+	indexService := index.NewService(serviceService, iStSiteDao, iStCategoryDao, iSysConfigDao, iSysVisitDao)
 	indexHandler := index2.NewHandler(handlerHandler, indexService)
 	iSysUserDao := repository.NewSysUserDao()
 	iSysMenuDao := repository.NewSysMenuDao()
@@ -66,7 +67,7 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 
 // wire.go:
 
-var repositorySet = wire.NewSet(repository.NewDB, repository.NewRepository, repository.NewSysUserDao, repository.NewStCategoryDao, repository.NewStSiteDao, repository.NewSysUserMenuDao, repository.NewSysConfigDao, repository.NewSysMenuDao)
+var repositorySet = wire.NewSet(repository.NewDB, repository.NewRepository, repository.NewSysUserDao, repository.NewStCategoryDao, repository.NewStSiteDao, repository.NewSysUserMenuDao, repository.NewSysConfigDao, repository.NewSysMenuDao, repository.NewSysVisitDao)
 
 var handlerSet = wire.NewSet(handler.NewHandler, user2.NewHandler, index2.NewHandler, site2.NewHandler, category2.NewHandler, dashboard2.NewHandler, config2.NewHandler)
 

@@ -7,6 +7,8 @@ web/admin/.vite
 # 只保留 .gitkeep，否则 //go:embed all:admin/dist 匹配不到文件会直接编译失败。
 web/admin/dist/*
 !web/admin/dist/.gitkeep
+# 本地 agent 笔记：只给自己看，不进仓库
+AGENTS.md
 .idea
 *.log
 deploy/docker-compose/conf

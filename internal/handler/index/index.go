@@ -20,5 +20,8 @@ func (h *Handler) Index(ctx *gin.Context) {
 		return
 	}
 
+	// 一次首页渲染 = 一次浏览量
+	h.indexService.RecordVisit(ctx)
+
 	ctx.HTML(http.StatusOK, "index.html", resp)
 }
