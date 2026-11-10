@@ -8,13 +8,34 @@ package index
 import (
 	"context"
 	"sort"
+	"time"
 
+	"github.com/duke-git/lancet/v2/cryptor"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/model"
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
+	"github.com/ch3nnn/webstack-go/internal/dal/repository"
 )
+
+// RecordVisit 记录一次首页访问。
+// 统计失败不能影响页面渲染，所以只记日志；IP 落库前先哈希，库里不留明文。
+func (s *service) RecordVisit(ctx *gin.Context) {
+	if s.visitRepo == nil {
+		return
+	}
+
+	visit := &model.SysVisit{
+		Day: time.Now().Format(repository.VisitDayFormat),
+		IP:  cryptor.Sha256(ctx.ClientIP()),
+	}
+	if err := s.visitRepo.WithContext(ctx).Record(visit); err != nil {
+		s.Logger.Error("记录首页访问失败", zap.Error(err))
+	}
+}
 
 // buildTree 构建树形结构
 func buildTree(nodes []*v1.TreeNode, pid int) []*v1.TreeNode {

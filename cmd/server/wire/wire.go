@@ -38,6 +38,7 @@ var repositorySet = wire.NewSet(
 	repository.NewSysUserMenuDao,
 	repository.NewSysConfigDao,
 	repository.NewSysMenuDao,
+	repository.NewSysVisitDao,
 )
 
 var handlerSet = wire.NewSet(

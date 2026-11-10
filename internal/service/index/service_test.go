@@ -100,7 +100,7 @@ func TestService_About(t *testing.T) {
 	configDao.EXPECT().WithContext(gomock.Any()).Return(configFunc)
 	configFunc.EXPECT().FindOne(gomock.Any()).Return(sysConfig, nil)
 
-	configService := NewService(srv, siteDao, categoryDao, configDao)
+	configService := NewService(srv, siteDao, categoryDao, configDao, nil)
 	resp, err := configService.About(ctx)
 
 	assert.NoError(t, err)
@@ -146,7 +146,7 @@ func TestService_Index(t *testing.T) {
 	configDao.EXPECT().WithContext(gomock.Any()).Return(configFunc)
 	configFunc.EXPECT().FindOne(gomock.Any()).Return(sysConfig, nil)
 
-	configService := NewService(srv, siteDao, categoryDao, configDao)
+	configService := NewService(srv, siteDao, categoryDao, configDao, nil)
 	_, err := configService.Index(ctx)
 
 	assert.NoError(t, err)

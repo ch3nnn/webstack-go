@@ -24,7 +24,7 @@ func TestHandler_Dashboard_首帧立即返回(t *testing.T) {
 
 	h := NewHandler(
 		handler.NewHandler(&log.Logger{Logger: zap.NewNop()}),
-		dashboard.NewService(&s.Service{}),
+		dashboard.NewService(&s.Service{}, nil, nil),
 	)
 
 	router := gin.New()

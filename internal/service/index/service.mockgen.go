@@ -72,6 +72,18 @@ func (mr *MockServiceMockRecorder) Index(ctx any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Index", reflect.TypeOf((*MockService)(nil).Index), ctx)
 }
 
+// RecordVisit mocks base method.
+func (m *MockService) RecordVisit(ctx *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "RecordVisit", ctx)
+}
+
+// RecordVisit indicates an expected call of RecordVisit.
+func (mr *MockServiceMockRecorder) RecordVisit(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecordVisit", reflect.TypeOf((*MockService)(nil).RecordVisit), ctx)
+}
+
 // i mocks base method.
 func (m *MockService) i() {
 	m.ctrl.T.Helper()
